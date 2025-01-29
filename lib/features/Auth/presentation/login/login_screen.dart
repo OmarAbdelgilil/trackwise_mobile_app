@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/features/Auth/presentation/login/login_viewmodel.dart';
+import 'package:track_wise_mobile_app/main.dart';
+import 'package:track_wise_mobile_app/utils/colors_manager.dart';
+import 'package:track_wise_mobile_app/utils/custom_text_field.dart';
+import 'package:track_wise_mobile_app/utils/extract_error.dart';
+import 'package:track_wise_mobile_app/utils/strings_manager.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -12,40 +18,194 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  RegExp emailRegex =
+      RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+  final formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     final logProv = ref.watch(loginProvider);
+
     if (logProv is SuccessState) {
+      //TBD!!!
       return Scaffold(
         body: Center(
-          child: Text(logProv.user.name),
+          child: Text(logProv.user.firstName),
         ),
       );
+      //////////
     }
+    if (logProv is ErrorState) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scaffoldMessengerKey.currentState!.clearSnackBars();
+        scaffoldMessengerKey.currentState!.showSnackBar(
+          SnackBar(content: Text(extractErrorMessage(logProv.error))),
+        );
+      });
+    }
+
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          TextField(
-            controller: _emailController,
+      appBar: AppBar(
+        title: Text(
+          StringsManager.loginTitle,
+          style: TextStyle(fontSize: 24.sp, color: Colors.white),
+        ),
+        backgroundColor: ColorsManager.backgroundColor,
+      ),
+      backgroundColor: ColorsManager.backgroundColor,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      CustomTextField(
+                        controller: _emailController,
+                        label: StringsManager.emailLabel,
+                        hint: StringsManager.emailHint,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return StringsManager.emptyEmailError;
+                          }
+                          if (!emailRegex.hasMatch(value)) {
+                            return StringsManager.invalidEmailFormat;
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      CustomTextField(
+                        label: StringsManager.passwordLabel,
+                        hint: StringsManager.passwordHint,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return StringsManager.emptyPasswordError;
+                          }
+                          return null;
+                        },
+                        obscureText: true,
+                        controller: _passwordController,
+                      ),
+                    ],
+                  )),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    StringsManager.forgetPassBtn,
+                    style: TextStyle(
+                        color: ColorsManager.primaryColor,
+                        decoration: TextDecoration.underline),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              logProv is LoadingState
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : SizedBox(
+                      width: 281.w,
+                      height: 50.h,
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorsManager.primaryColor,
+                              foregroundColor: Colors.white),
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              ref.read(loginProvider.notifier).login(
+                                  _emailController.text,
+                                  _passwordController.text);
+                            }
+                          },
+                          child: Text(
+                            StringsManager.loginTitle,
+                            style: TextStyle(fontSize: 16.sp),
+                          )),
+                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    StringsManager.dontHaveAcc,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      StringsManager.signUp,
+                      style: TextStyle(
+                          color: ColorsManager.primaryColor,
+                          decoration: TextDecoration.underline),
+                    ),
+                  ),
+                ],
+              ),
+              const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: ColorsManager.darkGrey,
+                        thickness: 1,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        StringsManager.or,
+                        style: TextStyle(
+                          color: ColorsManager
+                              .darkGrey, // Customize the text color
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: ColorsManager.darkGrey,
+                        thickness: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                child: ElevatedButton(
+                    onPressed: () {},
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                            height: 30.h,
+                            width: 30.w,
+                            child: Image.asset(
+                              "assets/images/google_icon.png",
+                              fit: BoxFit.cover,
+                            )),
+                        const Text(
+                          StringsManager.signWithGoogle,
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ],
+                    )),
+              )
+            ],
           ),
-          TextField(
-            controller: _passwordController,
-          ),
-          logProv is LoadingState
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : ElevatedButton(
-                  onPressed: () {
-                    //to do validations
-                    ref
-                        .read(loginProvider.notifier)
-                        .login(_emailController.text, _passwordController.text);
-                  },
-                  child: const Text("Submit"))
-        ],
+        ),
       ),
     );
   }

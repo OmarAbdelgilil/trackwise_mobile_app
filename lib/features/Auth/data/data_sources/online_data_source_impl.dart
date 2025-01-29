@@ -17,10 +17,7 @@ class OnlineDataSourceImpl implements OnlineDataSource {
     return executeApi(() async {
       final loginRequest = LoginRequest(email: eamil, password: password);
       final result = await _apiManager.login(loginRequest);
-      //final tempToken = result.token;
-      const tempToken =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjcyZjQ1YmYwOWU4NjkyNzE1YzBkMGY1IiwibmFtZSI6Im9tYXIiLCJlbWFpbCI6Im9tYXJAZW1haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3MzgwMTQ4NTV9.7HZjEHOBlNKmY--bW2hXFGHNtacgoQYT17C5trMviNQ";
-      final decodedToken = JwtDecoder.decode(tempToken);
+      final decodedToken = JwtDecoder.decode(result.token!);
       return User.fromJson(decodedToken);
     });
   }

@@ -6,6 +6,7 @@ import 'package:track_wise_mobile_app/main.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/custom_text_field.dart';
 import 'package:track_wise_mobile_app/utils/extract_error.dart';
+import 'package:track_wise_mobile_app/utils/image_path_manager.dart';
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -193,7 +194,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             height: 30.h,
                             width: 30.w,
                             child: Image.asset(
-                              "assets/images/google_icon.png",
+                              ImagePathManager.googleIcon,
                               fit: BoxFit.cover,
                             )),
                         const Text(

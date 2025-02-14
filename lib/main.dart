@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
-import 'package:track_wise_mobile_app/features/Auth/presentation/login/login_screen.dart';
+// import 'package:track_wise_mobile_app/features/Auth/presentation/login/login_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:track_wise_mobile_app/features/Home/presentation/home_screen.dart';
 
 //import 'package:shared_preferences_android/shared_preferences_android.dart';
 Future<void> main() async {
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           fontFamily: GoogleFonts.roboto().fontFamily,
         ),
-        home: const LoginScreen(),
+        home: const HomeScreen(),
       ),
     );
   }

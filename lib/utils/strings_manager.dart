@@ -14,4 +14,5 @@ class StringsManager {
   static const String signWithGoogle = "Sign in with google";
   static const String homeScreenTitle = "Usage Details";
   static const String screenTime = "Screen Time";
+  static const String apps = "Apps";
 }

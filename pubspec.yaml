@@ -45,6 +45,7 @@ dependencies:
   pretty_dio_logger: ^1.4.0
   flutter_screenutil: ^5.9.3
   syncfusion_flutter_gauges: ^28.2.5
+  fl_chart: ^0.70.2
 
 dev_dependencies:
   flutter_test:

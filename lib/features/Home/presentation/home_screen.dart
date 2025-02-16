@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/app_tile.dart';
+import 'package:track_wise_mobile_app/features/Home/presentation/widgets/bar_chart.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/circle_progress_bar.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/image_path_manager.dart';
@@ -39,10 +40,11 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal:18.0.h),
-          child: Column(
+          child:  Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const CircleProgressBar(),
+              //const CircleProgressBar(),
+              const BarChartWidget(),
               Container(alignment: Alignment.centerLeft,padding: EdgeInsets.only(left: 8.h) ,child: const Text(StringsManager.apps,style: TextStyle(color: Colors.white,fontSize: 20),)),
               SizedBox(
                 height: 360.h,

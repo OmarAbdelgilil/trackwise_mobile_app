@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
 class AppTile extends StatelessWidget {
   const AppTile({super.key});
@@ -21,7 +22,7 @@ class AppTile extends StatelessWidget {
                     //number of hours / max number of hours in this day
                     value: 6 / 8,
                     backgroundColor: Colors.grey.shade800,//Color.fromARGB(0, 66, 66, 66), 
-                    valueColor:const AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 23, 139, 241)),
+                    valueColor:const AlwaysStoppedAnimation<Color>(ColorsManager.blue),
                   ),
                   const Align(
                     alignment: Alignment.centerRight,

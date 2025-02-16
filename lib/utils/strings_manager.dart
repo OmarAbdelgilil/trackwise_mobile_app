@@ -15,4 +15,8 @@ class StringsManager {
   static const String homeScreenTitle = "Usage Details";
   static const String screenTime = "Screen Time";
   static const String apps = "Apps";
+  static const String usage = "Usage";
+  static const String steps = "Steps";
+  static const String friends = "Friends";
+  static const String profile = "Profile";
 }

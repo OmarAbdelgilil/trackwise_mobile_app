@@ -12,7 +12,6 @@ class StringsManager {
   static const String signUp = "sign up";
   static const String or = "OR";
   static const String signWithGoogle = "Sign in with google";
-  static const String homeScreenTitle = "Usage Details";
   static const String screenTime = "Screen Time";
   static const String apps = "Apps";
   static const String usage = "Usage";

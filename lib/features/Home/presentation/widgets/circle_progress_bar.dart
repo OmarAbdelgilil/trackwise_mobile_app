@@ -10,7 +10,7 @@ class CircleProgressBar extends StatelessWidget {
     return ClipRect(
   child: Align(
     alignment: Alignment.bottomCenter, 
-    heightFactor: 0.9,child: SfRadialGauge(axes: <RadialAxis>[
+    heightFactor: 0.86,child: SfRadialGauge(axes: <RadialAxis>[
                       RadialAxis(
                         annotations: const [
                           GaugeAnnotation(widget: Column(
@@ -21,7 +21,7 @@ class CircleProgressBar extends StatelessWidget {
                               Text('Today',style: TextStyle(color: Colors.white,fontSize: 13),),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.baseline, // Aligns text based on their baseline
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
                                 textBaseline: TextBaseline.alphabetic,
                                 children: [
                                   Text('12',style: TextStyle(color: Colors.white,fontSize: 32),),
@@ -40,7 +40,7 @@ class CircleProgressBar extends StatelessWidget {
                         endAngle: 90 + 360,
                         showLabels: false,
                         showTicks: false,
-                        radiusFactor: 0.7,
+                        radiusFactor: 0.65,
                         axisLineStyle: const AxisLineStyle(
                           thickness: 4.7
                         ),

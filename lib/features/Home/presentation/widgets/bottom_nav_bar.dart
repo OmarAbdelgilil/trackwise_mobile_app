@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:track_wise_mobile_app/features/Home/presentation/nav_bar_router/app_router.dart';
+import 'package:track_wise_mobile_app/features/Home/presentation/nav_bar_router/nav_bar_router.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/image_path_manager.dart';
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
@@ -16,6 +18,25 @@ class _BottomNavBarState extends State<BottomNavBar> {
     if (_selectedIndex != index) {
       setState(() {
         _selectedIndex = index;
+        switch (index) {
+          case 0:
+            currentPageNotifier.setPage(AppRoutes.homeScreen);
+            break;
+          case 1:
+            currentPageNotifier.setPage(AppRoutes.steps);
+            break;
+          case 2:
+          //todo
+            currentPageNotifier.setPage(AppRoutes.friends);
+            break;
+          case 3:
+          //todo
+            currentPageNotifier.setPage(AppRoutes.profile);
+            break;
+          default:
+            currentPageNotifier.setPage(AppRoutes.homeScreen);
+            break;
+        }
       });
     }
   }

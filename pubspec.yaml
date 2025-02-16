@@ -46,6 +46,8 @@ dependencies:
   flutter_screenutil: ^5.9.3
   syncfusion_flutter_gauges: ^28.2.5
   fl_chart: ^0.70.2
+  font_awesome_flutter: ^10.8.0
+  go_router: ^14.8.0
 
 dev_dependencies:
   flutter_test:

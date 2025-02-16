@@ -1,0 +1,2 @@
+C:/Users/Ibrahim Gad/AndroidStudioProjects/trackwise_mobile_app/android/app/.cxx/RelWithDebInfo/9466l2a1/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Ibrahim Gad/AndroidStudioProjects/trackwise_mobile_app/android/app/.cxx/RelWithDebInfo/9466l2a1/x86_64/CMakeFiles/rebuild_cache.dir

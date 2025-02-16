@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AppTile extends StatelessWidget {
   const AppTile({super.key});
@@ -9,11 +10,11 @@ class AppTile extends StatelessWidget {
     return ListTile(
               leading: const CircleAvatar(
                 backgroundColor: Colors.white,
-                child: Icon(Icons.camera, color: Colors.black), 
+                child: Icon(FontAwesomeIcons.instagram, color: Colors.black), 
               ),
               title: const Text(
-                'app.name',
-                style: TextStyle(color: Colors.white, fontSize: 18),
+                'Instagram',
+                style: TextStyle(color: Colors.white, fontSize: 14),
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

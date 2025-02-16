@@ -3,16 +3,30 @@ import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/image_path_manager.dart';
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
 
-class BottomNavBar extends StatelessWidget {
+class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});
+
+  @override
+  State<BottomNavBar> createState() => _BottomNavBarState();
+}
+
+class _BottomNavBarState extends State<BottomNavBar> {
+  int _selectedIndex = 0;
+  void _onItemTapped(int index) {
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
   type: BottomNavigationBarType.fixed,
   backgroundColor: Colors.black,
-  currentIndex: 0, 
-  onTap: (value) {}, 
+  currentIndex: _selectedIndex, 
+  onTap: _onItemTapped, 
   selectedItemColor: ColorsManager.blue,
   unselectedItemColor: Colors.grey, 
   selectedFontSize: 12, 

@@ -18,6 +18,7 @@ import '../../features/Auth/data/repos/auth_repository_impl.dart' as _i481;
 import '../../features/Auth/domain/repos/auth_repository.dart' as _i492;
 import '../../features/Auth/domain/use_cases/login_use_case.dart' as _i694;
 import '../../features/Auth/presentation/login/login_viewmodel.dart' as _i641;
+import '../../features/Home/presentation/home_view_model.dart' as _i286;
 import '../api/api_manager.dart' as _i1047;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -31,6 +32,7 @@ extension GetItInjectableX on _i174.GetIt {
       environment,
       environmentFilter,
     );
+    gh.factory<_i286.HomeViewModel>(() => _i286.HomeViewModel());
     gh.singleton<_i1047.ApiManager>(() => _i1047.ApiManager());
     gh.factory<_i597.OnlineDataSource>(
         () => _i163.OnlineDataSourceImpl(gh<_i1047.ApiManager>()));

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:track_wise_mobile_app/features/Home/presentation/home_view_model.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/nav_bar_router/nav_bar_router.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/app_tile.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/bar_chart.dart';
@@ -9,16 +11,17 @@ import 'package:track_wise_mobile_app/features/Home/presentation/widgets/scaffol
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    final prov = ref.read(homeProvider.notifier);
     return Scaffold(
       appBar:const ScaffoldAppBar(),
       bottomNavigationBar: const BottomNavBar(),
@@ -33,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child:  Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const CircleProgressBar(),
+                  GestureDetector(onTap: ()async{await prov.openCalender(context);}, child: const CircleProgressBar()),
                   //const BarChartWidget(),
                   Container(alignment: Alignment.centerLeft,padding: EdgeInsets.only(left: 8.h) ,child: const Text(StringsManager.apps,style: TextStyle(color: Colors.white,fontSize: 20),)),
                   SizedBox(

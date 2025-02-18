@@ -1,25 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:track_wise_mobile_app/features/Home/presentation/home_view_model.dart';
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
+import 'package:intl/intl.dart';
 
-class CircleProgressBar extends StatelessWidget {
+class CircleProgressBar extends ConsumerWidget {
   const CircleProgressBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,ref) {
+    ref.watch(homeProvider);
+    final prov = ref.read(homeProvider.notifier);
+    final String date = DateFormat("d/M").format(prov.pickedDate);
     return ClipRect(
   child: Align(
     alignment: Alignment.bottomCenter, 
     heightFactor: 0.86,child: SfRadialGauge(axes: <RadialAxis>[
                       RadialAxis(
-                        annotations: const [
+                        annotations: [
                           GaugeAnnotation(widget: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(StringsManager.screenTime,style: TextStyle(color: Colors.white,fontSize: 16),),
+                              const Text(StringsManager.screenTime,style: TextStyle(color: Colors.white,fontSize: 16),),
                               //to be dynamic
-                              Text('Today',style: TextStyle(color: Colors.white,fontSize: 13),),
-                              Row(
+                              Text(date, style: const TextStyle(color: Colors.white,fontSize: 13),),
+                              const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.baseline,
                                 textBaseline: TextBaseline.alphabetic,
@@ -28,7 +34,7 @@ class CircleProgressBar extends StatelessWidget {
                                   Text('hrs',style: TextStyle(color: Colors.white,fontSize: 12),),
                                 ],
                               ),
-                              Text('2 hours less than yesterday',style: TextStyle(color: Colors.white,fontSize: 12),),
+                              const Text('2 hours less than yesterday',style: TextStyle(color: Colors.white,fontSize: 12),),
                             ],
                           )
                           )

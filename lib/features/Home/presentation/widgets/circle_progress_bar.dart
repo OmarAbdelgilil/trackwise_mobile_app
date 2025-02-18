@@ -25,12 +25,12 @@ class CircleProgressBar extends ConsumerWidget {
                               const Text(StringsManager.screenTime,style: TextStyle(color: Colors.white,fontSize: 16),),
                               //to be dynamic
                               Text(date, style: const TextStyle(color: Colors.white,fontSize: 13),),
-                              const Row(
+                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.baseline,
                                 textBaseline: TextBaseline.alphabetic,
                                 children: [
-                                  Text('12',style: TextStyle(color: Colors.white,fontSize: 32),),
+                                  Text(prov.totalUsageTime.inHours.toString() ,style: TextStyle(color: Colors.white,fontSize: 32),),
                                   Text('hrs',style: TextStyle(color: Colors.white,fontSize: 12),),
                                 ],
                               ),

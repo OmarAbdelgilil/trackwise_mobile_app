@@ -7,13 +7,11 @@ class AppUsageNotifier extends StateNotifier <Map<String,List<AppUsageInfo>>>
   
   Future<List<AppUsageInfo>> getUsageData(DateTime startDate,DateTime endDate) async
   {
-    print(startDate);
     final String formattedDate = "${startDate.toString()};;;${endDate.toString()}";
-    if(state.containsKey(formattedDate))
-    {
-      print('inside');
-      return state[formattedDate]!;
-    }
+    // if(state.containsKey(formattedDate))
+    // {
+    //   return state[formattedDate]!;
+    // }
     try{
       List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startDate, endDate);
       state = {...state, formattedDate : infoList};

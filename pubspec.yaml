@@ -34,22 +34,23 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  injectable: ^2.5.0
-  get_it: ^8.0.3
-  dio: ^5.7.0
-  jwt_decoder: ^2.0.1
-  flutter_riverpod: ^2.6.1
-  shared_preferences_android: ^2.4.4
-  google_fonts: ^6.2.1
-  pretty_dio_logger: ^1.4.0
-  flutter_screenutil: ^5.9.3
-  syncfusion_flutter_gauges: ^28.2.5
-  fl_chart: ^0.70.2
-  font_awesome_flutter: ^10.8.0
-  go_router: ^14.8.0
-  app_usage: ^4.0.0
-  intl: ^0.20.2
+  cupertino_icons: 
+  injectable: 
+  get_it: 
+  dio: 
+  jwt_decoder: 
+  flutter_riverpod: 
+  shared_preferences_android: 
+  google_fonts: 
+  pretty_dio_logger: 
+  flutter_screenutil: 
+  syncfusion_flutter_gauges:
+  fl_chart: 
+  font_awesome_flutter:
+  go_router: 
+  app_usage: 
+  intl: 
+  installed_apps: 
 
 dev_dependencies:
   flutter_test:

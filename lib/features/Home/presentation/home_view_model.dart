@@ -10,25 +10,31 @@ import 'package:track_wise_mobile_app/features/Auth/domain/entities/user.dart';
 class HomeViewModel extends StateNotifier<HomeState> {
   late final ProviderContainer _providerContainer;
   late DateTime pickedDate;
-  late Duration totalUsageTime;
+  Duration? totalUsageTime;
   late List<AppUsageInfo> appUsageInfo;
 
   HomeViewModel() : super(InitialState()) {
     _providerContainer = ProviderContainer();
     final now = DateTime.now();
     pickedDate = DateTime(now.year, now.month, now.day);
-    _getUsageData(now);
-
+    _getUsageData();
   }
-  Future<void> _getUsageData(DateTime date) async
-  {
+  Future<void> _getUsageData() async {
     state = LoadingState();
-    appUsageInfo = await _providerContainer.read(appUsageProvider.notifier).getUsageData(pickedDate.subtract(const Duration(days: 1)), pickedDate);
-    totalUsageTime = appUsageInfo.fold(const Duration(minutes: 0), (Duration a,AppUsageInfo b) => a + b.usage,);
+    appUsageInfo = await _providerContainer
+        .read(appUsageProvider.notifier)
+        .getUsageData(
+            pickedDate,
+            DateTime(
+                pickedDate.year, pickedDate.month, pickedDate.day, 23, 59, 59));
+    totalUsageTime = appUsageInfo.fold(
+      const Duration(minutes: 0),
+      (Duration? a, AppUsageInfo b) => a! + b.usage,
+    );
     state = UsageUpdated();
   }
-  Future<void> openCalender(BuildContext context) async
-  {
+
+  Future<void> openCalender(BuildContext context) async {
     final now = DateTime.now();
     pickedDate = (await showDatePicker(
       context: context,
@@ -37,7 +43,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
       lastDate: now,
     ))!;
     state = DatePicked();
-    await _getUsageData(pickedDate);
+    await _getUsageData();
   }
 }
 

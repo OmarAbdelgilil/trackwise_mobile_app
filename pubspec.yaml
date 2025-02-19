@@ -48,9 +48,10 @@ dependencies:
   fl_chart: 
   font_awesome_flutter:
   go_router: 
-  app_usage: 
+  app_usage: ^4.0.0
   intl: 
-  installed_apps: 
+  appcheck: ^1.5.3
+  device_info_plus: ^11.3.0
 
 dev_dependencies:
   flutter_test:

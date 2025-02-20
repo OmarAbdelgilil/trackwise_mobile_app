@@ -13,6 +13,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
   late final ProviderContainer _providerContainer;
   late DateTime pickedDate;
   Duration? totalUsageTime;
+  Duration? totalUsageTimeToCompare;
   late List<AppUsageData> appUsageInfo;
   ChangeDateMode changeDateMode = ChangeDateMode.daily;
   HomeViewModel() : super(InitialState()) {
@@ -26,19 +27,22 @@ class HomeViewModel extends StateNotifier<HomeState> {
     //state = LoadingState();
     pickedDate = changeDateMode == ChangeDateMode.monthly? DateTime(pickedDate.year, pickedDate.month, 1) : pickedDate;
     DateTime endDate = changeDateMode == ChangeDateMode.daily? DateTime(pickedDate.year, pickedDate.month, pickedDate.day, 23, 59, 59) : changeDateMode == ChangeDateMode.weekly? pickedDate.add(const Duration(days: 7)): DateTime(pickedDate.year, pickedDate.month + 1, 1); 
-    appUsageInfo = await _providerContainer
-        .read(appUsageProvider.notifier)
-        .getUsageData(
-            pickedDate,
-            endDate);
+    appUsageInfo = await _providerContainer.read(appUsageProvider.notifier).getUsageData(pickedDate, endDate);
+    ///////////////////////////////////
+    DateTime startDateCompare = DateTime(pickedDate.year, changeDateMode == ChangeDateMode.monthly? pickedDate.month - 1 : pickedDate.month, changeDateMode == ChangeDateMode.daily? pickedDate.day - 1 : changeDateMode == ChangeDateMode.weekly? pickedDate.day - 7 : pickedDate.day, pickedDate.hour,pickedDate.minute,pickedDate.second);
+    DateTime endDateCompare = DateTime(endDate.year, changeDateMode == ChangeDateMode.monthly? endDate.month - 1 : endDate.month, changeDateMode == ChangeDateMode.daily? endDate.day - 1 : changeDateMode == ChangeDateMode.weekly? endDate.day - 7 : endDate.day, endDate.hour,endDate.minute,endDate.second);
+    final appUsageInfoCompare = await _providerContainer.read(appUsageProvider.notifier).getUsageData(startDateCompare, endDateCompare);
+    totalUsageTimeToCompare = appUsageInfoCompare.fold(
+      const Duration(minutes: 0), (Duration? a, AppUsageData b) => a! + b.usageTime,
+    );
+    //////////////////////////////////
     print(pickedDate);
     print(endDate);
     print('-----------------------------');
     appUsageInfo = appUsageInfo.where((element)  => element.usageTime.inMinutes != 0).toList();
     appUsageInfo.sort((a, b) => b.usageTime.compareTo(a.usageTime));
     totalUsageTime = appUsageInfo.fold(
-      const Duration(minutes: 0),
-      (Duration? a, AppUsageData b) => a! + b.usageTime,
+      const Duration(minutes: 0), (Duration? a, AppUsageData b) => a! + b.usageTime,
     );
     state = UsageUpdated();
   }
@@ -48,9 +52,9 @@ class HomeViewModel extends StateNotifier<HomeState> {
     DateTime? pickedDateTemp = await (changeDateMode != ChangeDateMode.monthly
       ? showDatePicker(
         context: context,
-        initialDate: pickedDate.isAfter(now.subtract(const Duration(days: 7)))? now.subtract(const Duration(days: 7)) : pickedDate,
+        initialDate: pickedDate,
         firstDate: now.subtract(const Duration(days: 365 * 3)),
-        lastDate: changeDateMode != ChangeDateMode.weekly? now.subtract(const Duration(days: 7)): now,
+        lastDate: now,
         )
       : showMonthPicker(
         context: context,
@@ -67,6 +71,25 @@ class HomeViewModel extends StateNotifier<HomeState> {
     await _getUsageData();
   }
 
+  String getCompareText(Duration? myTime,Duration? compareTime,ChangeDateMode changeDateMode)
+  {
+    if(myTime == null || compareTime == null)
+    {
+      return '';
+    }
+    String finalPart = changeDateMode == ChangeDateMode.daily? 'yesterday' : changeDateMode == ChangeDateMode.weekly? 'last week' : 'last month';
+    final diff = myTime.inHours - compareTime.inHours;
+    if(diff == 0)
+    {
+      
+      return 'same Amount of time as $finalPart';
+    }else if (diff > 0)
+    {
+      return '$diff hours more than $finalPart';
+    }else{
+      return '${-1 *diff} hours less than $finalPart';
+    }
+  }
   void toggleDateMode(ChangeDateMode mode)
   {
     if(changeDateMode != mode)

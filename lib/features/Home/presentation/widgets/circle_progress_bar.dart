@@ -30,7 +30,6 @@ class CircleProgressBar extends ConsumerWidget {
                         StringsManager.screenTime,
                         style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
-                      //to be dynamic
                       Text(
                         date,
                         style:
@@ -52,9 +51,9 @@ class CircleProgressBar extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      const Text(
-                        '2 hours less than yesterday',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      Text(
+                        prov.getCompareText(prov.totalUsageTime, prov.totalUsageTimeToCompare, prov.changeDateMode),
+                        style: const TextStyle(color: Colors.white, fontSize: 12),
                       ),
                     ],
                   ))

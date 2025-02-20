@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/home_view_model.dart';
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
@@ -51,10 +52,18 @@ class CircleProgressBar extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      Text(
-                        prov.getCompareText(prov.totalUsageTime, prov.totalUsageTimeToCompare, prov.changeDateMode),
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
-                      ),
+                      SizedBox(
+                        width: 215.w,
+                        child: Align(
+                          child: Text(
+                            prov.getCompareText(prov.totalUsageTime, prov.totalUsageTimeToCompare, prov.changeDateMode),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.white, fontSize: 11),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
+                        ),)
+
                     ],
                   ))
                 ],

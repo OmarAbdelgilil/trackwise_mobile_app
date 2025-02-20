@@ -5,6 +5,8 @@ import 'package:track_wise_mobile_app/core/di/di.dart';
 import 'package:track_wise_mobile_app/core/provider/usage_provider.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/entities/user.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
+import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 @injectable
 class HomeViewModel extends StateNotifier<HomeState> {
@@ -12,7 +14,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
   late DateTime pickedDate;
   Duration? totalUsageTime;
   late List<AppUsageData> appUsageInfo;
-
+  ChangeDateMode changeDateMode = ChangeDateMode.daily;
   HomeViewModel() : super(InitialState()) {
     _providerContainer = ProviderContainer();
     final now = DateTime.now();
@@ -22,12 +24,16 @@ class HomeViewModel extends StateNotifier<HomeState> {
   Future<void> _getUsageData() async {
     //to load only the first time
     //state = LoadingState();
+    pickedDate = changeDateMode == ChangeDateMode.monthly? DateTime(pickedDate.year, pickedDate.month, 1) : pickedDate;
+    DateTime endDate = changeDateMode == ChangeDateMode.daily? DateTime(pickedDate.year, pickedDate.month, pickedDate.day, 23, 59, 59) : changeDateMode == ChangeDateMode.weekly? pickedDate.add(const Duration(days: 7)): DateTime(pickedDate.year, pickedDate.month + 1, 1); 
     appUsageInfo = await _providerContainer
         .read(appUsageProvider.notifier)
         .getUsageData(
             pickedDate,
-            DateTime(
-                pickedDate.year, pickedDate.month, pickedDate.day, 23, 59, 59));
+            endDate);
+    print(pickedDate);
+    print(endDate);
+    print('-----------------------------');
     appUsageInfo = appUsageInfo.where((element)  => element.usageTime.inMinutes != 0).toList();
     appUsageInfo.sort((a, b) => b.usageTime.compareTo(a.usageTime));
     totalUsageTime = appUsageInfo.fold(
@@ -39,14 +45,36 @@ class HomeViewModel extends StateNotifier<HomeState> {
 
   Future<void> openCalender(BuildContext context) async {
     final now = DateTime.now();
-    pickedDate = (await showDatePicker(
-      context: context,
-      initialDate: pickedDate,
-      firstDate: now.subtract(const Duration(days: 365 * 3)),
-      lastDate: now,
-    ))!;
+    DateTime? pickedDateTemp = await (changeDateMode != ChangeDateMode.monthly
+      ? showDatePicker(
+        context: context,
+        initialDate: pickedDate.isAfter(now.subtract(const Duration(days: 7)))? now.subtract(const Duration(days: 7)) : pickedDate,
+        firstDate: now.subtract(const Duration(days: 365 * 3)),
+        lastDate: changeDateMode != ChangeDateMode.weekly? now.subtract(const Duration(days: 7)): now,
+        )
+      : showMonthPicker(
+        context: context,
+        initialDate: pickedDate,
+        firstDate: now.subtract(const Duration(days: 365 * 3)),
+        lastDate: now,
+        ));
+    if(pickedDateTemp == null)
+    {
+      return ;
+    }
+    pickedDate = pickedDateTemp;
     state = DatePicked();
     await _getUsageData();
+  }
+
+  void toggleDateMode(ChangeDateMode mode)
+  {
+    if(changeDateMode != mode)
+    {
+      changeDateMode = mode;
+      _getUsageData();
+      state = DateModeChanged();
+    }
   }
 }
 
@@ -63,6 +91,7 @@ class DatePicked extends HomeState {}
 
 class UsageUpdated extends HomeState {}
 
+class DateModeChanged extends HomeState {}
 class SuccessState extends HomeState {
   final User user;
   SuccessState(this.user);

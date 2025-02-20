@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/home_view_model.dart';
+import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
 import 'package:intl/intl.dart';
 
@@ -12,7 +13,8 @@ class CircleProgressBar extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     ref.watch(homeProvider);
     final prov = ref.read(homeProvider.notifier);
-    final String date = DateFormat(prov.pickedDate.year == DateTime.now().year? "d/M" : "d/M/yy").format(prov.pickedDate);
+    final endDateWeekly = prov.pickedDate.add(const Duration(days: 7));
+    final String date = prov.changeDateMode == ChangeDateMode.weekly ? '${prov.pickedDate.day}/${prov.pickedDate.month}-${endDateWeekly.day}/${endDateWeekly.month}' : DateFormat(prov.changeDateMode == ChangeDateMode.monthly ? "MMMyy" : prov.pickedDate.year == DateTime.now().year ? "d/M" : "d/M/yy").format(prov.pickedDate);
     return ClipRect(
         child: Align(
             alignment: Alignment.bottomCenter,
@@ -58,7 +60,7 @@ class CircleProgressBar extends ConsumerWidget {
                   ))
                 ],
                 minimum: 0,
-                maximum: 24,
+                maximum: prov.changeDateMode == ChangeDateMode.daily? 24 : prov.changeDateMode == ChangeDateMode.weekly? 168 : 730.001,
                 //change where the progress will start
                 startAngle: 90,
                 endAngle: 90 + 360,

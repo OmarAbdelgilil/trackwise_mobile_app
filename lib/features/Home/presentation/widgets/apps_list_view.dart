@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
@@ -20,7 +19,7 @@ class AppsListView extends ConsumerWidget {
       maxUsage = prov.appUsageInfo.reduce((a, b) => a.usageTime > b.usageTime ? a : b);
     }
     return  SizedBox(
-                    height: 290.h,
+                    height: 255.h,
                     child: prov.appUsageInfo.isEmpty? const Center(child: Text(StringsManager.noAppsFound,style: TextStyle(color: Colors.white ,fontWeight: FontWeight.bold),)) : ListView(
                       children: [
                         for(AppUsageData app in prov.appUsageInfo)

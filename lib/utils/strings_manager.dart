@@ -19,5 +19,8 @@ class StringsManager {
   static const String friends = "Friends";
   static const String profile = "Profile";
   static const String noAppsFound = "No apps found in this date";
+  static const String daily = "Daily";
+  static const String weekly = "Weekly";
+  static const String monthly = "Monthly";
   
 }

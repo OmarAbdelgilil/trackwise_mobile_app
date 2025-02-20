@@ -52,6 +52,8 @@ dependencies:
   intl: 
   appcheck: ^1.5.3
   device_info_plus: ^11.3.0
+  month_picker_dialog: ^6.0.3
+  weekly_date_picker: ^1.4.2
 
 dev_dependencies:
   flutter_test:

@@ -1,30 +1,14 @@
-import 'package:app_usage/app_usage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
 
-class AppUsageNotifier extends StateNotifier<Map<String, List<AppUsageInfo>>> {
+class AppUsageNotifier extends StateNotifier<Map<String, List<AppUsageData>>> {
   static const platform = MethodChannel('usage_stats');
 
   AppUsageNotifier() : super({});
 
-  Future<List<AppUsageInfo>> getUsageData(
-      DateTime startDate, DateTime endDate) async {
-    late List<Map<dynamic, dynamic>>? appsUsage;
-
-    AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
-    if (androidInfo.manufacturer == 'samsung') {
-      appsUsage = await platform.invokeListMethod('getUsageStatsSam', {
-        "startTime": startDate.millisecondsSinceEpoch,
-        "endTime": endDate.millisecondsSinceEpoch,
-      });
-    } else {
-      appsUsage = await platform.invokeListMethod('getUsageStats', {
-        "startTime": startDate.millisecondsSinceEpoch,
-        "endTime": endDate.millisecondsSinceEpoch,
-      });
-    }
-    print(appsUsage![2]);
+  Future<List<AppUsageData>> getUsageData(DateTime startDate, DateTime endDate) async {    
 
     final String formattedDate =
         "${startDate.toString()};;;${endDate.toString()}";
@@ -32,22 +16,24 @@ class AppUsageNotifier extends StateNotifier<Map<String, List<AppUsageInfo>>> {
       return state[formattedDate]!;
     }
     try {
-      //List<AppInfo>? appNames = await AppCheck().getInstalledApps();
-      List<AppUsageInfo> infoList = [];
-      List<AppUsageInfo> infoListTemp =
-          await AppUsage().getAppUsage(startDate, endDate);
-      // for (AppInfo i in appNames!) {
-      //   // if (i.isSystemApp == null || i.isSystemApp == true) continue;
-      //   try {
-      //     infoList.add(infoListTemp
-      //         .firstWhere((element) => element.packageName == i.packageName));
-      //   } catch (e) {}
-      // }
-      for (AppUsageInfo i in infoListTemp) {
-        print(i.appName);
-        print(i.usage.inMinutes);
+      late List<Map<dynamic, dynamic>>? appsUsage;
+      AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+      if (androidInfo.manufacturer == 'samsung') {
+        appsUsage = await platform.invokeListMethod('getUsageStatsSam', {
+          "startTime": startDate.millisecondsSinceEpoch,
+          "endTime": endDate.millisecondsSinceEpoch,
+        });
+      } else {
+        appsUsage = await platform.invokeListMethod('getUsageStats', {
+          "startTime": startDate.millisecondsSinceEpoch,
+          "endTime": endDate.millisecondsSinceEpoch,
+        });
       }
-
+      List<AppUsageData> infoList = [];
+      if(appsUsage != null && appsUsage.isNotEmpty)
+      {
+        infoList = appsUsage.map((e) => AppUsageData.fromJson(e)).toList();
+      }      
       state = {...state, formattedDate: infoList};
       return infoList;
     } catch (e) {
@@ -57,5 +43,5 @@ class AppUsageNotifier extends StateNotifier<Map<String, List<AppUsageInfo>>> {
 }
 
 final appUsageProvider =
-    StateNotifierProvider<AppUsageNotifier, Map<String, List<AppUsageInfo>>>(
+    StateNotifierProvider<AppUsageNotifier, Map<String, List<AppUsageData>>>(
         (ref) => AppUsageNotifier());

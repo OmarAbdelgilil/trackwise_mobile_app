@@ -1,17 +1,17 @@
-import 'package:app_usage/app_usage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
 import 'package:track_wise_mobile_app/core/provider/usage_provider.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/entities/user.dart';
+import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
 
 @injectable
 class HomeViewModel extends StateNotifier<HomeState> {
   late final ProviderContainer _providerContainer;
   late DateTime pickedDate;
   Duration? totalUsageTime;
-  late List<AppUsageInfo> appUsageInfo;
+  late List<AppUsageData> appUsageInfo;
 
   HomeViewModel() : super(InitialState()) {
     _providerContainer = ProviderContainer();
@@ -20,16 +20,19 @@ class HomeViewModel extends StateNotifier<HomeState> {
     _getUsageData();
   }
   Future<void> _getUsageData() async {
-    state = LoadingState();
+    //to load only the first time
+    //state = LoadingState();
     appUsageInfo = await _providerContainer
         .read(appUsageProvider.notifier)
         .getUsageData(
             pickedDate,
             DateTime(
                 pickedDate.year, pickedDate.month, pickedDate.day, 23, 59, 59));
+    appUsageInfo = appUsageInfo.where((element)  => element.usageTime.inMinutes != 0).toList();
+    appUsageInfo.sort((a, b) => b.usageTime.compareTo(a.usageTime));
     totalUsageTime = appUsageInfo.fold(
       const Duration(minutes: 0),
-      (Duration? a, AppUsageInfo b) => a! + b.usage,
+      (Duration? a, AppUsageData b) => a! + b.usageTime,
     );
     state = UsageUpdated();
   }
@@ -54,7 +57,7 @@ sealed class HomeState {}
 
 class InitialState extends HomeState {}
 
-class LoadingState extends HomeState {}
+// class LoadingState extends HomeState {}
 
 class DatePicked extends HomeState {}
 

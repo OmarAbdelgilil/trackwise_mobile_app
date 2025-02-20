@@ -39,11 +39,7 @@ class CircleProgressBar extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.alphabetic,
                         children: [
-                          prov.totalUsageTime == null
-                              ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                              : Text(
+                          Text(
                                   prov.totalUsageTime!.inHours.toString(),
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 32),

@@ -18,4 +18,6 @@ class StringsManager {
   static const String steps = "Steps";
   static const String friends = "Friends";
   static const String profile = "Profile";
+  static const String noAppsFound = "No apps found in this date";
+  
 }

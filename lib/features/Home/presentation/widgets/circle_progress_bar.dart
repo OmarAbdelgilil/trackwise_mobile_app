@@ -12,7 +12,7 @@ class CircleProgressBar extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     ref.watch(homeProvider);
     final prov = ref.read(homeProvider.notifier);
-    final String date = DateFormat("d/M").format(prov.pickedDate);
+    final String date = DateFormat(prov.pickedDate.year == DateTime.now().year? "d/M" : "d/M/yy").format(prov.pickedDate);
     return ClipRect(
         child: Align(
             alignment: Alignment.bottomCenter,
@@ -66,11 +66,11 @@ class CircleProgressBar extends ConsumerWidget {
                 showTicks: false,
                 radiusFactor: 0.65,
                 axisLineStyle: const AxisLineStyle(thickness: 4.7),
-                pointers: const <GaugePointer>[
+                pointers: <GaugePointer>[
                   RangePointer(
-                      value: 12,
+                      value: prov.totalUsageTime!.inHours.toDouble(),
                       enableAnimation: true,
-                      color: Color.fromARGB(255, 23, 139, 241),
+                      color: const Color.fromARGB(255, 23, 139, 241),
                       width: 5.1,
                       cornerStyle: CornerStyle.bothCurve,
                       animationType: AnimationType.ease)

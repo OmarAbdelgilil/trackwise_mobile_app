@@ -31,7 +31,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         valueListenable: currentPageNotifier,
         builder: (context, value, child) {
           final providerState = ref.watch(homeProvider);
-          return providerState is InitialState?  const Center(child: CircularProgressIndicator()) :
+          return providerState is InitialState || (prov.appUsageInfoMap[prov.pickedDate] == null || prov.appUsageInfoMap[prov.pickedDate]![prov.changeDateMode] == null)?  const Center(child: CircularProgressIndicator()) :
           value['widget'] is! HomeScreen ? value['widget'] : 
           SingleChildScrollView(
             child: Padding(
@@ -42,15 +42,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(onPressed: (){prov.toggleDateMode(ChangeDateMode.daily);},style: ElevatedButton.styleFrom(backgroundColor: prov.changeDateMode == ChangeDateMode.daily? Colors.green : null) , child: const Text(StringsManager.daily),),
-                      const SizedBox(width: 5,),
-                      ElevatedButton(onPressed: (){prov.toggleDateMode(ChangeDateMode.weekly);},style: ElevatedButton.styleFrom(backgroundColor: prov.changeDateMode == ChangeDateMode.weekly? Colors.green : null)  ,child: const Text(StringsManager.weekly)),
-                      const SizedBox(width: 5,),
-                      ElevatedButton(onPressed: (){prov.toggleDateMode(ChangeDateMode.monthly);},style: ElevatedButton.styleFrom(backgroundColor: prov.changeDateMode == ChangeDateMode.monthly? Colors.green : null)  ,child: const Text(StringsManager.monthly)),
+                      ElevatedButton(onPressed: (){prov.toggleDateMode(ChangeDateMode.daily);},style: ButtonStyle(
+                        backgroundColor: ChangeDateMode.daily == prov.changeDateMode
+                            ? WidgetStateProperty.all<Color>(
+                                Theme.of(context).colorScheme.primary)
+                            : WidgetStateProperty.all<Color>(Colors.white),
+                        foregroundColor: ChangeDateMode.daily == prov.changeDateMode
+                            ? WidgetStateProperty.all<Color>(Colors.white)
+                            : WidgetStateProperty.all<Color>(
+                                Theme.of(context).colorScheme.primary),
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                            const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.zero),
+                        ))), child: const Text(StringsManager.daily),),
+                      const SizedBox(width: 2,),
+                      ElevatedButton(onPressed: (){prov.toggleDateMode(ChangeDateMode.weekly);},style: ButtonStyle(
+                        backgroundColor: ChangeDateMode.weekly == prov.changeDateMode
+                            ? WidgetStateProperty.all<Color>(
+                                Theme.of(context).colorScheme.primary)
+                            : WidgetStateProperty.all<Color>(Colors.white),
+                        foregroundColor: ChangeDateMode.weekly == prov.changeDateMode
+                            ? WidgetStateProperty.all<Color>(Colors.white)
+                            : WidgetStateProperty.all<Color>(
+                                Theme.of(context).colorScheme.primary),
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                            const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.zero),
+                        ))), child: const Text(StringsManager.weekly),),
+                      const SizedBox(width: 2,),
+                      ElevatedButton(onPressed: (){prov.toggleDateMode(ChangeDateMode.monthly);},style: ButtonStyle(
+                        backgroundColor: ChangeDateMode.monthly == prov.changeDateMode
+                            ? WidgetStateProperty.all<Color>(
+                                Theme.of(context).colorScheme.primary)
+                            : WidgetStateProperty.all<Color>(Colors.white),
+                        foregroundColor: ChangeDateMode.monthly == prov.changeDateMode
+                            ? WidgetStateProperty.all<Color>(Colors.white)
+                            : WidgetStateProperty.all<Color>(
+                                Theme.of(context).colorScheme.primary),
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                            const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.zero),
+                        ))), child: const Text(StringsManager.monthly),),
                     ],
                   ),
                   GestureDetector(onTap: ()async{await prov.openCalender(context);}, child: const CircleProgressBar()),
-                  //const BarChartWidget(),
+                  // const BarChartWidget(),
                   Container(alignment: Alignment.centerLeft,padding: EdgeInsets.only(left: 8.h) ,child: const Text(StringsManager.apps,style: TextStyle(color: Colors.white,fontSize: 20),)),
                   const AppsListView()
                 ],

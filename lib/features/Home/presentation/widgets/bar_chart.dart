@@ -8,6 +8,7 @@ class BarChartWidget extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    //dynamic durations in info
     final List<double> points = [4, 8, 7, 2, 6, 10, 5];
     final avgY = points.reduce(
           (a, b) => a + b,
@@ -70,6 +71,7 @@ class BarChartWidget extends StatelessWidget {
 }
 
 List<BarChartGroupData> _chartGroups(avg,points) {
+  //avg to be dynamic
   List<BarChartGroupData> data = [];
   for (int i = 0; i < points.length; i++) {
     data.add(BarChartGroupData(x: i, barRods: [
@@ -84,7 +86,7 @@ SideTitles get _bottomTitles => SideTitles(
 
     showTitles: true,
     getTitlesWidget: (value, meta) {
-      //dates to do
+      //dates to be dynamic
       String text = '${(value.toInt() + 12).toString()}/12';
       return Padding(
         padding: const EdgeInsets.only(top:  4.0),

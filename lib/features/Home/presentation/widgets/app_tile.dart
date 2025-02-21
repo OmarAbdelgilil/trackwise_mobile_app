@@ -31,7 +31,7 @@ class AppTile extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      appData.usageTime.inHours != 0 ?'${appData.usageTime.inHours}hrs' : '${appData.usageTime.inMinutes}mins',
+                      appData.usageTime.inHours != 0 ?'${appData.usageTime.inHours}hrs ${appData.usageTime.inMinutes.remainder(60)}mins' : '${appData.usageTime.inMinutes}mins',
                       style:const TextStyle(color: Colors.white70),
                     ),
                   )

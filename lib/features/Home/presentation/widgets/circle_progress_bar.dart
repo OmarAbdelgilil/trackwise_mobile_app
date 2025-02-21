@@ -7,15 +7,24 @@ import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
 import 'package:intl/intl.dart';
 
-class CircleProgressBar extends ConsumerWidget {
+class CircleProgressBar extends ConsumerStatefulWidget {
   const CircleProgressBar({super.key});
 
   @override
-  Widget build(BuildContext context, ref) {
+  ConsumerState<CircleProgressBar> createState() => _CircleProgressBarState();
+}
+
+class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
+  String compareText = '';
+  @override
+  Widget build(BuildContext context) {
     ref.watch(homeProvider);
     final prov = ref.read(homeProvider.notifier);
     final endDateWeekly = prov.pickedDate.add(const Duration(days: 7));
     final String date = prov.changeDateMode == ChangeDateMode.weekly ? '${prov.pickedDate.day}/${prov.pickedDate.month}-${endDateWeekly.day}/${endDateWeekly.month}' : DateFormat(prov.changeDateMode == ChangeDateMode.monthly ? "MMMyy" : prov.pickedDate.year == DateTime.now().year ? "d/M" : "d/M/yy").format(prov.pickedDate);
+    final totalUsageTime = prov.getTotalUsage(prov.appUsageInfoMap[prov.pickedDate]![prov.changeDateMode]!);
+    prov.getCompareText(prov.pickedDate, prov.changeDateMode).then((value) {setState(() {compareText = value;});},);
+    
     return ClipRect(
         child: Align(
             alignment: Alignment.bottomCenter,
@@ -42,7 +51,7 @@ class CircleProgressBar extends ConsumerWidget {
                         textBaseline: TextBaseline.alphabetic,
                         children: [
                           Text(
-                                  prov.totalUsageTime!.inHours.toString(),
+                                  totalUsageTime.inHours.toString(),
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 32),
                                 ),
@@ -54,14 +63,12 @@ class CircleProgressBar extends ConsumerWidget {
                       ),
                       SizedBox(
                         width: 215.w,
-                        child: Align(
-                          child: Text(
-                            prov.getCompareText(prov.totalUsageTime, prov.totalUsageTimeToCompare, prov.changeDateMode),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.white, fontSize: 11),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                          ),
+                        child: Text(
+                          compareText,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.white, fontSize: 11),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
                         ),)
 
                     ],
@@ -78,7 +85,7 @@ class CircleProgressBar extends ConsumerWidget {
                 axisLineStyle: const AxisLineStyle(thickness: 4.7),
                 pointers: <GaugePointer>[
                   RangePointer(
-                      value: prov.totalUsageTime!.inHours.toDouble(),
+                      value: totalUsageTime.inHours.toDouble(),
                       enableAnimation: true,
                       color: const Color.fromARGB(255, 23, 139, 241),
                       width: 5.1,

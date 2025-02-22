@@ -17,6 +17,8 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.util.Base64
 import java.io.ByteArrayOutputStream
+import android.graphics.Canvas
+import android.graphics.drawable.AdaptiveIconDrawable
 
 
 
@@ -75,7 +77,7 @@ class MainActivity: FlutterActivity(){
                     val isGoogleApp = packageName.startsWith("com.google.")
                      if (!isSystemApp || isGoogleApp) { 
                         val name = packageManager.getApplicationLabel(appInfo).toString()
-                        val icon = getAppIconAsBase64(packageManager, packageName)
+                        val icon = getAppIconAsBase64(packageName)
                         name to icon
                     } else null
                 } catch (e: PackageManager.NameNotFoundException) {
@@ -97,16 +99,32 @@ class MainActivity: FlutterActivity(){
 
 
 
-    private fun getAppIconAsBase64(packageManager: PackageManager, packageName: String): String {
-            return try {
-                val drawable = packageManager.getApplicationIcon(packageName)
-                val bitmap = (drawable as BitmapDrawable).bitmap
-                val stream = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                val byteArray = stream.toByteArray()
-                Base64.encodeToString(byteArray, Base64.DEFAULT)
-            } catch (e: Exception) {
-                ""
+    private fun getAppIconAsBase64(packageName: String): String {
+    return try {
+        val pm: PackageManager = applicationContext.packageManager
+        val drawable = pm.getApplicationIcon(packageName)
+
+        val bitmap = when (drawable) {
+            is BitmapDrawable -> drawable.bitmap
+            is AdaptiveIconDrawable -> {
+                val size = 108 // Adjust size if needed
+                val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(bitmap)
+                drawable.setBounds(0, 0, size, size)
+                drawable.draw(canvas)
+                bitmap
             }
+            else -> return ""
         }
+
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        val byteArray = stream.toByteArray()
+        Base64.encodeToString(byteArray, Base64.DEFAULT)
+    } catch (e: PackageManager.NameNotFoundException) {
+        ""
+    }
+}
+
+
 }

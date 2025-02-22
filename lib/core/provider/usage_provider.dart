@@ -6,6 +6,13 @@ class AppUsageNotifier extends StateNotifier<Map<String, List<AppUsageData>>> {
   static const platform = MethodChannel('usage_stats');
 
   AppUsageNotifier() : super({});
+  void printLongString(String text) {
+    const int chunkSize = 1000; // Adjust as needed
+    for (int i = 0; i < text.length; i += chunkSize) {
+      print(text.substring(
+          i, i + chunkSize > text.length ? text.length : i + chunkSize));
+    }
+  }
 
   Future<List<AppUsageData>> getUsageData(
       DateTime startDate, DateTime endDate) async {
@@ -24,6 +31,7 @@ class AppUsageNotifier extends StateNotifier<Map<String, List<AppUsageData>>> {
       if (appsUsage != null && appsUsage.isNotEmpty) {
         infoList = appsUsage.map((e) => AppUsageData.fromJson(e)).toList();
       }
+
       state = {...state, formattedDate: infoList};
       return infoList;
     } catch (e) {

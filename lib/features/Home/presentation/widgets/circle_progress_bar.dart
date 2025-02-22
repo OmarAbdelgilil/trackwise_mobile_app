@@ -57,6 +57,18 @@ class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
                             'hrs',
                             style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
+                          if(totalUsageTime.inMinutes.remainder(60) > 20)
+                           ...[
+                            Text(
+                                  totalUsageTime.inMinutes.remainder(60).toString(),
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 32),
+                                ),
+                          const Text(
+                            'mins',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                           ]
                         ],
                       ),
                       SizedBox(

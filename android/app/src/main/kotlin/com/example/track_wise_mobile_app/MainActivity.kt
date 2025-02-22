@@ -19,6 +19,9 @@ import android.util.Base64
 import java.io.ByteArrayOutputStream
 import android.graphics.Canvas
 import android.graphics.drawable.AdaptiveIconDrawable
+import android.app.AppOpsManager
+import android.content.Intent
+import android.os.Binder
 
 
 
@@ -34,11 +37,35 @@ class MainActivity: FlutterActivity(){
                 val usageStats = getUsageStats(startTime, endTime)
                 result.success(usageStats)
             }
+            else if (call.method == "checkUsageAccess") {
+                    result.success(hasUsageAccessPermission())
+                }
+            else if (call.method == "openUsageAccessSettings"){
+                    openUsageAccessSettings()
+                    result.success(null)
+                }
+
             else {
                 result.notImplemented()
             }
 
         }
+    }
+
+    private fun hasUsageAccessPermission(): Boolean {
+        val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val mode = appOps.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            Binder.getCallingUid(),
+            packageName
+        )
+        return mode == AppOpsManager.MODE_ALLOWED
+    }
+
+    private fun openUsageAccessSettings() {
+        val intent = Intent(android.provider.Settings.ACTION_USAGE_ACCESS_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

@@ -6,11 +6,11 @@ class AppUsageNotifier extends StateNotifier<Map<String, List<AppUsageData>>> {
   static const platform = MethodChannel('usage_stats');
 
   AppUsageNotifier() : super({});
-  void printLongString(String text) {
-    const int chunkSize = 1000; // Adjust as needed
-    for (int i = 0; i < text.length; i += chunkSize) {
-      print(text.substring(
-          i, i + chunkSize > text.length ? text.length : i + chunkSize));
+
+  Future<void> checkPermissions() async {
+    final permission = await platform.invokeMethod('checkUsageAccess');
+    if (!permission) {
+      await platform.invokeMethod('openUsageAccessSettings');
     }
   }
 

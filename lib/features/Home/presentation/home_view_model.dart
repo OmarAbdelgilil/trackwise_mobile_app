@@ -14,6 +14,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
   late DateTime pickedDate;
   Map<DateTime, Map<ChangeDateMode, List<AppUsageData>>> appUsageInfoMap = {};
   ChangeDateMode changeDateMode = ChangeDateMode.daily;
+  String compareText = '';
   HomeViewModel() : super(InitialState()) {
     _providerContainer = ProviderContainer();
     final now = DateTime.now();
@@ -42,13 +43,11 @@ class HomeViewModel extends StateNotifier<HomeState> {
       List<AppUsageData> appInfoTemp = await _providerContainer
           .read(appUsageProvider.notifier)
           .getUsageData(pickedDate, endDate);
-      appInfoTemp = appInfoTemp
-          .where((element) => element.usageTime.inMinutes != 0)
-          .toList();
       appInfoTemp.sort((a, b) => b.usageTime.compareTo(a.usageTime));
       appUsageInfoMap[pickedDate] ??= {};
       appUsageInfoMap[pickedDate]![changeDateMode] = [...appInfoTemp];
     }
+    await _getCompareText(pickedDate, changeDateMode);
     state = UsageUpdated();
   }
 
@@ -75,7 +74,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     await _getUsageData();
   }
 
-  Future<String> getCompareText(
+  Future<void> _getCompareText(
       DateTime myDate, ChangeDateMode changeDateMode) async {
     ///////////////////////////////////
     DateTime endDate = changeDateMode == ChangeDateMode.daily
@@ -140,11 +139,11 @@ class HomeViewModel extends StateNotifier<HomeState> {
             : 'last month';
     final diff = totalUsageTimePicked.inHours - totalUsageTimeToCompare.inHours;
     if (diff == 0) {
-      return 'same Amount of time as $finalPart';
+      compareText = 'same Amount of time as $finalPart';
     } else if (diff > 0) {
-      return '$diff hours more than $finalPart';
+      compareText = '$diff hours more than $finalPart';
     } else {
-      return '${-1 * diff} hours less than $finalPart';
+      compareText = '${-1 * diff} hours less than $finalPart';
     }
   }
 

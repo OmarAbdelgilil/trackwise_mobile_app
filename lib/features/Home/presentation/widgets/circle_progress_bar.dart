@@ -15,30 +15,14 @@ class CircleProgressBar extends ConsumerStatefulWidget {
 }
 
 class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
-  String compareText = '';
-  @override
-  void initState() {
-    super.initState();
-    _fetchCompareText();
-  }
 
-  Future<void> _fetchCompareText() async {
-    final prov = ref.read(homeProvider.notifier);
-    final result = await prov.getCompareText(prov.pickedDate, prov.changeDateMode);
-    if (mounted) {
-      setState(() {
-        compareText = result;
-      });
-    }
-  }
   @override
   Widget build(BuildContext context) {
     ref.watch(homeProvider);
     final prov = ref.read(homeProvider.notifier);
     final endDateWeekly = prov.pickedDate.add(const Duration(days: 7));
     final String date = prov.changeDateMode == ChangeDateMode.weekly ? '${prov.pickedDate.day}/${prov.pickedDate.month}-${endDateWeekly.day}/${endDateWeekly.month}' : DateFormat(prov.changeDateMode == ChangeDateMode.monthly ? "MMMyy" : prov.pickedDate.year == DateTime.now().year ? "d/M" : "d/M/yy").format(prov.pickedDate);
-    final totalUsageTime = prov.getTotalUsage(prov.appUsageInfoMap[prov.pickedDate]![prov.changeDateMode]!);
-    
+    final totalUsageTime = prov.getTotalUsage(prov.appUsageInfoMap[prov.pickedDate]![prov.changeDateMode]!);    
     return ClipRect(
         child: Align(
             alignment: Alignment.bottomCenter,
@@ -78,7 +62,7 @@ class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
                       SizedBox(
                         width: 215.w,
                         child: Text(
-                          compareText,
+                          prov.compareText,
                           textAlign: TextAlign.center,
                           style: const TextStyle(color: Colors.white, fontSize: 11),
                           overflow: TextOverflow.ellipsis,

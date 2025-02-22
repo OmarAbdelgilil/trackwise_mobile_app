@@ -29,7 +29,7 @@ class AppUsageNotifier extends StateNotifier<Map<String, List<AppUsageData>>> {
       });
       List<AppUsageData> infoList = [];
       if (appsUsage != null && appsUsage.isNotEmpty) {
-        infoList = appsUsage.map((e) => AppUsageData.fromJson(e)).toList();
+        infoList = appsUsage.map((e) => AppUsageData.fromJson(e)).where((element) => element.usageTime.inMinutes != 0).toList();
       }
 
       state = {...state, formattedDate: infoList};

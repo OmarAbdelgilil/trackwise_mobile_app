@@ -12,10 +12,6 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 class HomeViewModel extends StateNotifier<HomeState> {
   late final ProviderContainer _providerContainer;
   late DateTime pickedDate;
-  //to be map
-  // Duration? totalUsageTime;
-  // Duration? totalUsageTimeToCompare;
-  // late List<AppUsageData> appUsageInfo;
   Map<DateTime, Map<ChangeDateMode, List<AppUsageData>>> appUsageInfoMap = {};
   ChangeDateMode changeDateMode = ChangeDateMode.daily;
   HomeViewModel() : super(InitialState()) {
@@ -26,7 +22,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
   }
 
   Future<void> _getUsageData() async {
-    await _providerContainer.read(appUsageProvider.notifier).checkPermissions();
+    //await _providerContainer.read(appUsageProvider.notifier).checkPermissions();
     //to load only the first time
     //state = LoadingState();
     pickedDate = changeDateMode == ChangeDateMode.monthly
@@ -38,7 +34,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
         : changeDateMode == ChangeDateMode.weekly
             ? pickedDate.add(const Duration(days: 7))
             : DateTime(pickedDate.year, pickedDate.month + 1, 1);
-    // appUsageInfo = await _providerContainer.read(appUsageProvider.notifier).getUsageData(pickedDate, endDate);
+
     //check if already exists
     if (appUsageInfoMap[pickedDate] == null ||
         appUsageInfoMap[pickedDate]![changeDateMode] == null ||
@@ -53,22 +49,6 @@ class HomeViewModel extends StateNotifier<HomeState> {
       appUsageInfoMap[pickedDate] ??= {};
       appUsageInfoMap[pickedDate]![changeDateMode] = [...appInfoTemp];
     }
-    ///////////////////////////////////
-    // DateTime startDateCompare = DateTime(pickedDate.year, changeDateMode == ChangeDateMode.monthly? pickedDate.month - 1 : pickedDate.month, changeDateMode == ChangeDateMode.daily? pickedDate.day - 1 : changeDateMode == ChangeDateMode.weekly? pickedDate.day - 7 : pickedDate.day, pickedDate.hour,pickedDate.minute,pickedDate.second);
-    // DateTime endDateCompare = DateTime(endDate.year, changeDateMode == ChangeDateMode.monthly? endDate.month - 1 : endDate.month, changeDateMode == ChangeDateMode.daily? endDate.day - 1 : changeDateMode == ChangeDateMode.weekly? endDate.day - 7 : endDate.day, endDate.hour,endDate.minute,endDate.second);
-    // final appUsageInfoCompare = await _providerContainer.read(appUsageProvider.notifier).getUsageData(startDateCompare, endDateCompare);
-    // totalUsageTimeToCompare = appUsageInfoCompare.fold(
-    //   const Duration(minutes: 0), (Duration? a, AppUsageData b) => a! + b.usageTime,
-    // );
-    //////////////////////////////////
-    print(pickedDate);
-    print(endDate);
-    print('-----------------------------');
-    // appUsageInfo = appUsageInfo.where((element)  => element.usageTime.inMinutes != 0).toList();
-    // appUsageInfo.sort((a, b) => b.usageTime.compareTo(a.usageTime));
-    // totalUsageTime = appUsageInfo.fold(
-    //   const Duration(minutes: 0), (Duration? a, AppUsageData b) => a! + b.usageTime,
-    // );
     state = UsageUpdated();
   }
 

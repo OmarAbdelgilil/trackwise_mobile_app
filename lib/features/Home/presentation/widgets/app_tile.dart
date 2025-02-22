@@ -14,7 +14,7 @@ class AppTile extends StatelessWidget {
       leading: appData.appIcon.isEmpty
           ? Image.asset(ImagePathManager.appIcon, scale: 12)
           : CircleAvatar(
-              backgroundColor: Colors.white,
+              backgroundColor: const Color.fromARGB(0, 230, 34, 34),
               child: Image.memory(appData.appIcon),
             ),
       title: Text(

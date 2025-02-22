@@ -22,7 +22,7 @@ class AppsListView extends ConsumerWidget {
       maxUsage = prov.appUsageInfoMap[prov.pickedDate]![prov.changeDateMode]!.reduce((a, b) => a.usageTime > b.usageTime ? a : b);
     }
     return  SizedBox(
-                    height: 255.h,
+                    height: 265.h,
                     child: emptyCheck ?? ListView(
                       children: [
                         for(AppUsageData app in prov.appUsageInfoMap[prov.pickedDate]![prov.changeDateMode]!)

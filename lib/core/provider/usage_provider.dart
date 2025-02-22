@@ -7,13 +7,6 @@ class AppUsageNotifier extends StateNotifier<Map<String, List<AppUsageData>>> {
 
   AppUsageNotifier() : super({});
 
-  Future<void> checkPermissions() async {
-    final permission = await platform.invokeMethod('checkUsageAccess');
-    if (!permission) {
-      await platform.invokeMethod('openUsageAccessSettings');
-    }
-  }
-
   Future<List<AppUsageData>> getUsageData(
       DateTime startDate, DateTime endDate) async {
     final String formattedDate =

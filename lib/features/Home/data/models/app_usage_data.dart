@@ -21,7 +21,6 @@ class AppUsageData {
           json['appIcon'].toString().replaceAll("\n", "").replaceAll("\r", "");
       json['appIcon'] = base64Decode(n);
     } catch (e) {
-      print('failed to load icon');
       json['appIcon'] = Uint8List(0);
     }
     return AppUsageData(

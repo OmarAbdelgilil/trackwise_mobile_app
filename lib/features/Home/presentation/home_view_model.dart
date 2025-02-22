@@ -23,7 +23,6 @@ class HomeViewModel extends StateNotifier<HomeState> {
   }
 
   Future<void> _getUsageData() async {
-    //await _providerContainer.read(appUsageProvider.notifier).checkPermissions();
     //to load only the first time
     //state = LoadingState();
     pickedDate = changeDateMode == ChangeDateMode.monthly

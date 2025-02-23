@@ -25,14 +25,14 @@ class HomeViewModel extends StateNotifier<HomeState> {
     _getUsageData(pickedDate);
   }
 
-  Future<void> _getUsageData(DateTime startPickedDate) async {    
+  Future<void> _getUsageData(DateTime startPickedDate) async {
     pickedDate = changeDateMode == ChangeDateMode.monthly
         ? DateTime(startPickedDate.year, startPickedDate.month, 1)
         : startPickedDate;
     startPickedDate = pickedDate;
     DateTime endDate = changeDateMode == ChangeDateMode.daily
-        ? DateTime(
-            startPickedDate.year, startPickedDate.month, startPickedDate.day, 23, 59, 59)
+        ? DateTime(startPickedDate.year, startPickedDate.month,
+            startPickedDate.day, 23, 59, 59)
         : changeDateMode == ChangeDateMode.weekly
             ? startPickedDate.add(const Duration(days: 7))
             : DateTime(startPickedDate.year, startPickedDate.month + 1, 1);
@@ -40,8 +40,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     if (appUsageInfoMap[startPickedDate] == null ||
         appUsageInfoMap[startPickedDate]![changeDateMode] == null ||
         appUsageInfoMap[startPickedDate]![changeDateMode]!.isEmpty) {
-      if(!isBarChart)
-      {
+      if (!isBarChart) {
         state = HomeLoadingState();
       }
       List<AppUsageData> appInfoTemp = await _providerContainer
@@ -51,8 +50,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
       appUsageInfoMap[startPickedDate] ??= {};
       appUsageInfoMap[startPickedDate]![changeDateMode] = [...appInfoTemp];
     }
-    if(!isBarChart)
-    {
+    if (!isBarChart) {
       await _getCompareText(startPickedDate, changeDateMode);
       state = UsageUpdated();
     }
@@ -169,35 +167,36 @@ class HomeViewModel extends StateNotifier<HomeState> {
     );
   }
 
-  SideTitles  getBottomTitles() => SideTitles(
-    showTitles: true,
-    getTitlesWidget: (value, meta) {
-      late String text;
-      switch (changeDateMode) {
-        case ChangeDateMode.daily:
-          text = DateFormat('d/M').format(pickedDate.subtract(Duration(days: 6-value.toInt())));
-          break;
-        case ChangeDateMode.weekly:
-          text = '${DateFormat('d/M').format(pickedDate.subtract(Duration(days: 7 * (6 - value.toInt()))))} - ${DateFormat('d/M').format(pickedDate.subtract(Duration(days: 7 * (6 - value.toInt() - 1))))}';
-          break;
-        case ChangeDateMode.monthly:
-          text = DateFormat('MMMyy').format(DateTime(pickedDate.year,pickedDate.month - (6 - value.toInt()),pickedDate.day));
-          break;
+  SideTitles getBottomTitles() => SideTitles(
+      showTitles: true,
+      getTitlesWidget: (value, meta) {
+        late String text;
+        switch (changeDateMode) {
+          case ChangeDateMode.daily:
+            text = DateFormat('d/M')
+                .format(pickedDate.subtract(Duration(days: 6 - value.toInt())));
+            break;
+          case ChangeDateMode.weekly:
+            text =
+                '${DateFormat('d/M').format(pickedDate.subtract(Duration(days: 7 * (6 - value.toInt()))))} - ${DateFormat('d/M').format(pickedDate.subtract(Duration(days: 7 * (6 - value.toInt() - 1))))}';
+            break;
+          case ChangeDateMode.monthly:
+            text = DateFormat('MMMyy').format(DateTime(pickedDate.year,
+                pickedDate.month - (6 - value.toInt()), pickedDate.day));
+            break;
         }
-      return Padding(
-        padding: const EdgeInsets.only(top:  4.0),
-        child: 
-            Text(
-              text,
-              style: const TextStyle(color: Colors.white, fontSize: 11),
-            ),
-      );
-    });
+        return Padding(
+          padding: const EdgeInsets.only(top: 4.0),
+          child: Text(
+            text,
+            style: const TextStyle(color: Colors.white, fontSize: 11),
+          ),
+        );
+      });
 
-  Future<void> getBarData(DateTime pickedDateEndBar,int length) async
-  {
+  Future<void> getBarData(DateTime pickedDateEndBar, int length) async {
     Map<DateTime, Duration> result = {};
-    for (int i = 1;i <= length; i++) {
+    for (int i = 1; i <= length; i++) {
       late DateTime date;
       switch (changeDateMode) {
         case ChangeDateMode.daily:
@@ -207,11 +206,13 @@ class HomeViewModel extends StateNotifier<HomeState> {
           date = pickedDateEndBar.subtract(Duration(days: 7 * (length - i)));
           break;
         case ChangeDateMode.monthly:
-          date = DateTime(pickedDateEndBar.year,pickedDateEndBar.month - (length - i),pickedDateEndBar.day);
+          date = DateTime(pickedDateEndBar.year,
+              pickedDateEndBar.month - (length - i), pickedDateEndBar.day);
           break;
-        }
+      }
       await _getUsageData(date);
-      result.addAll({date: getTotalUsage(appUsageInfoMap[date]![changeDateMode]!)});
+      result.addAll(
+          {date: getTotalUsage(appUsageInfoMap[date]![changeDateMode]!)});
     }
   }
 }

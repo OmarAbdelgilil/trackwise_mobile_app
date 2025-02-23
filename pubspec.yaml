@@ -55,6 +55,7 @@ dependencies:
   month_picker_dialog: ^6.0.3
   weekly_date_picker: ^1.4.2
   health: ^12.0.1
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -84,7 +85,7 @@ flutter:
     - assets/images/google_icon.png
     - assets/images/app_icon.png
     - assets/images/heart_beat.png
-    # - images/a_dot_ham.jpeg
+    - assets/lotties/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

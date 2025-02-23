@@ -19,34 +19,39 @@ class HomeViewModel extends StateNotifier<HomeState> {
     _providerContainer = ProviderContainer();
     final now = DateTime.now();
     pickedDate = DateTime(now.year, now.month, now.day);
-    _getUsageData();
+    _getUsageData(pickedDate);
+    //uncomment later
+    // for(int i = 0; i <= 6 ;i++)
+    // {
+    //   _getUsageData(pickedDate.add(Duration(days: i)));
+    // }
+    
   }
 
-  Future<void> _getUsageData() async {
-    //to load only the first time
-    //state = LoadingState();
+  Future<void> _getUsageData(DateTime startPickedDate) async {    
     pickedDate = changeDateMode == ChangeDateMode.monthly
-        ? DateTime(pickedDate.year, pickedDate.month, 1)
-        : pickedDate;
+        ? DateTime(startPickedDate.year, startPickedDate.month, 1)
+        : startPickedDate;
+    startPickedDate = pickedDate;
     DateTime endDate = changeDateMode == ChangeDateMode.daily
         ? DateTime(
-            pickedDate.year, pickedDate.month, pickedDate.day, 23, 59, 59)
+            startPickedDate.year, startPickedDate.month, startPickedDate.day, 23, 59, 59)
         : changeDateMode == ChangeDateMode.weekly
-            ? pickedDate.add(const Duration(days: 7))
-            : DateTime(pickedDate.year, pickedDate.month + 1, 1);
-
-    //check if already exists
-    if (appUsageInfoMap[pickedDate] == null ||
-        appUsageInfoMap[pickedDate]![changeDateMode] == null ||
-        appUsageInfoMap[pickedDate]![changeDateMode]!.isEmpty) {
+            ? startPickedDate.add(const Duration(days: 7))
+            : DateTime(startPickedDate.year, startPickedDate.month + 1, 1);
+    //check if it doesn't exist
+    if (appUsageInfoMap[startPickedDate] == null ||
+        appUsageInfoMap[startPickedDate]![changeDateMode] == null ||
+        appUsageInfoMap[startPickedDate]![changeDateMode]!.isEmpty) {
+      state = HomeLoadingState();
       List<AppUsageData> appInfoTemp = await _providerContainer
           .read(appUsageProvider.notifier)
-          .getUsageData(pickedDate, endDate);
+          .getUsageData(startPickedDate, endDate);
       appInfoTemp.sort((a, b) => b.usageTime.compareTo(a.usageTime));
-      appUsageInfoMap[pickedDate] ??= {};
-      appUsageInfoMap[pickedDate]![changeDateMode] = [...appInfoTemp];
+      appUsageInfoMap[startPickedDate] ??= {};
+      appUsageInfoMap[startPickedDate]![changeDateMode] = [...appInfoTemp];
     }
-    await _getCompareText(pickedDate, changeDateMode);
+    await _getCompareText(startPickedDate, changeDateMode);
     state = UsageUpdated();
   }
 
@@ -70,7 +75,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     }
     pickedDate = pickedDateTemp;
     state = DatePicked();
-    await _getUsageData();
+    await _getUsageData(pickedDate);
   }
 
   Future<void> _getCompareText(
@@ -149,7 +154,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
   void toggleDateMode(ChangeDateMode mode) {
     if (changeDateMode != mode) {
       changeDateMode = mode;
-      _getUsageData();
+      _getUsageData(pickedDate);
       state = DateModeChanged();
     }
   }
@@ -169,7 +174,7 @@ sealed class HomeState {}
 
 class InitialState extends HomeState {}
 
-// class LoadingState extends HomeState {}
+class HomeLoadingState extends HomeState {}
 
 class DatePicked extends HomeState {}
 

@@ -1,13 +1,16 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
-class BarChartWidget extends StatelessWidget {
+class BarChartWidget extends ConsumerWidget {
   const BarChartWidget({super.key});
-  //number of hours
   
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,WidgetRef ref) {
+    // final prov = ref.read(homeProvider.notifier);
+    // prov.getBarData(prov.pickedDate,7);
+    //{25/12 as DateTime: 6, 28/12: 7};
     //dynamic durations in info
     final List<double> points = [4, 8, 7, 2, 6, 10, 5];
     final avgY = points.reduce(

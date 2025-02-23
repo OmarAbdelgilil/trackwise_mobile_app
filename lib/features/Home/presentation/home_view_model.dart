@@ -1,6 +1,8 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
+import 'package:intl/intl.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
 import 'package:track_wise_mobile_app/core/provider/usage_provider.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/entities/user.dart';
@@ -15,17 +17,12 @@ class HomeViewModel extends StateNotifier<HomeState> {
   Map<DateTime, Map<ChangeDateMode, List<AppUsageData>>> appUsageInfoMap = {};
   ChangeDateMode changeDateMode = ChangeDateMode.daily;
   String compareText = '';
+  bool isBarChart = false;
   HomeViewModel() : super(InitialState()) {
     _providerContainer = ProviderContainer();
     final now = DateTime.now();
     pickedDate = DateTime(now.year, now.month, now.day);
     _getUsageData(pickedDate);
-    //uncomment later
-    // for(int i = 0; i <= 6 ;i++)
-    // {
-    //   _getUsageData(pickedDate.add(Duration(days: i)));
-    // }
-    
   }
 
   Future<void> _getUsageData(DateTime startPickedDate) async {    
@@ -43,7 +40,10 @@ class HomeViewModel extends StateNotifier<HomeState> {
     if (appUsageInfoMap[startPickedDate] == null ||
         appUsageInfoMap[startPickedDate]![changeDateMode] == null ||
         appUsageInfoMap[startPickedDate]![changeDateMode]!.isEmpty) {
-      state = HomeLoadingState();
+      if(!isBarChart)
+      {
+        state = HomeLoadingState();
+      }
       List<AppUsageData> appInfoTemp = await _providerContainer
           .read(appUsageProvider.notifier)
           .getUsageData(startPickedDate, endDate);
@@ -51,8 +51,11 @@ class HomeViewModel extends StateNotifier<HomeState> {
       appUsageInfoMap[startPickedDate] ??= {};
       appUsageInfoMap[startPickedDate]![changeDateMode] = [...appInfoTemp];
     }
-    await _getCompareText(startPickedDate, changeDateMode);
-    state = UsageUpdated();
+    if(!isBarChart)
+    {
+      await _getCompareText(startPickedDate, changeDateMode);
+      state = UsageUpdated();
+    }
   }
 
   Future<void> openCalender(BuildContext context) async {
@@ -164,6 +167,52 @@ class HomeViewModel extends StateNotifier<HomeState> {
       const Duration(minutes: 0),
       (Duration? a, AppUsageData b) => a! + b.usageTime,
     );
+  }
+
+  SideTitles  getBottomTitles() => SideTitles(
+    showTitles: true,
+    getTitlesWidget: (value, meta) {
+      late String text;
+      switch (changeDateMode) {
+        case ChangeDateMode.daily:
+          text = DateFormat('d/M').format(pickedDate.subtract(Duration(days: 6-value.toInt())));
+          break;
+        case ChangeDateMode.weekly:
+          text = '${DateFormat('d/M').format(pickedDate.subtract(Duration(days: 7 * (6 - value.toInt()))))} - ${DateFormat('d/M').format(pickedDate.subtract(Duration(days: 7 * (6 - value.toInt() - 1))))}';
+          break;
+        case ChangeDateMode.monthly:
+          text = DateFormat('MMMyy').format(DateTime(pickedDate.year,pickedDate.month - (6 - value.toInt()),pickedDate.day));
+          break;
+        }
+      return Padding(
+        padding: const EdgeInsets.only(top:  4.0),
+        child: 
+            Text(
+              text,
+              style: const TextStyle(color: Colors.white, fontSize: 11),
+            ),
+      );
+    });
+
+  Future<void> getBarData(DateTime pickedDateEndBar,int length) async
+  {
+    Map<DateTime, Duration> result = {};
+    for (int i = 1;i <= length; i++) {
+      late DateTime date;
+      switch (changeDateMode) {
+        case ChangeDateMode.daily:
+          date = pickedDateEndBar.subtract(Duration(days: length - i));
+          break;
+        case ChangeDateMode.weekly:
+          date = pickedDateEndBar.subtract(Duration(days: 7 * (length - i)));
+          break;
+        case ChangeDateMode.monthly:
+          date = DateTime(pickedDateEndBar.year,pickedDateEndBar.month - (length - i),pickedDateEndBar.day);
+          break;
+        }
+      await _getUsageData(date);
+      result.addAll({date: getTotalUsage(appUsageInfoMap[date]![changeDateMode]!)});
+    }
   }
 }
 

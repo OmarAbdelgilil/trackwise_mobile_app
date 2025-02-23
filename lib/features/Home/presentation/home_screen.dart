@@ -32,7 +32,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             valueListenable: currentPageNotifier,
             builder: (context, value, child) {
               final providerState = ref.watch(homeProvider);
-              return providerState is InitialState ||
+              return providerState is HomeLoadingState ||
+                      providerState is InitialState ||
                       (prov.appUsageInfoMap[prov.pickedDate] == null ||
                           prov.appUsageInfoMap[prov.pickedDate]![
                                   prov.changeDateMode] ==

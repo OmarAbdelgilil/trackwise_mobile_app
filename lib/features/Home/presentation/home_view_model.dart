@@ -1,8 +1,6 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
-import 'package:intl/intl.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
 import 'package:track_wise_mobile_app/core/provider/usage_provider.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/entities/user.dart';
@@ -18,11 +16,17 @@ class HomeViewModel extends StateNotifier<HomeState> {
   ChangeDateMode changeDateMode = ChangeDateMode.daily;
   String compareText = '';
   bool isBarChart = false;
+  Map<DateTime, Duration> barData = {};
   HomeViewModel() : super(InitialState()) {
     _providerContainer = ProviderContainer();
     final now = DateTime.now();
     pickedDate = DateTime(now.year, now.month, now.day);
-    _getUsageData(pickedDate);
+    if(isBarChart)
+    {
+      _updateBarData(pickedDate);
+    }else{
+      _getUsageData(pickedDate);
+    }
   }
 
   Future<void> _getUsageData(DateTime startPickedDate) async {
@@ -76,7 +80,13 @@ class HomeViewModel extends StateNotifier<HomeState> {
     }
     pickedDate = pickedDateTemp;
     state = DatePicked();
-    await _getUsageData(pickedDate);
+    if(isBarChart)
+    {
+      _updateBarData(pickedDate);
+    }else{
+      await _getUsageData(pickedDate);
+    }
+
   }
 
   Future<void> _getCompareText(
@@ -152,10 +162,17 @@ class HomeViewModel extends StateNotifier<HomeState> {
     }
   }
 
-  void toggleDateMode(ChangeDateMode mode) {
+  void toggleDateMode(ChangeDateMode mode) async{
     if (changeDateMode != mode) {
       changeDateMode = mode;
-      _getUsageData(pickedDate);
+      
+      if(isBarChart)
+      {
+        await _getUsageData(pickedDate);
+        _updateBarData(pickedDate);
+      }else{
+        _getUsageData(pickedDate);
+      }
       state = DateModeChanged();
     }
   }
@@ -167,35 +184,10 @@ class HomeViewModel extends StateNotifier<HomeState> {
     );
   }
 
-  SideTitles getBottomTitles() => SideTitles(
-      showTitles: true,
-      getTitlesWidget: (value, meta) {
-        late String text;
-        switch (changeDateMode) {
-          case ChangeDateMode.daily:
-            text = DateFormat('d/M')
-                .format(pickedDate.subtract(Duration(days: 6 - value.toInt())));
-            break;
-          case ChangeDateMode.weekly:
-            text =
-                '${DateFormat('d/M').format(pickedDate.subtract(Duration(days: 7 * (6 - value.toInt()))))} - ${DateFormat('d/M').format(pickedDate.subtract(Duration(days: 7 * (6 - value.toInt() - 1))))}';
-            break;
-          case ChangeDateMode.monthly:
-            text = DateFormat('MMMyy').format(DateTime(pickedDate.year,
-                pickedDate.month - (6 - value.toInt()), pickedDate.day));
-            break;
-        }
-        return Padding(
-          padding: const EdgeInsets.only(top: 4.0),
-          child: Text(
-            text,
-            style: const TextStyle(color: Colors.white, fontSize: 11),
-          ),
-        );
-      });
-
-  Future<void> getBarData(DateTime pickedDateEndBar, int length) async {
+  Future<void> _updateBarData(DateTime pickedDateEndBar) async {
+    state = HomeLoadingState();
     Map<DateTime, Duration> result = {};
+    int length = changeDateMode == ChangeDateMode.daily ? 7 : 4;
     for (int i = 1; i <= length; i++) {
       late DateTime date;
       switch (changeDateMode) {
@@ -214,6 +206,8 @@ class HomeViewModel extends StateNotifier<HomeState> {
       result.addAll(
           {date: getTotalUsage(appUsageInfoMap[date]![changeDateMode]!)});
     }
+    barData = result;
+    state = BarDataUpdated();
   }
 }
 
@@ -229,6 +223,8 @@ class HomeLoadingState extends HomeState {}
 class DatePicked extends HomeState {}
 
 class UsageUpdated extends HomeState {}
+
+class BarDataUpdated extends HomeState {}
 
 class DateModeChanged extends HomeState {}
 

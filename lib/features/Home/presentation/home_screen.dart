@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/home_view_model.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/nav_bar_router/nav_bar_router.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/apps_list_view.dart';
-// import 'package:track_wise_mobile_app/features/Home/presentation/widgets/bar_chart.dart';
+import 'package:track_wise_mobile_app/features/Home/presentation/widgets/bar_chart.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/bottom_nav_bar.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/circle_progress_bar.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/home_toggle_button.dart';
@@ -70,6 +70,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         toggle: ChangeDateMode.monthly),
                                   ],
                                 ),
+                                if (prov.isBarChart) ...[
+                                  Row(
+                                    children: [
+                                      const Spacer(),
+                                      IconButton(
+                                          onPressed: () async {
+                                            await prov.openCalender(context);
+                                          },
+                                          icon:
+                                              const Icon(Icons.calendar_month))
+                                    ],
+                                  )
+                                ],
                                 GestureDetector(
                                     onTap: () async {
                                       await prov.openCalender(context);

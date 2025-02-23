@@ -1,6 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:track_wise_mobile_app/features/Home/presentation/home_view_model.dart';
+import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
 class BarChartWidget extends ConsumerWidget {
@@ -8,15 +11,17 @@ class BarChartWidget extends ConsumerWidget {
   
   @override
   Widget build(BuildContext context,WidgetRef ref) {
-    // final prov = ref.read(homeProvider.notifier);
-    // prov.getBarData(prov.pickedDate,7);
+    ref.watch(homeProvider);
+    final prov = ref.read(homeProvider.notifier);
+    final dates = prov.barData.keys.toList();
+    final durations = prov.barData.values.toList();
     //{25/12 as DateTime: 6, 28/12: 7};
     //dynamic durations in info
-    final List<double> points = [4, 8, 7, 2, 6, 10, 5];
-    final avgY = points.reduce(
+    // final List<double> points = [4, 8, 7, 2, 6, 10, 5];
+    final avgInHours = durations.reduce(
           (a, b) => a + b,
-        ) /
-        points.length;
+        ).inHours /
+        durations.length;
     return Padding(
       padding: const EdgeInsets.only(top: 15.0, bottom: 15),
       child: AspectRatio(
@@ -33,7 +38,7 @@ class BarChartWidget extends ConsumerWidget {
             )),
             extraLinesData: ExtraLinesData(horizontalLines: [
               HorizontalLine(
-                y: avgY,
+                y: avgInHours,
                 color: ColorsManager.red,
                 strokeWidth: 1.7,
                 dashArray: [3, 5],
@@ -53,12 +58,12 @@ class BarChartWidget extends ConsumerWidget {
                 dashArray: [2, 3],
               ),
             ]),
-            barGroups: _chartGroups(avgY, points),
+            barGroups: _chartGroups(avgInHours, prov.barData),
             borderData: FlBorderData(
                 border: const Border(bottom: BorderSide(), left: BorderSide())),
             gridData: const FlGridData(show: false),
             titlesData: FlTitlesData(
-              bottomTitles: AxisTitles(sideTitles: _bottomTitles),
+              bottomTitles: AxisTitles(sideTitles: _bottomTitles(prov.changeDateMode, dates)),
               leftTitles:
                   const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               topTitles:
@@ -73,24 +78,22 @@ class BarChartWidget extends ConsumerWidget {
   }
 }
 
-List<BarChartGroupData> _chartGroups(avg,points) {
-  //avg to be dynamic
+List<BarChartGroupData> _chartGroups(avg, Map<DateTime, Duration> barData) {
+  final dates = barData.keys.toList();
   List<BarChartGroupData> data = [];
-  for (int i = 0; i < points.length; i++) {
+  for (int i = 0; i < dates.length; i++) {
     data.add(BarChartGroupData(x: i, barRods: [
       BarChartRodData(
-          toY: points[i], color: points[i] >= avg ? ColorsManager.red : null,)
+          toY: barData[dates[i]]!.inHours.toDouble(), color: barData[dates[i]]!.inHours >= avg ? ColorsManager.red : null,)
     ]));
   }
   return data;
 }
 
-SideTitles get _bottomTitles => SideTitles(
-
+SideTitles _bottomTitles(ChangeDateMode changeDateMode,List<DateTime> dates) => SideTitles(
     showTitles: true,
     getTitlesWidget: (value, meta) {
-      //dates to be dynamic
-      String text = '${(value.toInt() + 12).toString()}/12';
+      final text = DateFormat(changeDateMode != ChangeDateMode.monthly? 'd/M' : 'MMMyy').format(dates[value.toInt()]);
       return Padding(
         padding: const EdgeInsets.only(top:  4.0),
         child: Text(

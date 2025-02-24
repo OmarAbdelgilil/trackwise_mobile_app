@@ -13,12 +13,12 @@ class OnlineDataSourceImpl implements OnlineDataSource {
   OnlineDataSourceImpl(this._apiManager);
 
   @override
-  Future<Result<User>> login(String eamil, String password) {
+  Future<Result<(User, String)>> login(String eamil, String password) {
     return executeApi(() async {
       final loginRequest = LoginRequest(email: eamil, password: password);
       final result = await _apiManager.login(loginRequest);
       final decodedToken = JwtDecoder.decode(result.token!);
-      return User.fromJson(decodedToken);
+      return (User.fromJson(decodedToken), result.token!);
     });
   }
 }

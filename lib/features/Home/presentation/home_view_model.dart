@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
 import 'package:track_wise_mobile_app/core/provider/usage_provider.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/entities/user.dart';
+import 'package:track_wise_mobile_app/features/Auth/domain/use_cases/check_user_cache_use_case.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
@@ -19,7 +20,8 @@ class HomeViewModel extends StateNotifier<HomeState> {
   String compareText = '';
   bool isBarChart = false;
   Map<DateTime, Duration> barData = {};
-  HomeViewModel() : super(InitialState()) {
+  final CheckUserCacheUseCase _checkUserCacheUseCase;
+  HomeViewModel(this._checkUserCacheUseCase) : super(InitialState()) {
     _providerContainer = ProviderContainer();
     _initFunction();
   }
@@ -42,34 +44,39 @@ class HomeViewModel extends StateNotifier<HomeState> {
       return;
     }
     pickedDate = pickedDateTemp;
-    appsList = List.from(_getUsageInfo(pickedDate,changeDateMode));
-    if(isBarChart)
-    {
+    appsList = List.from(_getUsageInfo(pickedDate, changeDateMode));
+    if (isBarChart) {
       _updateBarData(pickedDate);
     }
     state = DatePicked();
-
   }
-  void toggleBarTouch(DateTime date)
-  {
+
+  void toggleBarTouch(DateTime date) {
     pickedDate = date;
-    appsList = List.from(_getUsageInfo(pickedDate,changeDateMode));
+    appsList = List.from(_getUsageInfo(pickedDate, changeDateMode));
     state = DatePicked();
   }
+
   Future<void> _getCompareText(
       DateTime myDate, ChangeDateMode changeDateMode) async {
     ///////////////////////////////////
     DateTime startDateCompare = DateTime(
-        myDate.year,
-        changeDateMode == ChangeDateMode.monthly? myDate.month - 1: myDate.month,
-        changeDateMode == ChangeDateMode.daily? myDate.day - 1 : changeDateMode == ChangeDateMode.weekly
-                ? myDate.day - 7 : 1,);
+      myDate.year,
+      changeDateMode == ChangeDateMode.monthly
+          ? myDate.month - 1
+          : myDate.month,
+      changeDateMode == ChangeDateMode.daily
+          ? myDate.day - 1
+          : changeDateMode == ChangeDateMode.weekly
+              ? myDate.day - 7
+              : 1,
+    );
 
-    List<AppUsageData>? infoCompare = _getUsageInfo(startDateCompare,changeDateMode, isCompare: true);
-    final nowInfo = _getUsageInfo(myDate,changeDateMode, isCompare: true);
+    List<AppUsageData>? infoCompare =
+        _getUsageInfo(startDateCompare, changeDateMode, isCompare: true);
+    final nowInfo = _getUsageInfo(myDate, changeDateMode, isCompare: true);
 
-    final totalUsageTimeToCompare =
-        infoCompare.fold(
+    final totalUsageTimeToCompare = infoCompare.fold(
       const Duration(minutes: 0),
       (Duration? a, AppUsageData b) => a! + b.usageTime,
     );
@@ -93,12 +100,11 @@ class HomeViewModel extends StateNotifier<HomeState> {
     }
   }
 
-  void toggleDateMode(ChangeDateMode mode) async{
+  void toggleDateMode(ChangeDateMode mode) async {
     if (changeDateMode != mode) {
       changeDateMode = mode;
       appsList = List.from(_getUsageInfo(pickedDate, changeDateMode));
-      if(isBarChart)
-      {
+      if (isBarChart) {
         _updateBarData(pickedDate);
       }
       state = DateModeChanged();
@@ -130,77 +136,85 @@ class HomeViewModel extends StateNotifier<HomeState> {
           break;
       }
       final appList = _getUsageInfo(date, changeDateMode);
-      result.addAll(
-          {date: getTotalUsage(appList)});
+      result.addAll({date: getTotalUsage(appList)});
     }
     barData = result;
     state = BarDataUpdated();
   }
-  void toggleCharts()
-  {
-    if(isBarChart)
-    {
+
+  void toggleCharts() {
+    if (isBarChart) {
       isBarChart = false;
       state = ToggleCharts();
-    }else{
+    } else {
       //state updates in _updateBarData
       isBarChart = true;
-      if(barData.isEmpty)
-      {
+      if (barData.isEmpty) {
         _updateBarData(pickedDate);
       }
     }
     state = ToggleCharts();
   }
 
-  Future<void> _initFunction() async
-  {
+  Future<void> _initFunction() async {
+    await _checkUserCacheUseCase.checkCache();
     final prov = _providerContainer.read(appUsageProvider.notifier);
     final now = DateTime.now();
     pickedDate = DateTime(now.year, now.month, now.day);
-    for (int i=10; i >= 0;i--) {
-      final startDate = DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
-      final endDate = DateTime(startDate.year, startDate.month,startDate.day, 23, 59, 59);
+    for (int i = 10; i >= 0; i--) {
+      final startDate =
+          DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
+      final endDate =
+          DateTime(startDate.year, startDate.month, startDate.day, 23, 59, 59);
       await prov.getUsageData(startDate, endDate);
     }
     appsList = prov.getUsageState(pickedDate)!;
     appsList.sort((a, b) => b.usageTime.compareTo(a.usageTime));
-    if(!isBarChart)
-    {
+    if (!isBarChart) {
       _getCompareText(pickedDate, changeDateMode);
     }
     state = UsageUpdated();
   }
 
-  List<AppUsageData> _getUsageInfo(DateTime startPickedDate,ChangeDateMode currentChangeDateMode, {bool isCompare = false}) {
+  List<AppUsageData> _getUsageInfo(
+      DateTime startPickedDate, ChangeDateMode currentChangeDateMode,
+      {bool isCompare = false}) {
     ////////******** don't update apps list or state here */
-    int length = currentChangeDateMode == ChangeDateMode.daily? 1 : currentChangeDateMode == ChangeDateMode.weekly ? 7 : DateTimeRange(
-                       start: DateTime(startPickedDate.year, startPickedDate.month, 1),
-                       end: DateTime(startPickedDate.year, startPickedDate.month + 1,))
-                    .duration
-                    .inDays;
+    int length = currentChangeDateMode == ChangeDateMode.daily
+        ? 1
+        : currentChangeDateMode == ChangeDateMode.weekly
+            ? 7
+            : DateTimeRange(
+                start: DateTime(startPickedDate.year, startPickedDate.month, 1),
+                end: DateTime(
+                  startPickedDate.year,
+                  startPickedDate.month + 1,
+                )).duration.inDays;
     Map<String, AppUsageData> result = {};
     final prov = _providerContainer.read(appUsageProvider.notifier);
-    if (currentChangeDateMode == ChangeDateMode.monthly)
-    {
-      startPickedDate = DateTime(startPickedDate.year, startPickedDate.month, 1);
+    if (currentChangeDateMode == ChangeDateMode.monthly) {
+      startPickedDate =
+          DateTime(startPickedDate.year, startPickedDate.month, 1);
     }
-    for(int i=0;i<length;i++)
-    {
+    for (int i = 0; i < length; i++) {
       final date = startPickedDate.add(Duration(days: i));
       for (AppUsageData app in prov.getUsageState(date) ?? []) {
-        if(result.containsKey(app.appName)){
-          result[app.appName]!.usageTime = Duration(minutes: result[app.appName]!.usageTime.inMinutes + app.usageTime.inMinutes);
-        }else{
-          result[app.appName] = AppUsageData(appName: app.appName, usageTime: app.usageTime, appIcon: app.appIcon);
+        if (result.containsKey(app.appName)) {
+          result[app.appName]!.usageTime = Duration(
+              minutes: result[app.appName]!.usageTime.inMinutes +
+                  app.usageTime.inMinutes);
+        } else {
+          result[app.appName] = AppUsageData(
+              appName: app.appName,
+              usageTime: app.usageTime,
+              appIcon: app.appIcon);
         }
       }
     }
     final List<AppUsageData> sortedList = result.values.toList();
     sortedList.sort((a, b) => b.usageTime.compareTo(a.usageTime));
-    if(!isCompare && !isBarChart)
-    {
-      _getCompareText(startPickedDate,currentChangeDateMode);
+    if (!isCompare && !isBarChart) {
+      _getCompareText(startPickedDate, currentChangeDateMode);
     }
     return sortedList;
   }

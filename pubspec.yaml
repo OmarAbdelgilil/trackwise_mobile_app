@@ -40,7 +40,6 @@ dependencies:
   dio: 
   jwt_decoder: 
   flutter_riverpod: 
-  shared_preferences_android: 
   google_fonts: 
   pretty_dio_logger: 
   flutter_screenutil: 
@@ -56,6 +55,7 @@ dependencies:
   weekly_date_picker: ^1.4.2
   health: ^12.0.1
   lottie: ^3.3.1
+  shared_preferences: ^2.5.2
 
 dev_dependencies:
   flutter_test:

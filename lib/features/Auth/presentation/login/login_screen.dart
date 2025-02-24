@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/features/Auth/presentation/login/login_viewmodel.dart';
+import 'package:track_wise_mobile_app/features/Home/presentation/home_screen.dart';
 import 'package:track_wise_mobile_app/main.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/custom_text_field.dart';
@@ -28,13 +29,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final logProv = ref.watch(loginProvider);
 
     if (logProv is SuccessState) {
-      //TBD!!!
-      return Scaffold(
-        body: Center(
-          child: Text(logProv.user.firstName),
-        ),
-      );
-      //////////
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (Route<dynamic> route) => false,
+        );
+      });
     }
     if (logProv is ErrorState) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

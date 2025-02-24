@@ -1,0 +1,2 @@
+D:/uni/Graduation project/Project/track_wise_mobile_app/android/app/.cxx/RelWithDebInfo/3y5d2s71/x86_64/CMakeFiles/edit_cache.dir
+D:/uni/Graduation project/Project/track_wise_mobile_app/android/app/.cxx/RelWithDebInfo/3y5d2s71/x86_64/CMakeFiles/rebuild_cache.dir

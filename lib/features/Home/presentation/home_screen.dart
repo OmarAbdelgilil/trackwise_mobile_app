@@ -33,11 +33,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             builder: (context, value, child) {
               final providerState = ref.watch(homeProvider);
               return providerState is HomeLoadingState ||
-                      providerState is InitialState ||
-                      (prov.appUsageInfoMap[prov.pickedDate] == null ||
-                          prov.appUsageInfoMap[prov.pickedDate]![
-                                  prov.changeDateMode] ==
-                              null)
+                      providerState is InitialState
                   ? const Center(child: CircularProgressIndicator())
                   : value['widget'] is! HomeScreen
                       ? value['widget']
@@ -84,10 +80,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   )
                                 ],
                                 GestureDetector(
-                                    onTap: () async {
-                                      await prov.openCalender(context);
-                                    },
-                                    child: const CircleProgressBar()),
+                                  onHorizontalDragEnd: (data){prov.toggleCharts();},
+                                  child: AnimatedSwitcher(duration: const Duration(seconds: 1),child: !prov.isBarChart? GestureDetector(
+                                      onTap: () async {
+                                        await prov.openCalender(context);
+                                      },
+                                      child: const CircleProgressBar()) : const BarChartWidget(),),
+                                ),
+                                // GestureDetector(
+                                //     onTap: () async {
+                                //       await prov.openCalender(context);
+                                //     },
+                                //     child: const CircleProgressBar()),
                                 // const BarChartWidget(),
                                 Container(
                                     alignment: Alignment.centerLeft,

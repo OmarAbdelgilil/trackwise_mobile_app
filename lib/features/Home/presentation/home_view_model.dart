@@ -12,54 +12,17 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 class HomeViewModel extends StateNotifier<HomeState> {
   late final ProviderContainer _providerContainer;
   late DateTime pickedDate;
-  Map<DateTime, Map<ChangeDateMode, List<AppUsageData>>> appUsageInfoMap = {};
+  //Map<DateTime, Map<ChangeDateMode, List<AppUsageData>>> appUsageInfoMap = {};
+  //final Map<DateTime, List<AppUsageData>> _appUsageInfo = {};
+  List<AppUsageData> appsList = [];
   ChangeDateMode changeDateMode = ChangeDateMode.daily;
   String compareText = '';
   bool isBarChart = false;
   Map<DateTime, Duration> barData = {};
   HomeViewModel() : super(InitialState()) {
     _providerContainer = ProviderContainer();
-    final now = DateTime.now();
-    pickedDate = DateTime(now.year, now.month, now.day);
-    if(isBarChart)
-    {
-      _updateBarData(pickedDate);
-    }else{
-      _getUsageData(pickedDate);
-    }
+    _initFunction();
   }
-
-  Future<void> _getUsageData(DateTime startPickedDate) async {
-    pickedDate = changeDateMode == ChangeDateMode.monthly
-        ? DateTime(startPickedDate.year, startPickedDate.month, 1)
-        : startPickedDate;
-    startPickedDate = pickedDate;
-    DateTime endDate = changeDateMode == ChangeDateMode.daily
-        ? DateTime(startPickedDate.year, startPickedDate.month,
-            startPickedDate.day, 23, 59, 59)
-        : changeDateMode == ChangeDateMode.weekly
-            ? startPickedDate.add(const Duration(days: 7))
-            : DateTime(startPickedDate.year, startPickedDate.month + 1, 1);
-    //check if it doesn't exist
-    if (appUsageInfoMap[startPickedDate] == null ||
-        appUsageInfoMap[startPickedDate]![changeDateMode] == null ||
-        appUsageInfoMap[startPickedDate]![changeDateMode]!.isEmpty) {
-      if (!isBarChart) {
-        state = HomeLoadingState();
-      }
-      List<AppUsageData> appInfoTemp = await _providerContainer
-          .read(appUsageProvider.notifier)
-          .getUsageData(startPickedDate, endDate);
-      appInfoTemp.sort((a, b) => b.usageTime.compareTo(a.usageTime));
-      appUsageInfoMap[startPickedDate] ??= {};
-      appUsageInfoMap[startPickedDate]![changeDateMode] = [...appInfoTemp];
-    }
-    if (!isBarChart) {
-      await _getCompareText(startPickedDate, changeDateMode);
-      state = UsageUpdated();
-    }
-  }
-
   Future<void> openCalender(BuildContext context) async {
     final now = DateTime.now();
     DateTime? pickedDateTemp = await (changeDateMode != ChangeDateMode.monthly
@@ -79,70 +42,38 @@ class HomeViewModel extends StateNotifier<HomeState> {
       return;
     }
     pickedDate = pickedDateTemp;
-    state = DatePicked();
+    appsList = List.from(_getUsageInfo(pickedDate,changeDateMode));
     if(isBarChart)
     {
       _updateBarData(pickedDate);
-    }else{
-      await _getUsageData(pickedDate);
     }
+    state = DatePicked();
 
   }
-
+  void toggleBarTouch(DateTime date)
+  {
+    pickedDate = date;
+    appsList = List.from(_getUsageInfo(pickedDate,changeDateMode));
+    state = DatePicked();
+  }
   Future<void> _getCompareText(
       DateTime myDate, ChangeDateMode changeDateMode) async {
     ///////////////////////////////////
-    DateTime endDate = changeDateMode == ChangeDateMode.daily
-        ? DateTime(myDate.year, myDate.month, myDate.day, 23, 59, 59)
-        : changeDateMode == ChangeDateMode.weekly
-            ? myDate.add(const Duration(days: 7))
-            : DateTime(myDate.year, myDate.month + 1, 1);
     DateTime startDateCompare = DateTime(
         myDate.year,
-        changeDateMode == ChangeDateMode.monthly
-            ? myDate.month - 1
-            : myDate.month,
-        changeDateMode == ChangeDateMode.daily
-            ? myDate.day - 1
-            : changeDateMode == ChangeDateMode.weekly
-                ? myDate.day - 7
-                : myDate.day,
-        myDate.hour,
-        myDate.minute,
-        myDate.second);
-    DateTime endDateCompare = DateTime(
-        endDate.year,
-        changeDateMode == ChangeDateMode.monthly
-            ? endDate.month - 1
-            : endDate.month,
-        changeDateMode == ChangeDateMode.daily
-            ? endDate.day - 1
-            : changeDateMode == ChangeDateMode.weekly
-                ? endDate.day - 7
-                : endDate.day,
-        endDate.hour,
-        endDate.minute,
-        endDate.second);
+        changeDateMode == ChangeDateMode.monthly? myDate.month - 1: myDate.month,
+        changeDateMode == ChangeDateMode.daily? myDate.day - 1 : changeDateMode == ChangeDateMode.weekly
+                ? myDate.day - 7 : 1,);
 
-    List<AppUsageData>? infoCompare =
-        appUsageInfoMap[startDateCompare]?[changeDateMode];
-    if (infoCompare == null) {
-      List<AppUsageData> appInfoTemp = await _providerContainer
-          .read(appUsageProvider.notifier)
-          .getUsageData(startDateCompare, endDateCompare);
-      appInfoTemp = appInfoTemp
-          .where((element) => element.usageTime.inMinutes != 0)
-          .toList();
-      appInfoTemp.sort((a, b) => b.usageTime.compareTo(a.usageTime));
-      appUsageInfoMap[startDateCompare] ??= {};
-      appUsageInfoMap[startDateCompare]![changeDateMode] = [...appInfoTemp];
-    }
+    List<AppUsageData>? infoCompare = _getUsageInfo(startDateCompare,changeDateMode, isCompare: true);
+    final nowInfo = _getUsageInfo(myDate,changeDateMode, isCompare: true);
+
     final totalUsageTimeToCompare =
-        appUsageInfoMap[startDateCompare]![changeDateMode]!.fold(
+        infoCompare.fold(
       const Duration(minutes: 0),
       (Duration? a, AppUsageData b) => a! + b.usageTime,
     );
-    final totalUsageTimePicked = appUsageInfoMap[myDate]![changeDateMode]!.fold(
+    final totalUsageTimePicked = nowInfo.fold(
       const Duration(minutes: 0),
       (Duration? a, AppUsageData b) => a! + b.usageTime,
     );
@@ -165,13 +96,10 @@ class HomeViewModel extends StateNotifier<HomeState> {
   void toggleDateMode(ChangeDateMode mode) async{
     if (changeDateMode != mode) {
       changeDateMode = mode;
-      
+      appsList = List.from(_getUsageInfo(pickedDate, changeDateMode));
       if(isBarChart)
       {
-        await _getUsageData(pickedDate);
         _updateBarData(pickedDate);
-      }else{
-        _getUsageData(pickedDate);
       }
       state = DateModeChanged();
     }
@@ -184,8 +112,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     );
   }
 
-  Future<void> _updateBarData(DateTime pickedDateEndBar) async {
-    state = HomeLoadingState();
+  void _updateBarData(DateTime pickedDateEndBar) {
     Map<DateTime, Duration> result = {};
     int length = changeDateMode == ChangeDateMode.daily ? 7 : 4;
     for (int i = 1; i <= length; i++) {
@@ -202,12 +129,80 @@ class HomeViewModel extends StateNotifier<HomeState> {
               pickedDateEndBar.month - (length - i), pickedDateEndBar.day);
           break;
       }
-      await _getUsageData(date);
+      final appList = _getUsageInfo(date, changeDateMode);
       result.addAll(
-          {date: getTotalUsage(appUsageInfoMap[date]![changeDateMode]!)});
+          {date: getTotalUsage(appList)});
     }
     barData = result;
     state = BarDataUpdated();
+  }
+  void toggleCharts()
+  {
+    if(isBarChart)
+    {
+      isBarChart = false;
+      state = ToggleCharts();
+    }else{
+      //state updates in _updateBarData
+      isBarChart = true;
+      if(barData.isEmpty)
+      {
+        _updateBarData(pickedDate);
+      }
+    }
+    state = ToggleCharts();
+  }
+
+  Future<void> _initFunction() async
+  {
+    final prov = _providerContainer.read(appUsageProvider.notifier);
+    final now = DateTime.now();
+    pickedDate = DateTime(now.year, now.month, now.day);
+    for (int i=10; i >= 0;i--) {
+      final startDate = DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
+      final endDate = DateTime(startDate.year, startDate.month,startDate.day, 23, 59, 59);
+      await prov.getUsageData(startDate, endDate);
+    }
+    appsList = prov.getUsageState(pickedDate)!;
+    appsList.sort((a, b) => b.usageTime.compareTo(a.usageTime));
+    if(!isBarChart)
+    {
+      _getCompareText(pickedDate, changeDateMode);
+    }
+    state = UsageUpdated();
+  }
+
+  List<AppUsageData> _getUsageInfo(DateTime startPickedDate,ChangeDateMode currentChangeDateMode, {bool isCompare = false}) {
+    ////////******** don't update apps list or state here */
+    int length = currentChangeDateMode == ChangeDateMode.daily? 1 : currentChangeDateMode == ChangeDateMode.weekly ? 7 : DateTimeRange(
+                       start: DateTime(startPickedDate.year, startPickedDate.month, 1),
+                       end: DateTime(startPickedDate.year, startPickedDate.month + 1,))
+                    .duration
+                    .inDays;
+    Map<String, AppUsageData> result = {};
+    final prov = _providerContainer.read(appUsageProvider.notifier);
+    if (currentChangeDateMode == ChangeDateMode.monthly)
+    {
+      startPickedDate = DateTime(startPickedDate.year, startPickedDate.month, 1);
+    }
+    for(int i=0;i<length;i++)
+    {
+      final date = startPickedDate.add(Duration(days: i));
+      for (AppUsageData app in prov.getUsageState(date) ?? []) {
+        if(result.containsKey(app.appName)){
+          result[app.appName]!.usageTime = Duration(minutes: result[app.appName]!.usageTime.inMinutes + app.usageTime.inMinutes);
+        }else{
+          result[app.appName] = AppUsageData(appName: app.appName, usageTime: app.usageTime, appIcon: app.appIcon);
+        }
+      }
+    }
+    final List<AppUsageData> sortedList = result.values.toList();
+    sortedList.sort((a, b) => b.usageTime.compareTo(a.usageTime));
+    if(!isCompare && !isBarChart)
+    {
+      _getCompareText(startPickedDate,currentChangeDateMode);
+    }
+    return sortedList;
   }
 }
 
@@ -227,6 +222,8 @@ class UsageUpdated extends HomeState {}
 class BarDataUpdated extends HomeState {}
 
 class DateModeChanged extends HomeState {}
+
+class ToggleCharts extends HomeState {}
 
 class SuccessState extends HomeState {
   final User user;

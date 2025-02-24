@@ -6,36 +6,65 @@ import 'package:track_wise_mobile_app/features/Home/presentation/home_view_model
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
-class BarChartWidget extends ConsumerWidget {
+class BarChartWidget extends ConsumerStatefulWidget {
   const BarChartWidget({super.key});
-  
+
   @override
-  Widget build(BuildContext context,WidgetRef ref) {
+  ConsumerState<BarChartWidget> createState() => _BarChartWidgetState();
+}
+
+class _BarChartWidgetState extends ConsumerState<BarChartWidget> {
+  int touchedBarGroupIndex = -1;
+  @override
+  Widget build(BuildContext context) {
     ref.watch(homeProvider);
     final prov = ref.read(homeProvider.notifier);
+    if (prov.barData.isEmpty) {
+      return const Placeholder();
+    }
     final dates = prov.barData.keys.toList();
     final durations = prov.barData.values.toList();
-    //{25/12 as DateTime: 6, 28/12: 7};
-    //dynamic durations in info
-    // final List<double> points = [4, 8, 7, 2, 6, 10, 5];
-    final avgInHours = durations.reduce(
-          (a, b) => a + b,
-        ).inHours /
+    if(touchedBarGroupIndex != dates.indexOf(prov.pickedDate))
+    {
+      setState(() {
+        touchedBarGroupIndex = dates.indexOf(prov.pickedDate);
+      });
+    }
+    final avgInHours = durations
+            .reduce(
+              (a, b) => a + b,
+            )
+            .inHours /
         durations.length;
     return Padding(
-      padding: const EdgeInsets.only(top: 15.0, bottom: 15),
+      padding: const EdgeInsets.only(top: 15.0, bottom: 45),
       child: AspectRatio(
-        aspectRatio: 2,
-        child: BarChart(
+        aspectRatio: 1.7,
+        child: BarChart(          
           BarChartData(
-            barTouchData: BarTouchData(touchTooltipData: BarTouchTooltipData(
-              fitInsideVertically: true,
-              tooltipBorder: BorderSide.none,
-              tooltipMargin: 0,
-              tooltipPadding: const EdgeInsets.all(0),
-              getTooltipColor: (group) => const Color.fromARGB(0, 0, 0, 0),
-              getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem("${rod.toY.toInt().toString()} hrs",const TextStyle(color: Color.fromARGB(212, 255, 255, 255),fontSize: 10)),
-            )),
+            barTouchData: BarTouchData(
+                touchCallback: (FlTouchEvent event, barTouchResponse) {
+                  if (barTouchResponse != null &&
+                      barTouchResponse.spot != null) {
+                    setState(() {
+                      touchedBarGroupIndex = barTouchResponse.spot!.touchedBarGroupIndex;
+                      prov.toggleBarTouch(dates[touchedBarGroupIndex]);
+                    });
+                  }
+                },
+                touchTooltipData: BarTouchTooltipData(
+                  fitInsideVertically: true,
+                  tooltipBorder: BorderSide.none,
+                  tooltipMargin: 0,
+                  tooltipPadding: const EdgeInsets.all(0),
+                  getTooltipColor: (group) => const Color.fromARGB(0, 0, 0, 0),
+                  getTooltipItem: (group, groupIndex, rod, rodIndex) =>
+                      BarTooltipItem(
+                          "${rod.toY.toInt().toString()} hrs",
+                          const TextStyle(
+                              color: Color.fromARGB(212, 255, 255, 255),
+                              fontSize: 10)),
+                )),
             extraLinesData: ExtraLinesData(horizontalLines: [
               HorizontalLine(
                 y: avgInHours,
@@ -58,12 +87,13 @@ class BarChartWidget extends ConsumerWidget {
                 dashArray: [2, 3],
               ),
             ]),
-            barGroups: _chartGroups(avgInHours, prov.barData),
+            barGroups: _chartGroups(avgInHours, prov.barData,touchedBarGroupIndex),
             borderData: FlBorderData(
                 border: const Border(bottom: BorderSide(), left: BorderSide())),
             gridData: const FlGridData(show: false),
             titlesData: FlTitlesData(
-              bottomTitles: AxisTitles(sideTitles: _bottomTitles(prov.changeDateMode, dates)),
+              bottomTitles: AxisTitles(
+                  sideTitles: _bottomTitles(prov.changeDateMode, dates)),
               leftTitles:
                   const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               topTitles:
@@ -78,27 +108,35 @@ class BarChartWidget extends ConsumerWidget {
   }
 }
 
-List<BarChartGroupData> _chartGroups(avg, Map<DateTime, Duration> barData) {
+List<BarChartGroupData> _chartGroups(avg, Map<DateTime, Duration> barData,int touchedBarGroupIndex) {
   final dates = barData.keys.toList();
   List<BarChartGroupData> data = [];
   for (int i = 0; i < dates.length; i++) {
+    final toY = barData[dates[i]]!.inHours;
     data.add(BarChartGroupData(x: i, barRods: [
       BarChartRodData(
-          toY: barData[dates[i]]!.inHours.toDouble(), color: barData[dates[i]]!.inHours >= avg ? ColorsManager.red : null,)
+        toY: toY.toDouble(),
+        color: barData[dates[i]]!.inHours >= avg ? ColorsManager.red : null,
+        width: i == touchedBarGroupIndex ? 15 : 10,
+      )
     ]));
   }
   return data;
 }
 
-SideTitles _bottomTitles(ChangeDateMode changeDateMode,List<DateTime> dates) => SideTitles(
-    showTitles: true,
-    getTitlesWidget: (value, meta) {
-      final text = DateFormat(changeDateMode != ChangeDateMode.monthly? 'd/M' : 'MMMyy').format(dates[value.toInt()]);
-      return Padding(
-        padding: const EdgeInsets.only(top:  4.0),
-        child: Text(
-          text,
-          style: const TextStyle(color: Colors.white, fontSize: 11),
-        ),
-      );
-    });
+SideTitles _bottomTitles(ChangeDateMode changeDateMode, List<DateTime> dates) =>
+    SideTitles(
+        showTitles: true,
+        getTitlesWidget: (value, meta) {
+          final endDateWeekly = DateFormat('d/M').format(dates[value.toInt()].add(const Duration(days: 6)));
+          final text = DateFormat(
+                  changeDateMode != ChangeDateMode.monthly ? 'd/M' : 'MMMyy')
+              .format(dates[value.toInt()]);
+          return Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Text(
+              changeDateMode == ChangeDateMode.weekly? '$text-$endDateWeekly' : text,
+              style: const TextStyle(color: Colors.white, fontSize: 11),
+            ),
+          );
+        });

@@ -15,14 +15,20 @@ class CircleProgressBar extends ConsumerStatefulWidget {
 }
 
 class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
-
   @override
   Widget build(BuildContext context) {
     ref.watch(homeProvider);
     final prov = ref.read(homeProvider.notifier);
-    final endDateWeekly = prov.pickedDate.add(const Duration(days: 7));
-    final String date = prov.changeDateMode == ChangeDateMode.weekly ? '${prov.pickedDate.day}/${prov.pickedDate.month}-${endDateWeekly.day}/${endDateWeekly.month}' : DateFormat(prov.changeDateMode == ChangeDateMode.monthly ? "MMMyy" : prov.pickedDate.year == DateTime.now().year ? "d/M" : "d/M/yy").format(prov.pickedDate);
-    final totalUsageTime = prov.getTotalUsage(prov.appUsageInfoMap[prov.pickedDate]![prov.changeDateMode]!);    
+    final endDateWeekly = prov.pickedDate.add(const Duration(days: 6));
+    final String date = prov.changeDateMode == ChangeDateMode.weekly
+        ? '${prov.pickedDate.day}/${prov.pickedDate.month}-${endDateWeekly.day}/${endDateWeekly.month}'
+        : DateFormat(prov.changeDateMode == ChangeDateMode.monthly
+                ? "MMMyy"
+                : prov.pickedDate.year == DateTime.now().year
+                    ? "d/M"
+                    : "d/M/yy")
+            .format(prov.pickedDate);
+    final totalUsageTime = prov.getTotalUsage(prov.appsList);
     return ClipRect(
         child: Align(
             alignment: Alignment.bottomCenter,
@@ -49,26 +55,26 @@ class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
                         textBaseline: TextBaseline.alphabetic,
                         children: [
                           Text(
-                                  totalUsageTime.inHours.toString(),
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 32),
-                                ),
+                            totalUsageTime.inHours.toString(),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 32),
+                          ),
                           const Text(
                             'hrs',
                             style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
-                          if(totalUsageTime.inMinutes.remainder(60) > 20)
-                           ...[
+                          if (totalUsageTime.inMinutes.remainder(60) > 20) ...[
                             Text(
-                                  totalUsageTime.inMinutes.remainder(60).toString(),
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 32),
-                                ),
-                          const Text(
-                            'mins',
-                            style: TextStyle(color: Colors.white, fontSize: 12),
-                          ),
-                           ]
+                              totalUsageTime.inMinutes.remainder(60).toString(),
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 32),
+                            ),
+                            const Text(
+                              'mins',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 12),
+                            ),
+                          ]
                         ],
                       ),
                       SizedBox(
@@ -76,16 +82,21 @@ class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
                         child: Text(
                           prov.compareText,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.white, fontSize: 11),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 11),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
-                        ),)
-
+                        ),
+                      )
                     ],
                   ))
                 ],
                 minimum: 0,
-                maximum: prov.changeDateMode == ChangeDateMode.daily? 24 : prov.changeDateMode == ChangeDateMode.weekly? 168 : 730.001,
+                maximum: prov.changeDateMode == ChangeDateMode.daily
+                    ? 24
+                    : prov.changeDateMode == ChangeDateMode.weekly
+                        ? 168
+                        : 730.001,
                 //change where the progress will start
                 startAngle: 90,
                 endAngle: 90 + 360,

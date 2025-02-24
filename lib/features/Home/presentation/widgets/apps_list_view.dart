@@ -15,17 +15,17 @@ class AppsListView extends ConsumerWidget {
     ref.watch(homeProvider);
     late AppUsageData? maxUsage;
     Widget? emptyCheck;
-    if(prov.appUsageInfoMap[prov.pickedDate] == null || prov.appUsageInfoMap[prov.pickedDate]![prov.changeDateMode] == null || prov.appUsageInfoMap[prov.pickedDate]![prov.changeDateMode]!.isEmpty)
+    if(prov.appsList.isEmpty)
     {
       emptyCheck = const Center(child: Text(StringsManager.noAppsFound,style: TextStyle(color: Colors.white ,fontWeight: FontWeight.bold),));
     }else{
-      maxUsage = prov.appUsageInfoMap[prov.pickedDate]![prov.changeDateMode]!.reduce((a, b) => a.usageTime > b.usageTime ? a : b);
+      maxUsage = prov.appsList.reduce((a, b) => a.usageTime > b.usageTime ? a : b);
     }
     return  SizedBox(
                     height: 265.h,
                     child: emptyCheck ?? ListView(
                       children: [
-                        for(AppUsageData app in prov.appUsageInfoMap[prov.pickedDate]![prov.changeDateMode]!)
+                        for(AppUsageData app in prov.appsList)
                           AppTile(appData: app,maxUsage:maxUsage == null? const Duration(minutes: 0) :  maxUsage.usageTime)
                       ],
                     ),

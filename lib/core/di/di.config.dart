@@ -32,6 +32,7 @@ import '../../features/Auth/presentation/register/register_viewmodel.dart'
 import '../../features/Home/presentation/home_view_model.dart' as _i286;
 import '../../features/profile/presentation/view_models/profile_view_model.dart'
     as _i668;
+import '../../features/steps/presentation/steps_viewmodel.dart' as _i1071;
 import '../api/api_manager.dart' as _i1047;
 import '../modules/shared_prefs_module.dart' as _i998;
 import '../provider/user_provider.dart' as _i505;
@@ -52,6 +53,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => sharedPrefsModule.prefs,
       preResolve: true,
     );
+    gh.factory<_i1071.StepsViewmodel>(() => _i1071.StepsViewmodel());
     gh.singleton<_i1047.ApiManager>(() => _i1047.ApiManager());
     gh.lazySingleton<_i505.UserNotifier>(() => _i505.UserNotifier());
     gh.factory<_i537.OfflineDataSource>(

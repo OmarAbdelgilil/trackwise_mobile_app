@@ -3,10 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/home_view_model.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/nav_bar_router/nav_bar_router.dart';
+import 'package:track_wise_mobile_app/features/Home/presentation/widgets/animated_bar_circle_switch.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/apps_list_view.dart';
-import 'package:track_wise_mobile_app/features/Home/presentation/widgets/bar_chart.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/bottom_nav_bar.dart';
-import 'package:track_wise_mobile_app/features/Home/presentation/widgets/circle_progress_bar.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/home_toggle_button.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/scaffold_app_bar.dart';
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
@@ -79,13 +78,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     ],
                                   )
                                 ],
-                                GestureDetector(
-                                  onHorizontalDragEnd: (data){prov.toggleCharts();},
-                                  child: AnimatedSwitcher(duration: const Duration(seconds: 1),child: !prov.isBarChart? GestureDetector(
-                                      onTap: () async {
-                                        await prov.openCalender(context);
-                                      },
-                                      child: const CircleProgressBar()) : const BarChartWidget(),),
+                                AnimatedBarCircleSwitch(
+                                  prov: prov,
                                 ),
                                 // GestureDetector(
                                 //     onTap: () async {

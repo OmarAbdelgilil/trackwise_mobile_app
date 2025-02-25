@@ -23,6 +23,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final user = result.data!.$1;
       final token = result.data!.$2;
       _providerContainer.read(userProvider.notifier).setUser(user, token);
+      await _offlineDataSource.saveToken(token);
       return Success(user);
     }
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/features/Auth/presentation/login/login_viewmodel.dart';
-import 'package:track_wise_mobile_app/features/Home/presentation/home_screen.dart';
+import 'package:track_wise_mobile_app/features/Auth/presentation/register/register_screen.dart';
 import 'package:track_wise_mobile_app/main.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/custom_text_field.dart';
@@ -23,17 +23,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   RegExp emailRegex =
       RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
   final formKey = GlobalKey<FormState>();
-
+  @override
+  void dispose() {
+    super.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final logProv = ref.watch(loginProvider);
 
     if (logProv is SuccessState) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-          (Route<dynamic> route) => false,
-        );
+        Navigator.of(context).pop();
+        ref.read(loginProvider.notifier).resetState();
       });
     }
     if (logProv is ErrorState) {
@@ -42,6 +45,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         scaffoldMessengerKey.currentState!.showSnackBar(
           SnackBar(content: Text(extractErrorMessage(logProv.error))),
         );
+        ref.read(loginProvider.notifier).resetState();
       });
     }
 
@@ -142,7 +146,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     style: TextStyle(color: Colors.white),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                            builder: (context) => const RegisterScreen()),
+                      );
+                    },
                     child: const Text(
                       StringsManager.signUp,
                       style: TextStyle(

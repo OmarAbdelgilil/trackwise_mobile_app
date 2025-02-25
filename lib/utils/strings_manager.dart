@@ -1,15 +1,27 @@
 class StringsManager {
   static const String loginTitle = "Login";
+  static const String signUpTitle = "Sign Up";
+  static const String register = "Register";
   static const String emailLabel = "Email";
   static const String emailHint = "Example@gmail.com";
+  static const String firstNameHint = "First name";
+  static const String firstNameLabel = "Ex:John";
+  static const String lastNameHint = "Last name";
+  static const String lastNameLabel = "Ex:Doe";
+  static const String phoneNumberHint = "+201333333333";
+  static const String phoneNumberLabel = "Phone Number";
   static const String emptyEmailError = "Please enter an email";
   static const String invalidEmailFormat = "Please enter a valid email address";
   static const String passwordLabel = "Password";
+  static const String confirmPasswordLabel = "Confirm Password";
   static const String passwordHint = "********";
   static const String emptyPasswordError = "Please enter Password";
+  static const String passwordDontMatchError = "Passwords don't match";
   static const String forgetPassBtn = "Forgot password?";
   static const String dontHaveAcc = "Don’t have an account?";
+  static const String alreadyHaveAcc = "Already have an account?";
   static const String signUp = "sign up";
+  static const String signIn = "sign in";
   static const String or = "OR";
   static const String signWithGoogle = "Sign in with google";
   static const String screenTime = "Screen Time";
@@ -22,5 +34,7 @@ class StringsManager {
   static const String daily = "Daily";
   static const String weekly = "Weekly";
   static const String monthly = "Monthly";
+  static const String phoneNumberError = "wrong phone number format";
+  static const String minLengthPasswordError = "Your password must be at least 8 characters long";
   
 }

@@ -29,7 +29,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
     return Fail((result as Fail).exception);
   }
-
+  @override
+  Future<Result<void>> register(String email, String firstName, String lastName,String phoneNumber, String password, String confirmPassword) async
+  {
+    final res = await _onlineDataSource.register(email, firstName, lastName, phoneNumber, password, confirmPassword);
+    return res is Success ? Success(res.data) : Fail((res as Fail).exception);
+  }
   @override
   Future<void> checkCache() async {
     if (_providerContainer.read(userProvider.notifier).token == null) {

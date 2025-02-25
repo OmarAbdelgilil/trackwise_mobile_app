@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
+import 'package:track_wise_mobile_app/utils/strings_manager.dart';
 
 class CustomTextField extends StatefulWidget {
   final String hint;
@@ -57,6 +58,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      keyboardType: widget.label == StringsManager.emailLabel? TextInputType.emailAddress : (widget.label == StringsManager.passwordLabel || widget.label == StringsManager.confirmPasswordLabel) ? TextInputType.visiblePassword : widget.label == StringsManager.phoneNumberLabel? TextInputType.phone : null,
       obscureText: _obscureText, // Use _obscureText to toggle visibility
       validator: _validate,
       readOnly: widget.readOnly ?? false,

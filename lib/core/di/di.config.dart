@@ -25,7 +25,10 @@ import '../../features/Auth/domain/use_cases/check_user_cache_use_case.dart'
     as _i513;
 import '../../features/Auth/domain/use_cases/login_use_case.dart' as _i694;
 import '../../features/Auth/domain/use_cases/logout_use_case.dart' as _i1054;
+import '../../features/Auth/domain/use_cases/register_use_case.dart' as _i228;
 import '../../features/Auth/presentation/login/login_viewmodel.dart' as _i641;
+import '../../features/Auth/presentation/register/register_viewmodel.dart'
+    as _i902;
 import '../../features/Home/presentation/home_view_model.dart' as _i286;
 import '../../features/profile/presentation/view_models/profile_view_model.dart'
     as _i668;
@@ -65,10 +68,14 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i694.LoginUseCase(gh<_i492.AuthRepository>()));
     gh.factory<_i1054.LogoutUseCase>(
         () => _i1054.LogoutUseCase(gh<_i492.AuthRepository>()));
+    gh.factory<_i228.RegisterUseCase>(
+        () => _i228.RegisterUseCase(gh<_i492.AuthRepository>()));
     gh.factory<_i668.ProfileViewModel>(
         () => _i668.ProfileViewModel(gh<_i1054.LogoutUseCase>()));
     gh.factory<_i286.HomeViewModel>(
         () => _i286.HomeViewModel(gh<_i513.CheckUserCacheUseCase>()));
+    gh.factory<_i902.RegisterViewmodel>(
+        () => _i902.RegisterViewmodel(gh<_i228.RegisterUseCase>()));
     gh.factory<_i641.LoginViewmodel>(
         () => _i641.LoginViewmodel(gh<_i694.LoginUseCase>()));
     return this;

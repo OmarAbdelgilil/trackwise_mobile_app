@@ -22,6 +22,10 @@ class LoginViewmodel extends StateNotifier<LoginState> {
         return;
     }
   }
+  void resetState()
+  {
+    state = InitialState();
+  }
 }
 
 final loginProvider = StateNotifierProvider<LoginViewmodel, LoginState>(

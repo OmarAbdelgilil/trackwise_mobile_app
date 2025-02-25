@@ -9,15 +9,15 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final prov = ref.watch(userProvider.notifier);
-    final viewModel = ref.watch(profileProvider.notifier);
-    return prov.token == null
+    final prov = ref.watch(userProvider);
+    final viewModel = ref.read(profileProvider.notifier);
+    return prov == null
         ? const ProfileLoginScreen()
         : Center(
             child: Column(
               children: [
                 Text(
-                  ref.read(userProvider)!.firstName,
+                  prov.firstName,
                   style: const TextStyle(color: Colors.white),
                 ),
                 ElevatedButton(

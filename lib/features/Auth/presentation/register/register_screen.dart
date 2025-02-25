@@ -37,6 +37,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _lastNameController.dispose();
     _phoneNumberController.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     final regProv = ref.watch(registerProvider);
@@ -60,6 +61,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
         title: Text(
           StringsManager.signUpTitle,
           style: TextStyle(fontSize: 24.sp, color: Colors.white),
@@ -196,14 +198,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           onPressed: () {
                             if (formKey.currentState!.validate()) {
                               FocusManager.instance.primaryFocus?.unfocus();
-                                ref.read(registerProvider.notifier).register(
-                                _emailController.text,
-                                _firstNameController.text,
-                                _lastNameController.text,
-                                _phoneNumberController.text,
-                                _passwordController.text,
-                                _confirmPasswordController.text
-                                );
+                              ref.read(registerProvider.notifier).register(
+                                  _emailController.text,
+                                  _firstNameController.text,
+                                  _lastNameController.text,
+                                  _phoneNumberController.text,
+                                  _passwordController.text,
+                                  _confirmPasswordController.text);
                             }
                           },
                           child: Text(

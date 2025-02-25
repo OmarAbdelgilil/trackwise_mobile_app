@@ -29,6 +29,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     final logProv = ref.watch(loginProvider);
@@ -51,6 +52,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
         title: Text(
           StringsManager.loginTitle,
           style: TextStyle(fontSize: 24.sp, color: Colors.white),

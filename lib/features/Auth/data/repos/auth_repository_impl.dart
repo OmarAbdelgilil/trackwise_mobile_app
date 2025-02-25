@@ -40,4 +40,10 @@ class AuthRepositoryImpl implements AuthRepository {
       }
     }
   }
+
+  @override
+  Future<void> logout() async {
+    await _offlineDataSource.clearToken();
+    _providerContainer.read(userProvider.notifier).clearUser();
+  }
 }

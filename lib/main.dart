@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
 // import 'package:track_wise_mobile_app/features/Auth/presentation/login/login_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,8 +12,6 @@ import 'package:track_wise_mobile_app/permission_failed_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  print(prefs.get("token"));
   configureDependencies();
 
   runApp(const ProviderScope(child: MyApp()));

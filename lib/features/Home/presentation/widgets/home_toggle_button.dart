@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:track_wise_mobile_app/features/Home/presentation/home_view_model.dart';
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
 class HomeToggleButton extends StatelessWidget {
-  final HomeViewModel prov;
+  final dynamic prov;
   final String text;
   final ChangeDateMode toggle;
   const HomeToggleButton(

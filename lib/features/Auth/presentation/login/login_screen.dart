@@ -130,6 +130,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               foregroundColor: Colors.white),
                           onPressed: () {
                             if (formKey.currentState!.validate()) {
+                              FocusManager.instance.primaryFocus?.unfocus();
                               ref.read(loginProvider.notifier).login(
                                   _emailController.text,
                                   _passwordController.text);

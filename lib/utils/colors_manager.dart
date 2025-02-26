@@ -8,4 +8,5 @@ class ColorsManager {
   static const Color red = Color.fromARGB(255, 199, 48, 63);
   static const Color blue = Color.fromARGB(255, 48, 176, 199);
   static const Color darkTr = Color(0xff227697);
+  static const Color containerColor = Color.fromARGB(255, 7, 7, 44);
 }

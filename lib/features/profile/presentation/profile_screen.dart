@@ -21,7 +21,7 @@ class ProfileScreen extends ConsumerWidget {
         ? const ProfileLoginScreen()
         : SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(15),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -30,8 +30,8 @@ class ProfileScreen extends ConsumerWidget {
                       children: [
                         SvgPicture.asset(
                           "assets/svgs/profile_icon.svg",
-                          width: 150,
-                          height: 150,
+                          width: 150.w,
+                          height: 150.h,
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -48,17 +48,17 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const TagsSection(),
                   ProfileDetailsSection(
-                      email: prov.email, phone: "0111000000000"),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 25),
-                    child: Divider(
+                      email: prov.email, phone: prov.phone.toString()),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 25.w),
+                    child: const Divider(
                       color: ColorsManager.lightgrey,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 30),
-                    child: InkWell(
-                      onTap: () => showLogoutDialog(context, viewModel.logout),
+                  InkWell(
+                    onTap: () => showLogoutDialog(context, viewModel.logout),
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 12.h, bottom: 12.h),
                       child: Row(
                         children: [
                           Icon(

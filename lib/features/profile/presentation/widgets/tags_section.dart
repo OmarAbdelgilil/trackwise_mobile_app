@@ -11,7 +11,7 @@ class TagsSection extends StatelessWidget {
         SectionHeader(title: "Tags", buttonText: "Show all", onPressed: () {}),
         //tbd tags list
         const SizedBox(
-          height: 100,
+          height: 10,
         ),
         //////////////
       ],

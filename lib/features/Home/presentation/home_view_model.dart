@@ -44,6 +44,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
       return;
     }
     pickedDate = pickedDateTemp;
+    state = LoadingAppsList();
     appsList = List.from(_getUsageInfo(pickedDate, changeDateMode));
     if (isBarChart) {
       _updateBarData(pickedDate);
@@ -53,6 +54,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
 
   void toggleBarTouch(DateTime date) {
     pickedDate = date;
+    state = LoadingAppsList();
     appsList = List.from(_getUsageInfo(pickedDate, changeDateMode));
     state = DatePicked();
   }
@@ -103,6 +105,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
   void toggleDateMode(ChangeDateMode mode) async {
     if (changeDateMode != mode) {
       changeDateMode = mode;
+      state = LoadingAppsList();
       appsList = List.from(_getUsageInfo(pickedDate, changeDateMode));
       if (isBarChart) {
         _updateBarData(pickedDate);
@@ -236,6 +239,8 @@ class UsageUpdated extends HomeState {}
 class BarDataUpdated extends HomeState {}
 
 class DateModeChanged extends HomeState {}
+
+class LoadingAppsList extends HomeState {}
 
 class ToggleCharts extends HomeState {}
 

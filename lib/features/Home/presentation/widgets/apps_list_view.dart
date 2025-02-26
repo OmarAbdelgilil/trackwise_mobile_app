@@ -12,23 +12,34 @@ class AppsListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final prov = ref.read(homeProvider.notifier);
-    ref.watch(homeProvider);
+    final state = ref.watch(homeProvider);
     late AppUsageData? maxUsage;
-    Widget? emptyCheck;
-    if(prov.appsList.isEmpty)
-    {
-      emptyCheck = const Center(child: Text(StringsManager.noAppsFound,style: TextStyle(color: Colors.white ,fontWeight: FontWeight.bold),));
-    }else{
-      maxUsage = prov.appsList.reduce((a, b) => a.usageTime > b.usageTime ? a : b);
+    Widget? currentWidget;
+    if (state is LoadingAppsList) {
+      currentWidget = const Center(child: CircularProgressIndicator());
+    } else if (prov.appsList.isEmpty) {
+      currentWidget = const Center(
+          child: Text(
+        StringsManager.noAppsFound,
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ));
+    } else {
+      maxUsage =
+          prov.appsList.reduce((a, b) => a.usageTime > b.usageTime ? a : b);
     }
-    return  SizedBox(
-                    height: 265.h,
-                    child: emptyCheck ?? ListView(
-                      children: [
-                        for(AppUsageData app in prov.appsList)
-                          AppTile(appData: app,maxUsage:maxUsage == null? const Duration(minutes: 0) :  maxUsage.usageTime)
-                      ],
-                    ),
-                  );
+    return SizedBox(
+      height: 265.h,
+      child: currentWidget ??
+          ListView(
+            children: [
+              for (AppUsageData app in prov.appsList)
+                AppTile(
+                    appData: app,
+                    maxUsage: maxUsage == null
+                        ? const Duration(minutes: 0)
+                        : maxUsage.usageTime)
+            ],
+          ),
+    );
   }
 }

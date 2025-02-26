@@ -24,30 +24,28 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
     }
     final dates = prov.barData.keys.toList();
     final durations = prov.barData.values.toList();
-    if(touchedBarGroupIndex != dates.indexOf(prov.pickedDate))
-    {
+    if (touchedBarGroupIndex != dates.indexOf(prov.pickedDate)) {
       setState(() {
         touchedBarGroupIndex = dates.indexOf(prov.pickedDate);
       });
     }
-    final avgInHours = durations
-            .reduce(
-              (a, b) => a + b,
-            )
-             /
+    final avgInHours = durations.reduce(
+          (a, b) => a + b,
+        ) /
         durations.length;
     return Padding(
       padding: const EdgeInsets.only(top: 15.0, bottom: 45),
       child: AspectRatio(
         aspectRatio: 1.7,
-        child: BarChart(          
+        child: BarChart(
           BarChartData(
             barTouchData: BarTouchData(
                 touchCallback: (FlTouchEvent event, barTouchResponse) {
                   if (barTouchResponse != null &&
                       barTouchResponse.spot != null) {
                     setState(() {
-                      touchedBarGroupIndex = barTouchResponse.spot!.touchedBarGroupIndex;
+                      touchedBarGroupIndex =
+                          barTouchResponse.spot!.touchedBarGroupIndex;
                       prov.toggleBarTouch(dates[touchedBarGroupIndex]);
                     });
                   }
@@ -60,7 +58,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
                   getTooltipColor: (group) => const Color.fromARGB(0, 0, 0, 0),
                   getTooltipItem: (group, groupIndex, rod, rodIndex) =>
                       BarTooltipItem(
-                          "${rod.toY.toInt().toString()} hrs",
+                          "${rod.toY.toInt().toString()} steps",
                           const TextStyle(
                               color: Color.fromARGB(212, 255, 255, 255),
                               fontSize: 10)),
@@ -75,7 +73,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
                   alignment: Alignment.centerRight,
                   padding: const EdgeInsets.only(bottom: 20),
                   show: true,
-                  labelResolver: (line) => '${line.y.toInt()}hrs',
+                  labelResolver: (line) => '${line.y.toInt()}steps',
                   style: const TextStyle(
                       color: ColorsManager.blue, fontWeight: FontWeight.bold),
                 ),
@@ -87,13 +85,15 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
                 dashArray: [2, 3],
               ),
             ]),
-            barGroups: _chartGroups(avgInHours, prov.barData,touchedBarGroupIndex),
+            barGroups:
+                _chartGroups(avgInHours, prov.barData, touchedBarGroupIndex),
             borderData: FlBorderData(
                 border: const Border(bottom: BorderSide(), left: BorderSide())),
             gridData: const FlGridData(show: false),
             titlesData: FlTitlesData(
               bottomTitles: AxisTitles(
-                  sideTitles: _bottomTitles(prov.changeDateMode, dates)),
+                  sideTitles: _bottomTitles(
+                      prov.changeDateMode, dates, touchedBarGroupIndex)),
               leftTitles:
                   const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               topTitles:
@@ -108,7 +108,8 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
   }
 }
 
-List<BarChartGroupData> _chartGroups(avg, Map<DateTime, int> barData,int touchedBarGroupIndex) {
+List<BarChartGroupData> _chartGroups(
+    avg, Map<DateTime, int> barData, int touchedBarGroupIndex) {
   final dates = barData.keys.toList();
   List<BarChartGroupData> data = [];
   for (int i = 0; i < dates.length; i++) {
@@ -124,19 +125,36 @@ List<BarChartGroupData> _chartGroups(avg, Map<DateTime, int> barData,int touched
   return data;
 }
 
-SideTitles _bottomTitles(ChangeDateMode changeDateMode, List<DateTime> dates) =>
+SideTitles _bottomTitles(ChangeDateMode changeDateMode, List<DateTime> dates,
+        int touchedBarGroupIndex) =>
     SideTitles(
         showTitles: true,
         getTitlesWidget: (value, meta) {
-          final endDateWeekly = DateFormat('d/M').format(dates[value.toInt()].add(const Duration(days: 6)));
+          final index = value.toInt();
+          final isSelected = index == touchedBarGroupIndex;
+          final endDateWeekly = DateFormat('d/M')
+              .format(dates[index].add(const Duration(days: 6)));
           final text = DateFormat(
                   changeDateMode != ChangeDateMode.monthly ? 'd/M' : 'MMMyy')
-              .format(dates[value.toInt()]);
-          return Padding(
-            padding: const EdgeInsets.only(top: 4.0),
+              .format(dates[index]);
+
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: isSelected
+                ? BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  )
+                : null,
             child: Text(
-              changeDateMode == ChangeDateMode.weekly? '$text-$endDateWeekly' : text,
-              style: const TextStyle(color: Colors.white, fontSize: 11),
+              changeDateMode == ChangeDateMode.weekly
+                  ? '$text-$endDateWeekly'
+                  : text,
+              style: TextStyle(
+                color: isSelected ? Colors.black : Colors.white,
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           );
         });

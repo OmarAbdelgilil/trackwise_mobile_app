@@ -19,16 +19,22 @@ import android.app.usage.UsageStatsManager
 import android.app.usage.UsageEvents
 import android.app.AppOpsManager
 import android.content.pm.PackageManager
-import android.os.Binder
 import android.content.pm.ApplicationInfo
 import java.util.Calendar
+import okhttp3.*
+import com.google.gson.Gson
+import java.io.IOException
+import java.util.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 
 private val CHANNEL_ID = "BackgroundServiceChannel"
 
 class BackgroundService : Service() {
     private val TAG = "BackgroundService"
+    private val client = OkHttpClient()
     private val handler = Handler(Looper.getMainLooper())
-    private val interval = 15 * 1000L // 15 seconds interval
+    private val interval = 500 * 1000L // 15 seconds interval
     private var userToken: String? = null
     private val runnable = object : Runnable {
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -66,8 +72,8 @@ class BackgroundService : Service() {
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Background Service Running")
-            .setContentText("Collecting usage stats every 15s")
+            .setContentTitle("Service Running")
+            .setContentText("Keep on the hard work")
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(pendingIntent)
             .build()
@@ -91,7 +97,32 @@ class BackgroundService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
-    
+    private fun sendPostRequest(jsonData: String, userToken: String?) {
+        val url = "https://your-api-endpoint.com/usage-stats"
+        
+        // Ensure token is not null
+        val token = userToken ?: ""
+
+        val requestBody = jsonData.toRequestBody("application/json; charset=utf-8".toMediaType())
+
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("Authorization", "Bearer $token")
+            .post(requestBody)
+            .build()
+
+        val client = OkHttpClient()
+        
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "Failed to send data: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                Log.d(TAG, "Server response: ${response.code} - ${response.body?.string()}")
+            }
+        })
+    }
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun collectUsageStats() {
 
@@ -117,7 +148,9 @@ class BackgroundService : Service() {
         val startTime = calendar.timeInMillis
         
         val stats = getUsageStats(usageStatsManager, startTime, endTime)
-        
+        val jsonData = Gson().toJson(stats)
+        // Send data to server
+        sendPostRequest(jsonData, userToken)
         // Just log the results
         Log.d(TAG, "Collected ${stats.size} app usage entries ${userToken}")
         stats.forEach { appData ->
@@ -180,7 +213,17 @@ class BackgroundService : Service() {
         return resultList
     }
 
-    
+    companion object {
+        fun isServiceRunning(context: Context): Boolean {
+            val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+            for (service in activityManager.getRunningServices(Integer.MAX_VALUE)) {
+                if (BackgroundService::class.java.name == service.service.className) {
+                    return true
+                }
+            }
+            return false
+        }
+    }
     // Make sure service restarts if killed
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)

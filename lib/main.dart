@@ -32,7 +32,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    //platform.invokeMethod('startBackgroundService', {'token': "sup"});
     platform.invokeMethod('checkUsageAccess').then((result) {
       setState(() {
         kPermission.value = result;

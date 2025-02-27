@@ -8,8 +8,15 @@ class HiveManager {
   //ex/////////////////////
   Future<void> addAppUsage(
       Map<String, dynamic> appUsage, String formatedDate) async {
-    final box = await Hive.openBox(HiveConstants.usageBox);
-    await box.put(formatedDate, appUsage);
+    late Box box;
+    if (Hive.isBoxOpen(HiveConstants.usageBox)) {
+      box = Hive.box(HiveConstants.usageBox);
+    } else {
+      Hive.openBox(HiveConstants.usageBox);
+    }
+    if (!box.containsKey(formatedDate)) {
+      await box.put(formatedDate, appUsage);
+    }
   }
   ///////////////////////////
 }

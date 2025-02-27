@@ -72,6 +72,9 @@ class MainActivity: FlutterActivity(){
             else if (call.method == "stopBackgroundService") {
                 stopBackgroundService()
                 result.success("Background service stopped")
+            }else if (call.method == "isBackgroundServiceRunning") {
+                val isRunning = BackgroundService.isServiceRunning(this)
+                result.success(isRunning)
             }
             else {
                 result.notImplemented()

@@ -5,6 +5,8 @@ xmlns:tools="http://schemas.android.com/tools"
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions"/>
         <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+        <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+        <uses-permission android:name="android.permission.WAKE_LOCK" />
     <application
         android:label="track_wise_mobile_app"
         android:name="${applicationName}"
@@ -36,6 +38,18 @@ xmlns:tools="http://schemas.android.com/tools"
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <service
+            android:name=".BackgroundService"
+            android:exported="false" />
+        
+        <!-- For auto-starting service -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

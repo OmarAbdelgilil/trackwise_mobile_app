@@ -27,7 +27,27 @@ import android.os.Binder
 
 class MainActivity: FlutterActivity(){
      private val CHANNEL = "usage_stats"
-
+    companion object {
+        private var instance: MainActivity? = null
+        
+        fun getInstance(): MainActivity? {
+            return instance
+        }
+    }
+    
+    // ADDED: Set instance in onCreate
+    override fun onCreate(savedInstanceState: android.os.Bundle?) {
+        super.onCreate(savedInstanceState)
+        instance = this
+    }
+    
+    // ADDED: Clear instance in onDestroy
+    override fun onDestroy() {
+        super.onDestroy()
+        if (instance == this) {
+            instance = null
+        }
+    }
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
@@ -44,15 +64,37 @@ class MainActivity: FlutterActivity(){
                     openUsageAccessSettings()
                     result.success(null)
                 }
-
+            else if (call.method == "startBackgroundService") {
+                val token = call.argument<String>("token") ?: ""
+                startBackgroundService(token)
+                result.success("Background service started")
+            }
+            else if (call.method == "stopBackgroundService") {
+                stopBackgroundService()
+                result.success("Background service stopped")
+            }
             else {
                 result.notImplemented()
             }
 
         }
     }
+    private fun startBackgroundService(token: String) {
+        val serviceIntent = Intent(this, BackgroundService::class.java)
+        serviceIntent.putExtra("TOKEN_KEY", token) 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
+        }
+    }
+    
+    private fun stopBackgroundService() {
+        val serviceIntent = Intent(this, BackgroundService::class.java)
+        stopService(serviceIntent)
+    }
 
-    private fun hasUsageAccessPermission(): Boolean {
+    fun hasUsageAccessPermission(): Boolean {
         val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
         val mode = appOps.checkOpNoThrow(
             AppOpsManager.OPSTR_GET_USAGE_STATS,
@@ -69,7 +111,7 @@ class MainActivity: FlutterActivity(){
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun getUsageStats(startTime: Long, endTime: Long): List<Map<String, Any>> {
+    fun getUsageStats(startTime: Long, endTime: Long): List<Map<String, Any>> {
         val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val packageManager = packageManager
 
@@ -101,7 +143,7 @@ class MainActivity: FlutterActivity(){
                 try {
                     val appInfo = packageManager.getApplicationInfo(packageName, 0)
                     val isSystemApp = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
-                    val isGoogleApp = packageName.startsWith("com.google.")
+                    val isGoogleApp = packageName.startsWith("com.google.") || (packageName == "com.android.chrome") || (packageName == "com.android.settings")
                      if (!isSystemApp || isGoogleApp) { 
                         val name = packageManager.getApplicationLabel(appInfo).toString()
                         val icon = getAppIconAsBase64(packageName)

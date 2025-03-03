@@ -12,7 +12,10 @@ class LoginViewmodel extends StateNotifier<LoginState> {
   LoginViewmodel(this._loginUseCase) : super(InitialState());
   void login(String email, String password) async {
     state = LoadingState();
-    final result = await _loginUseCase.login(email, password);
+    final result = await _loginUseCase.login(email, password).timeout(
+        const Duration(seconds: 7),
+        onTimeout: () =>
+            Fail<User>(Exception("something went wrong try again")));
     switch (result) {
       case Success<User>():
         state = SuccessState(result.data!);
@@ -22,8 +25,8 @@ class LoginViewmodel extends StateNotifier<LoginState> {
         return;
     }
   }
-  void resetState()
-  {
+
+  void resetState() {
     state = InitialState();
   }
 }

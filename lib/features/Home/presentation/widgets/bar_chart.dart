@@ -75,7 +75,7 @@ class _BarChartWidgetState extends ConsumerState<BarChartWidget> {
                   alignment: Alignment.centerRight,
                   padding: const EdgeInsets.only(bottom: 20),
                   show: true,
-                  labelResolver: (line) => 'avg: ${line.y.toInt()}hrs',
+                  labelResolver: (line) => '${line.y.toInt()}hrs',
                   style: const TextStyle(
                       color: ColorsManager.red, fontWeight: FontWeight.bold),
                 ),

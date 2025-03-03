@@ -16,6 +16,6 @@ class User {
       email: json['email'] as String,
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String,
-      phone: (json['phoneNumber'] as int).toString(),
+      phone: json['phoneNumber'] as String,
       id: json['id'] as String);
 }

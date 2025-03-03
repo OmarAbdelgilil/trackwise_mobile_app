@@ -27,7 +27,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final token = result.data!.$2;
       _providerContainer.read(userProvider.notifier).setUser(user, token);
       await _offlineDataSource.saveToken(token);
-      //platform.invokeMethod('startBackgroundService', {'token': token});
+      platform.invokeMethod('startBackgroundService', {'token': token});
       return Success(user);
     }
 
@@ -62,6 +62,6 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() async {
     await _offlineDataSource.clearToken();
     _providerContainer.read(userProvider.notifier).clearUser();
-    //platform.invokeMethod('stopBackgroundService');
+    platform.invokeMethod('stopBackgroundService');
   }
 }

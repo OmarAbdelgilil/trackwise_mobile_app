@@ -34,7 +34,9 @@ import '../../features/profile/presentation/view_models/profile_view_model.dart'
     as _i668;
 import '../../features/steps/presentation/steps_viewmodel.dart' as _i1071;
 import '../api/api_manager.dart' as _i1047;
+import '../local/hive_manager.dart' as _i587;
 import '../modules/shared_prefs_module.dart' as _i998;
+import '../provider/usage_provider.dart' as _i229;
 import '../provider/user_provider.dart' as _i505;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -49,6 +51,7 @@ extension GetItInjectableX on _i174.GetIt {
       environmentFilter,
     );
     final sharedPrefsModule = _$SharedPrefsModule();
+    gh.factory<_i587.HiveManager>(() => _i587.HiveManager());
     await gh.factoryAsync<_i460.SharedPreferences>(
       () => sharedPrefsModule.prefs,
       preResolve: true,
@@ -58,6 +61,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i505.UserNotifier>(() => _i505.UserNotifier());
     gh.factory<_i537.OfflineDataSource>(
         () => _i553.OfflineDataSourceImpl(gh<_i460.SharedPreferences>()));
+    gh.factory<_i229.AppUsageNotifier>(
+        () => _i229.AppUsageNotifier(gh<_i587.HiveManager>()));
     gh.factory<_i597.OnlineDataSource>(
         () => _i163.OnlineDataSourceImpl(gh<_i1047.ApiManager>()));
     gh.factory<_i492.AuthRepository>(() => _i481.AuthRepositoryImpl(

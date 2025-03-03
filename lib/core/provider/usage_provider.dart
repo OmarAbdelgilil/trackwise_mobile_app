@@ -1,11 +1,17 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:injectable/injectable.dart';
+import 'package:track_wise_mobile_app/core/common/result.dart';
+import 'package:track_wise_mobile_app/core/di/di.dart';
+import 'package:track_wise_mobile_app/core/local/execute_hive.dart';
+import 'package:track_wise_mobile_app/core/local/hive_manager.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
-
-class AppUsageNotifier extends StateNotifier<Map<DateTime, List<AppUsageData>>> {
+@injectable
+class AppUsageNotifier
+    extends StateNotifier<Map<DateTime, List<AppUsageData>>> {
   static const platform = MethodChannel('usage_stats');
-
-  AppUsageNotifier() : super({});
+  final HiveManager _hiveManager;
+  AppUsageNotifier(this._hiveManager) : super({});
 
   Future<List<AppUsageData>> getUsageData(
       DateTime startDate, DateTime endDate) async {
@@ -20,9 +26,18 @@ class AppUsageNotifier extends StateNotifier<Map<DateTime, List<AppUsageData>>> 
       });
       List<AppUsageData> infoList = [];
       if (appsUsage != null && appsUsage.isNotEmpty) {
-        infoList = appsUsage.map((e) => AppUsageData.fromJson(e)).where((element) => element.usageTime.inMinutes != 0).toList();
+        infoList = appsUsage
+            .map((e) => AppUsageData.fromJson(e))
+            .where((element) => element.usageTime.inMinutes != 0)
+            .toList();
       }
-
+      if (infoList.isNotEmpty) {
+        executeHive(
+          () async {
+            _hiveManager.addUsageDateToCache(startDate, infoList);
+          },
+        );
+      }
       state = {...state, startDate: infoList};
       return infoList;
     } catch (e) {
@@ -30,13 +45,22 @@ class AppUsageNotifier extends StateNotifier<Map<DateTime, List<AppUsageData>>> 
     }
   }
 
-  List<AppUsageData>? getUsageState(DateTime date)
-  {
-    //check cache here
+  List<AppUsageData>? getUsageState(DateTime date) {
     return state[date];
+  }
+
+  Future<void> addCachedDataToProvider() async {
+    final result = await executeHive(
+      () async {
+        return await _hiveManager.getAllCachedUsage();
+      },
+    );
+    if (result is Success<Map<DateTime, List<AppUsageData>>>) {
+      state = {...state, ...result.data!};
+    }
   }
 }
 
 final appUsageProvider =
     StateNotifierProvider<AppUsageNotifier, Map<DateTime, List<AppUsageData>>>(
-        (ref) => AppUsageNotifier());
+        (ref) => getIt<AppUsageNotifier>());

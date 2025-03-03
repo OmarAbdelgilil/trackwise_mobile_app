@@ -164,6 +164,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     final prov = _providerContainer.read(appUsageProvider.notifier);
     final now = DateTime.now();
     pickedDate = DateTime(now.year, now.month, now.day);
+    await prov.addCachedDataToProvider();
     for (int i = 10; i >= 0; i--) {
       final startDate =
           DateTime(now.year, now.month, now.day).subtract(Duration(days: i));

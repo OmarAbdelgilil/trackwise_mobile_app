@@ -21,20 +21,18 @@ import android.app.AppOpsManager
 import android.content.pm.PackageManager
 import android.content.pm.ApplicationInfo
 import java.util.Calendar
-import okhttp3.*
 import com.google.gson.Gson
 import java.io.IOException
 import java.util.*
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
+import java.net.HttpURLConnection
+import java.net.URL
 
 private val CHANNEL_ID = "BackgroundServiceChannel"
 
 class BackgroundService : Service() {
     private val TAG = "BackgroundService"
-    private val client = OkHttpClient()
     private val handler = Handler(Looper.getMainLooper())
-    private val interval = 500 * 1000L // 15 seconds interval
+    private val interval = 500 * 1000L // 500 seconds interval
     private var userToken: String? = null
     private val runnable = object : Runnable {
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -98,31 +96,37 @@ class BackgroundService : Service() {
         return null
     }
     private fun sendPostRequest(jsonData: String, userToken: String?) {
-        val url = "https://your-api-endpoint.com/usage-stats"
-        
-        // Ensure token is not null
+        val urlString = "https://your-api-endpoint.com/usage-stats"
         val token = userToken ?: ""
-
-        val requestBody = jsonData.toRequestBody("application/json; charset=utf-8".toMediaType())
-
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("Authorization", "Bearer $token")
-            .post(requestBody)
-            .build()
-
-        val client = OkHttpClient()
         
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
+        Thread {
+            try {
+                val url = URL(urlString)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.doOutput = true
+                connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                connection.setRequestProperty("Authorization", "Bearer $token")
+
+                // Write data
+                val outputStream = connection.outputStream
+                outputStream.write(jsonData.toByteArray(Charsets.UTF_8))
+                outputStream.flush()
+                outputStream.close()
+
+                // Read response
+                val responseCode = connection.responseCode
+                val response = connection.inputStream.bufferedReader().use { it.readText() }
+
+                Log.d(TAG, "Server response: $responseCode - $response")
+
+                connection.disconnect()
+            } catch (e: IOException) {
                 Log.e(TAG, "Failed to send data: ${e.message}")
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                Log.d(TAG, "Server response: ${response.code} - ${response.body?.string()}")
-            }
-        })
+        }.start()
     }
+
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun collectUsageStats() {
 
@@ -150,7 +154,7 @@ class BackgroundService : Service() {
         val stats = getUsageStats(usageStatsManager, startTime, endTime)
         val jsonData = Gson().toJson(stats)
         // Send data to server
-        sendPostRequest(jsonData, userToken)
+        // sendPostRequest(jsonData, userToken)
         // Just log the results
         Log.d(TAG, "Collected ${stats.size} app usage entries ${userToken}")
         stats.forEach { appData ->

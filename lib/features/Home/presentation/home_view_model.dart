@@ -148,6 +148,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
   void toggleCharts() {
     if (isBarChart) {
       isBarChart = false;
+      _getCompareText(pickedDate, changeDateMode);
       state = ToggleCharts();
     } else {
       //state updates in _updateBarData

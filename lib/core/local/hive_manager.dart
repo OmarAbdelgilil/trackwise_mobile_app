@@ -36,8 +36,10 @@ class HiveManager {
     } else {
       box = await Hive.openBox(HiveConstants.usageBox);
     }
-    await box.put(date.toIso8601String(),
-        usageData.map((data) => data.toJson()).toList());
+    await box.put(
+        date.toIso8601String(),
+        usageData.map((data) {
+          return data.toJson();
+        }).toList());
   }
-
 }

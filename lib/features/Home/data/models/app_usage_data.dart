@@ -30,5 +30,5 @@ class AppUsageData {
   }
 
   Map<String, dynamic> toJson() =>
-      {'appName': appName, 'usageMinutes': usageTime, 'appIcon': appIcon};
+      {'appName': appName, 'usageMinutes': usageTime, 'appIcon': base64Encode(appIcon)};
 }

@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/home_view_model.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/bar_chart.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/circle_progress_bar.dart';
@@ -38,28 +40,40 @@ class AnimatedBarCircleSwitchState extends State<AnimatedBarCircleSwitch>
     double squeezeFactor = 1 - (_dragAmount.abs() / pi);
     squeezeFactor = squeezeFactor.clamp(0.2, 1.0);
 
-    return GestureDetector(
-      onHorizontalDragUpdate: _onDragUpdate,
-      onHorizontalDragEnd: _onDragEnd,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        child: widget.prov.isBarChart
-            ? Transform(
-                transform: Matrix4.identity()..scale(squeezeFactor, 1.0, 1.0),
-                alignment: Alignment.center,
-                child: const BarChartWidget(),
-              )
-            : Transform(
-                transform: Matrix4.rotationY(_dragAmount),
-                alignment: Alignment.center,
-                child: GestureDetector(
-                  onTap: () async {
-                    await widget.prov.openCalender(context);
-                  },
-                  child: const CircleProgressBar(),
-                ),
-              ),
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onHorizontalDragUpdate: _onDragUpdate,
+          onHorizontalDragEnd: _onDragEnd,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: widget.prov.isBarChart
+                ? Transform(
+                    transform: Matrix4.identity()..scale(squeezeFactor, 1.0, 1.0),
+                    alignment: Alignment.center,
+                    child: const BarChartWidget(),
+                  )
+                : Transform(
+                    transform: Matrix4.rotationY(_dragAmount),
+                    alignment: Alignment.center,
+                    child: GestureDetector(
+                      onTap: () async {
+                        await widget.prov.openCalender(context);
+                      },
+                      child: const CircleProgressBar(),
+                    ),
+                  ),
+          ),
+        ),
+        PageViewDotIndicator(
+          currentItem: widget.prov.isBarChart? 1 : 0,
+          count: 2,
+          unselectedColor: Colors.white,
+          selectedColor: Colors.blue,
+        ),
+      ],
     );
   }
 }

@@ -78,6 +78,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     ],
                                   )
                                 ],
+                                // SwipeAnimation(prov: prov),
                                 AnimatedBarCircleSwitch(
                                   prov: prov,
                                 ),

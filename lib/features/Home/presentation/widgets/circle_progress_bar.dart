@@ -83,7 +83,7 @@ class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
                           prov.compareText,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                              color: Colors.white, fontSize: 11),
+                              color: Colors.white, fontSize: 10),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                         ),

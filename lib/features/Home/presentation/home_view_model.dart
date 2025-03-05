@@ -88,17 +88,17 @@ class HomeViewModel extends StateNotifier<HomeState> {
     );
     //////////////////////////////////
     String finalPart = changeDateMode == ChangeDateMode.daily
-        ? 'yesterday'
+        ? 'the day before'
         : changeDateMode == ChangeDateMode.weekly
-            ? 'last week'
-            : 'last month';
+            ? 'the week before'
+            : 'the month before';
     final diff = totalUsageTimePicked.inHours - totalUsageTimeToCompare.inHours;
     if (diff == 0) {
       compareText = 'same Amount of time as $finalPart';
     } else if (diff > 0) {
-      compareText = '$diff hours more than $finalPart';
+      compareText = '$diff hrs more than $finalPart';
     } else {
-      compareText = '${-1 * diff} hours less than $finalPart';
+      compareText = '${-1 * diff} hrs less than $finalPart';
     }
   }
 
@@ -107,9 +107,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
       changeDateMode = mode;
       state = LoadingAppsList();
       appsList = List.from(_getUsageInfo(pickedDate, changeDateMode));
-      if (isBarChart) {
-        _updateBarData(pickedDate);
-      }
+      _updateBarData(pickedDate);
       state = DateModeChanged();
     }
   }
@@ -153,7 +151,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     } else {
       //state updates in _updateBarData
       isBarChart = true;
-      if (barData.isEmpty) {
+      if (barData.isEmpty || !barData.keys.toList().contains(pickedDate)) {
         _updateBarData(pickedDate);
       }
     }

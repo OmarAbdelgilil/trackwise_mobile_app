@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
 import 'package:track_wise_mobile_app/core/provider/steps_provider.dart';
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
@@ -9,15 +10,22 @@ import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 @injectable
 class StepsViewmodel extends StateNotifier<StepsState> {
   late final ProviderContainer _providerContainer;
+  final SharedPreferences _prefs;
   late DateTime pickedDate;
   int pickedDateStepsData = 15000;
+  int dailyTarget = 6000;
+  int weight = 70;
+  double strideLength = 0.75;
   ChangeDateMode changeDateMode = ChangeDateMode.daily;
   Map<DateTime, int> barData = {};
-  StepsViewmodel() : super(InitialState()) {
+  StepsViewmodel(this._prefs) : super(InitialState()) {
     _providerContainer = ProviderContainer();
     final now = DateTime.now();
     pickedDate = DateTime(now.year, now.month, now.day);
     pickedDateStepsData = _getUsageInfo(pickedDate, changeDateMode);
+    dailyTarget = _prefs.getInt('dailyTarget') ?? dailyTarget;
+    weight = _prefs.getInt('weight') ?? weight;
+    strideLength = _prefs.getDouble('strideLength') ?? strideLength;
     _updateBarData(pickedDate);
   }
   Future<void> openCalender(BuildContext context) async {
@@ -84,6 +92,16 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     state = BarDataUpdated();
   }
 
+  void setStepsData({required int myWeight,required int myDailyTarget, required double heightCm})
+  {
+    weight = myWeight;
+    dailyTarget = myDailyTarget;
+    strideLength = heightCm * 0.01 * 0.414;
+    _prefs.setInt('dailyTarget', myDailyTarget);
+    _prefs.setInt('weight', myWeight);
+    _prefs.setDouble('strideLength', strideLength);
+    state = StepsDataUpdated();
+  }
   int _getUsageInfo(
       DateTime startPickedDate, ChangeDateMode currentChangeDateMode) {
     ////////******** don't update apps list or state here */
@@ -126,3 +144,5 @@ class DatePicked extends StepsState {}
 class DateModeChanged extends StepsState {}
 
 class BarDataUpdated extends StepsState {}
+
+class StepsDataUpdated extends StepsState {}

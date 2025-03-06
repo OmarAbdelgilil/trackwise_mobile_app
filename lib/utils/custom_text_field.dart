@@ -58,7 +58,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      keyboardType: widget.label == StringsManager.emailLabel? TextInputType.emailAddress : (widget.label == StringsManager.passwordLabel || widget.label == StringsManager.confirmPasswordLabel) ? TextInputType.visiblePassword : widget.label == StringsManager.phoneNumberLabel? TextInputType.phone : null,
+      keyboardType: widget.label == StringsManager.emailLabel? TextInputType.emailAddress : (widget.label == StringsManager.passwordLabel || widget.label == StringsManager.confirmPasswordLabel) ? TextInputType.visiblePassword : widget.label == StringsManager.phoneNumberLabel? TextInputType.phone :(widget.label == StringsManager.heightLabel || widget.label == StringsManager.weightLabel || widget.label == StringsManager.dailyTargetLabel)? TextInputType.number : null,
       obscureText: _obscureText, // Use _obscureText to toggle visibility
       validator: _validate,
       readOnly: widget.readOnly ?? false,

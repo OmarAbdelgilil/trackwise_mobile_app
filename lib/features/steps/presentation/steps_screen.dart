@@ -5,6 +5,7 @@ import 'package:track_wise_mobile_app/features/Home/presentation/widgets/home_to
 import 'package:track_wise_mobile_app/features/steps/presentation/steps_viewmodel.dart';
 import 'package:track_wise_mobile_app/features/steps/presentation/widgets/steps_bar_chart.dart';
 import 'package:track_wise_mobile_app/features/steps/presentation/widgets/steps_data_container.dart';
+import 'package:track_wise_mobile_app/features/steps/presentation/widgets/steps_data_dialog.dart';
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
 
@@ -63,7 +64,7 @@ class StepsScreen extends ConsumerWidget {
           const StepsDataContainer(),
           const SizedBox(height: 4),
           TextButton(
-              onPressed: () {},
+              onPressed: (){showStepsDataDialogDialog(context, prov);},
               child: const Text(
                 "Enter weight and height for better readings",
                 style: TextStyle(color: Colors.blue, fontSize: 14),

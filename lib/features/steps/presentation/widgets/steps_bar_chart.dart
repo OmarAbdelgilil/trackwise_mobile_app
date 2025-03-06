@@ -17,6 +17,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
   int touchedBarGroupIndex = -1;
   @override
   Widget build(BuildContext context) {
+    final formater = NumberFormat.decimalPatternDigits(locale: 'en_us', decimalDigits: 0);
     ref.watch(stepsViewModelProvider);
     final prov = ref.read(stepsViewModelProvider.notifier);
     if (prov.barData.isEmpty) {
@@ -58,7 +59,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
                   getTooltipColor: (group) => const Color.fromARGB(0, 0, 0, 0),
                   getTooltipItem: (group, groupIndex, rod, rodIndex) =>
                       BarTooltipItem(
-                          "${rod.toY.toInt().toString()} steps",
+                          "${formater.format(rod.toY.toInt())} steps",
                           const TextStyle(
                               color: Color.fromARGB(212, 255, 255, 255),
                               fontSize: 10)),
@@ -73,7 +74,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
                   alignment: Alignment.centerRight,
                   padding: const EdgeInsets.only(bottom: 20),
                   show: true,
-                  labelResolver: (line) => '${line.y.toInt()}steps',
+                  labelResolver: (line) => '${formater.format(line.y.toInt())} steps',
                   style: const TextStyle(
                       color: ColorsManager.blue, fontWeight: FontWeight.bold),
                 ),

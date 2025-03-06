@@ -56,11 +56,12 @@ extension GetItInjectableX on _i174.GetIt {
       () => sharedPrefsModule.prefs,
       preResolve: true,
     );
-    gh.factory<_i1071.StepsViewmodel>(() => _i1071.StepsViewmodel());
     gh.singleton<_i1047.ApiManager>(() => _i1047.ApiManager());
     gh.lazySingleton<_i505.UserNotifier>(() => _i505.UserNotifier());
     gh.factory<_i537.OfflineDataSource>(
         () => _i553.OfflineDataSourceImpl(gh<_i460.SharedPreferences>()));
+    gh.factory<_i1071.StepsViewmodel>(
+        () => _i1071.StepsViewmodel(gh<_i460.SharedPreferences>()));
     gh.factory<_i229.AppUsageNotifier>(
         () => _i229.AppUsageNotifier(gh<_i587.HiveManager>()));
     gh.factory<_i597.OnlineDataSource>(

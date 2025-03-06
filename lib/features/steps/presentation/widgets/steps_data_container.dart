@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:track_wise_mobile_app/features/steps/presentation/steps_viewmodel.dart';
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
@@ -10,8 +11,10 @@ class StepsDataContainer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
+    final formater = NumberFormat.decimalPatternDigits(locale: 'en_us', decimalDigits: 0);
     ref.watch(stepsViewModelProvider);
     final prov = ref.read(stepsViewModelProvider.notifier);
+    final distanceKm = (prov.pickedDateStepsData * prov.strideLength) / 1000;
     return Container(
       padding: const EdgeInsets.all(16.0),
       margin: EdgeInsets.symmetric(horizontal: 18.0.w),
@@ -23,7 +26,7 @@ class StepsDataContainer extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            "${prov.pickedDateStepsData} steps",
+            "${formater.format(prov.pickedDateStepsData)} steps",
             style: const TextStyle(
               color: Colors.white,
               fontSize: 24,
@@ -36,10 +39,10 @@ class StepsDataContainer extends ConsumerWidget {
             child: LinearProgressIndicator(
               value: (prov.pickedDateStepsData) /
                   (prov.changeDateMode == ChangeDateMode.daily
-                      ? 6000
+                      ? prov.dailyTarget
                       : prov.changeDateMode == ChangeDateMode.weekly
-                          ? 6000 * 7
-                          : 6000 * 30),
+                          ? prov.dailyTarget * 7
+                          : prov.dailyTarget * 30),
               backgroundColor: Colors.grey[800],
               valueColor:
                   const AlwaysStoppedAnimation<Color>(ColorsManager.blue),
@@ -55,7 +58,7 @@ class StepsDataContainer extends ConsumerWidget {
                 style: TextStyle(color: Colors.white),
               ),
               Text(
-                "Target: ${(prov.changeDateMode == ChangeDateMode.daily ? 6000 : prov.changeDateMode == ChangeDateMode.weekly ? 6000 * 7 : 6000 * 30)}",
+                "Target: ${formater.format(prov.changeDateMode == ChangeDateMode.daily ? prov.dailyTarget : prov.changeDateMode == ChangeDateMode.weekly ? prov.dailyTarget * 7 : prov.dailyTarget * 30)}",
                 style: const TextStyle(color: Colors.white),
               ),
             ],
@@ -65,11 +68,11 @@ class StepsDataContainer extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "${(prov.pickedDateStepsData * 0.75) / 1000} km",
+                "${distanceKm.toStringAsFixed(2)} km",
                 style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
               Text(
-                "${((prov.pickedDateStepsData * 0.75) / 1000) * 70 * 0.57} cal",
+                "${(distanceKm * prov.weight * 0.57).round()} cal",
                 style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ],

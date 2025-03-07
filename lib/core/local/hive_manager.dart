@@ -25,6 +25,22 @@ class HiveManager {
     return usageData;
   }
 
+  Future<Map<DateTime, int>> getAllCachedSteps() async {
+    Map<DateTime, int> stepsData = {};
+    late Box box;
+    if (Hive.isBoxOpen(HiveConstants.stepsBox)) {
+      box = Hive.box(HiveConstants.stepsBox);
+    } else {
+      box = await Hive.openBox(HiveConstants.stepsBox);
+    }
+    for (var key in box.keys) {
+      DateTime date = DateTime.parse(key);
+      int data = box.get(key);
+      stepsData[date] = data;
+    }
+    return stepsData;
+  }
+
   void addUsageDateToCache(DateTime date, List<AppUsageData> usageData) async {
     final now = DateTime.now();
     if (date.isSameDateAs(DateTime(now.year, now.month, now.day))) {
@@ -41,5 +57,19 @@ class HiveManager {
         usageData.map((data) {
           return data.toJson();
         }).toList());
+  }
+
+  void addStepsDateToCache(DateTime date, int stepsData) async {
+    final now = DateTime.now();
+    if (date.isSameDateAs(DateTime(now.year, now.month, now.day))) {
+      return;
+    }
+    late Box box;
+    if (Hive.isBoxOpen(HiveConstants.stepsBox)) {
+      box = Hive.box(HiveConstants.stepsBox);
+    } else {
+      box = await Hive.openBox(HiveConstants.stepsBox);
+    }
+    await box.put(date.toIso8601String(), stepsData);
   }
 }

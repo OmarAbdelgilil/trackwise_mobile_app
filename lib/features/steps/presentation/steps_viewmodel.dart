@@ -20,9 +20,16 @@ class StepsViewmodel extends StateNotifier<StepsState> {
   Map<DateTime, int> barData = {};
   StepsViewmodel(this._prefs) : super(InitialState()) {
     _providerContainer = ProviderContainer();
+    initFunction();
+  }
+
+  void initFunction() async
+  {
+    final prov = _providerContainer.read(stepsProvider.notifier);
     final now = DateTime.now();
     pickedDate = DateTime(now.year, now.month, now.day);
     pickedDateStepsData = _getUsageInfo(pickedDate, changeDateMode);
+    await prov.addCachedDataToProvider();
     dailyTarget = _prefs.getInt('dailyTarget') ?? dailyTarget;
     weight = _prefs.getInt('weight') ?? weight;
     strideLength = _prefs.getDouble('strideLength') ?? strideLength;

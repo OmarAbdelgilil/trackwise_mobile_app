@@ -4,7 +4,6 @@ import 'package:track_wise_mobile_app/core/local/hive_constants.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
 import 'package:weekly_date_picker/datetime_apis.dart';
 
-@injectable
 @singleton
 class HiveManager {
   Future<Map<DateTime, List<AppUsageData>>> getAllCachedUsage() async {

@@ -13,6 +13,7 @@ import 'package:track_wise_mobile_app/loading_screen.dart';
 import 'package:track_wise_mobile_app/permission_failed_screen.dart';
 import 'package:path_provider/path_provider.dart';
 
+final providerContainer = ProviderContainer();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final appDocumentDirectory = await getApplicationDocumentsDirectory();

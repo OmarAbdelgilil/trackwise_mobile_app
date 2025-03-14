@@ -57,7 +57,7 @@ class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
                           Text(
                             totalUsageTime.inHours.toString(),
                             style: const TextStyle(
-                                color: Colors.white, fontSize: 32),
+                                color: Colors.white, fontSize: 30),
                           ),
                           const Text(
                             'hrs',
@@ -78,7 +78,7 @@ class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
                         ],
                       ),
                       SizedBox(
-                        width: 215.w,
+                        width: 195.w,
                         child: Text(
                           prov.compareText,
                           textAlign: TextAlign.center,

@@ -71,4 +71,36 @@ class HiveManager {
     }
     await box.put(date.toIso8601String(), stepsData);
   }
+  Future<void> addAllUsageToCache(
+      Map<DateTime, List<AppUsageData>> data) async {
+    final now = DateTime.now();
+    late Box box;
+        if (Hive.isBoxOpen(HiveConstants.usageBox)) {
+          box = Hive.box(HiveConstants.usageBox);
+        } else {
+          box = await Hive.openBox(HiveConstants.usageBox);
+        }
+    data.forEach(
+      (date, usageData) async {
+        if (date.isSameDateAs(DateTime(now.year, now.month, now.day))) {
+          return;
+        }
+        await box.put(
+            date.toIso8601String(),
+            usageData.map((data) {
+              return data.toJson();
+            }).toList());
+      },
+    );
+  }
+
+  Future<void> clearUsageCache() async {
+    late Box box;
+    if (Hive.isBoxOpen(HiveConstants.usageBox)) {
+      box = Hive.box(HiveConstants.usageBox);
+    } else {
+      box = await Hive.openBox(HiveConstants.usageBox);
+    }
+    await box.clear();
+  }
 }

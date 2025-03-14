@@ -6,6 +6,7 @@ import 'package:track_wise_mobile_app/core/provider/usage_provider.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/entities/user.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/use_cases/check_user_cache_use_case.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
+import 'package:track_wise_mobile_app/main.dart';
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
@@ -22,7 +23,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
   Map<DateTime, Duration> barData = {};
   final CheckUserCacheUseCase _checkUserCacheUseCase;
   HomeViewModel(this._checkUserCacheUseCase) : super(InitialState()) {
-    _providerContainer = ProviderContainer();
+    _providerContainer = providerContainer;
     _initFunction();
   }
   Future<void> openCalender(BuildContext context) async {
@@ -178,7 +179,18 @@ class HomeViewModel extends StateNotifier<HomeState> {
     }
     state = UsageUpdated();
   }
-
+  void resetUsageWhenLogin()
+  {
+    final prov = _providerContainer.read(appUsageProvider.notifier);
+    appsList = prov.getUsageState(pickedDate)!;
+    appsList.sort((a, b) => b.usageTime.compareTo(a.usageTime));
+    if (!isBarChart) {
+      _getCompareText(pickedDate, changeDateMode);
+    }else{
+      _updateBarData(pickedDate);
+    }
+    state = UsageUpdated();
+  }
   List<AppUsageData> _getUsageInfo(
       DateTime startPickedDate, ChangeDateMode currentChangeDateMode,
       {bool isCompare = false}) {
@@ -209,6 +221,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
         } else {
           result[app.appName] = AppUsageData(
               appName: app.appName,
+              packageName: app.packageName,
               usageTime: app.usageTime,
               appIcon: app.appIcon);
         }

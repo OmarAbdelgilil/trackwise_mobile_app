@@ -156,7 +156,7 @@ class BackgroundService : Service() {
         // Send data to server
         // sendPostRequest(jsonData, userToken)
         // Just log the results
-        Log.d(TAG, "Collected ${stats.size} app usage entries ${userToken}")
+        Log.d(TAG, "Collected ${stats.size} app usage entries")
         stats.forEach { appData ->
             Log.d(TAG, "App: ${appData["appName"]}, Usage: ${appData["usageMinutes"]} minutes")
         }

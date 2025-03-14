@@ -75,6 +75,10 @@ class MainActivity: FlutterActivity(){
             }else if (call.method == "isBackgroundServiceRunning") {
                 val isRunning = BackgroundService.isServiceRunning(this)
                 result.success(isRunning)
+            }else if (call.method == "getIcon") {
+                 val packageName = call.argument<String>("packageName") ?: ""
+                val icon = getAppIconAsBase64(packageName)
+                result.success(icon)
             }
             else {
                 result.notImplemented()
@@ -161,6 +165,7 @@ class MainActivity: FlutterActivity(){
                 mapOf(
                     "appName" to appName,
                     "usageMinutes" to usageTime / (1000.0 * 60), // Convert to minutes
+                    "packageName" to packageName,
                     "appIcon" to appIcon
                 )
             )
@@ -171,7 +176,7 @@ class MainActivity: FlutterActivity(){
 
 
 
-    private fun getAppIconAsBase64(packageName: String): String {
+    fun getAppIconAsBase64(packageName: String): String {
     return try {
         val pm: PackageManager = applicationContext.packageManager
         val drawable = pm.getApplicationIcon(packageName)

@@ -72,6 +72,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i492.AuthRepository>(() => _i481.AuthRepositoryImpl(
           gh<_i597.OnlineDataSource>(),
           gh<_i537.OfflineDataSource>(),
+          gh<_i587.HiveManager>(),
         ));
     gh.factory<_i513.CheckUserCacheUseCase>(
         () => _i513.CheckUserCacheUseCase(gh<_i492.AuthRepository>()));

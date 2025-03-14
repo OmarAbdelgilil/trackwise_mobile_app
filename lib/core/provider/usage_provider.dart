@@ -48,7 +48,9 @@ class AppUsageNotifier
   List<AppUsageData>? getUsageState(DateTime date) {
     return state[date];
   }
-
+  void resetUsageProvider(Map<DateTime, List<AppUsageData>> data) {
+    state = data;
+  }
   Future<void> addCachedDataToProvider() async {
     final result = await executeHive(
       () async {

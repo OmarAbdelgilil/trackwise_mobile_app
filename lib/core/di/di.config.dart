@@ -58,6 +58,7 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i1047.ApiManager>(() => _i1047.ApiManager());
     gh.singleton<_i587.HiveManager>(() => _i587.HiveManager());
+    gh.singleton<_i481.AuthEventService>(() => _i481.AuthEventService());
     gh.lazySingleton<_i505.UserNotifier>(() => _i505.UserNotifier());
     gh.factory<_i537.OfflineDataSource>(
         () => _i553.OfflineDataSourceImpl(gh<_i460.SharedPreferences>()));
@@ -73,6 +74,7 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i597.OnlineDataSource>(),
           gh<_i537.OfflineDataSource>(),
           gh<_i587.HiveManager>(),
+          gh<_i481.AuthEventService>(),
         ));
     gh.factory<_i513.CheckUserCacheUseCase>(
         () => _i513.CheckUserCacheUseCase(gh<_i492.AuthRepository>()));
@@ -82,10 +84,12 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i1054.LogoutUseCase(gh<_i492.AuthRepository>()));
     gh.factory<_i228.RegisterUseCase>(
         () => _i228.RegisterUseCase(gh<_i492.AuthRepository>()));
+    gh.factory<_i286.HomeViewModel>(() => _i286.HomeViewModel(
+          gh<_i513.CheckUserCacheUseCase>(),
+          gh<_i481.AuthEventService>(),
+        ));
     gh.factory<_i668.ProfileViewModel>(
         () => _i668.ProfileViewModel(gh<_i1054.LogoutUseCase>()));
-    gh.factory<_i286.HomeViewModel>(
-        () => _i286.HomeViewModel(gh<_i513.CheckUserCacheUseCase>()));
     gh.factory<_i902.RegisterViewmodel>(
         () => _i902.RegisterViewmodel(gh<_i228.RegisterUseCase>()));
     gh.factory<_i641.LoginViewmodel>(

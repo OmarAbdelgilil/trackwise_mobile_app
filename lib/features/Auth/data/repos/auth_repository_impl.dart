@@ -1,4 +1,6 @@
 // import 'package:flutter/services.dart';
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
@@ -9,6 +11,7 @@ import 'package:track_wise_mobile_app/core/provider/usage_provider.dart';
 import 'package:track_wise_mobile_app/core/provider/user_provider.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/contracts/offline_data_source.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/contracts/online_data_source.dart';
+import 'package:track_wise_mobile_app/features/Auth/data/models/response/login_response.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/entities/user.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/repos/auth_repository.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
@@ -20,34 +23,35 @@ class AuthRepositoryImpl implements AuthRepository {
   final OnlineDataSource _onlineDataSource;
   final OfflineDataSource _offlineDataSource;
   final ProviderContainer _providerContainer = providerContainer;
+  final AuthEventService _authEventService;
   final HiveManager _hiveManager;
   static const platform = MethodChannel('usage_stats');
   AuthRepositoryImpl(
-      this._onlineDataSource, this._offlineDataSource, this._hiveManager);
+      this._onlineDataSource, this._offlineDataSource, this._hiveManager, this._authEventService);
 
   @override
   Future<Result<User>> login(String email, String password) async {
-    final Result<String> result =
+    final Result<LoginResponse> result =
         await _onlineDataSource.login(email, password);
 
-    if (result is Success<String> && result.data != null) {
-      final token = result.data!;
+    if (result is Success<LoginResponse> && result.data != null && result.data!.token != null) {
+      final token = result.data!.token!;
       final decodedToken = JwtDecoder.decode(token);
       final user = User.fromJson(decodedToken);
       _providerContainer.read(userProvider.notifier).setUser(user, token);
       await _offlineDataSource.saveToken(token);
       try {
-        if (!decodedToken.containsKey('usage') ||
-            decodedToken['usage'] == null ||
-            (decodedToken['usage'] as Map<String, dynamic>).isEmpty) {
+        if (
+            result.data!.usage == null ||
+            (result.data!.usage as Map<String, dynamic>).isEmpty) {
           _onlineDataSource.setUsageHistory(
               _providerContainer.read(appUsageProvider), token);
         } else {
-          final data = await AppUsageData.fromRequest(decodedToken['usage']);
+          final data = await AppUsageData.fromRequest(result.data!.usage!);
           await _hiveManager.clearUsageCache();
           await _hiveManager.addAllUsageToCache(data);
           _providerContainer.read(appUsageProvider.notifier).resetUsageProvider(data);
-          //_providerContainer.read(homeProvider.notifier).resetUsageWhenLogin();
+          _authEventService.emitLoginSuccess(user);
 
         }
       } catch (e) {
@@ -86,9 +90,32 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> logout() async {
-    await _offlineDataSource.clearToken();
     _providerContainer.read(userProvider.notifier).clearUser();
+    await _offlineDataSource.clearToken();
     await _hiveManager.clearUsageCache();
+    _authEventService.emitLogoutSuccess();
     platform.invokeMethod('stopBackgroundService');
+  }
+}
+
+@singleton
+class AuthEventService {
+  final _loginSuccessController = StreamController<User>.broadcast();
+  final _logoutSuccessController = StreamController<void>.broadcast();
+  
+  Stream<User> get onLoginSuccess => _loginSuccessController.stream;
+  Stream<void> get onLogoutSuccess => _logoutSuccessController.stream;
+  
+  void emitLoginSuccess(User user) {
+    _loginSuccessController.add(user);
+  }
+  
+  void emitLogoutSuccess() {
+    _logoutSuccessController.add(null);
+  }
+  
+  void dispose() {
+    _loginSuccessController.close();
+    _logoutSuccessController.close();
   }
 }

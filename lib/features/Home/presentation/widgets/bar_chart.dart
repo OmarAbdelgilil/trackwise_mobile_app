@@ -36,7 +36,7 @@ class _BarChartWidgetState extends ConsumerState<BarChartWidget> {
             .inHours /
         durations.length;
     return Padding(
-      padding: const EdgeInsets.only(top: 15.0, bottom: 30),
+      padding: const EdgeInsets.only(top: 15.0, bottom: 25),
       child: AspectRatio(
         aspectRatio: 1.7,
         child: BarChart(
@@ -154,7 +154,7 @@ SideTitles _bottomTitles(ChangeDateMode changeDateMode, List<DateTime> dates,
                   : text,
               style: TextStyle(
                 color: isSelected ? Colors.black : Colors.white,
-                fontSize: 11,
+                fontSize: changeDateMode == ChangeDateMode.weekly? 9: 11,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),

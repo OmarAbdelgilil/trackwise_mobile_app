@@ -31,11 +31,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             valueListenable: currentPageNotifier,
             builder: (context, value, child) {
               final providerState = ref.watch(homeProvider);
-              return providerState is HomeLoadingState ||
-                      providerState is InitialState
-                  ? const Center(child: CircularProgressIndicator())
-                  : value['widget'] is! HomeScreen
-                      ? value['widget']
+              return value['widget'] is! HomeScreen
+                  ? value['widget']
+                  : providerState is HomeLoadingState ||
+                          providerState is InitialState
+                      ? const Center(child: CircularProgressIndicator())
                       : SingleChildScrollView(
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 18.0.h),

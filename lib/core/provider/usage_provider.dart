@@ -49,6 +49,13 @@ class AppUsageNotifier
     return state[date];
   }
   void resetUsageProvider(Map<DateTime, List<AppUsageData>> data) {
+    final now = DateTime.now();
+    final todayDate = DateTime(now.year, now.month, now.day);
+    data.remove(todayDate);
+    if(state.containsKey(todayDate) && state[todayDate] != null)
+    {
+      data[todayDate] = state[todayDate]!;
+    }
     state = data;
   }
   Future<void> addCachedDataToProvider() async {
@@ -60,6 +67,10 @@ class AppUsageNotifier
     if (result is Success<Map<DateTime, List<AppUsageData>>>) {
       state = {...state, ...result.data!};
     }
+  }
+  void clearProvider()
+  {
+    state = {};
   }
 }
 

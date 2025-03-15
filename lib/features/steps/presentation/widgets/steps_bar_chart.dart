@@ -35,7 +35,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
         ) /
         durations.length;
     return Padding(
-      padding: const EdgeInsets.only(top: 15.0, bottom: 45),
+      padding: const EdgeInsets.only(top: 15.0, bottom: 25),
       child: AspectRatio(
         aspectRatio: 1.7,
         child: BarChart(
@@ -140,7 +140,7 @@ SideTitles _bottomTitles(ChangeDateMode changeDateMode, List<DateTime> dates,
               .format(dates[index]);
 
           return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
             decoration: isSelected
                 ? BoxDecoration(
                     color: Colors.white,

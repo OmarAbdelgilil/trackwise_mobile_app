@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
 import 'package:track_wise_mobile_app/core/provider/usage_provider.dart';
+import 'package:track_wise_mobile_app/features/Auth/data/repos/auth_repository_impl.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/entities/user.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/use_cases/check_user_cache_use_case.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
@@ -14,17 +17,33 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 class HomeViewModel extends StateNotifier<HomeState> {
   late final ProviderContainer _providerContainer;
   late DateTime pickedDate;
-  //Map<DateTime, Map<ChangeDateMode, List<AppUsageData>>> appUsageInfoMap = {};
-  //final Map<DateTime, List<AppUsageData>> _appUsageInfo = {};
   List<AppUsageData> appsList = [];
   ChangeDateMode changeDateMode = ChangeDateMode.daily;
   String compareText = '';
   bool isBarChart = false;
   Map<DateTime, Duration> barData = {};
   final CheckUserCacheUseCase _checkUserCacheUseCase;
-  HomeViewModel(this._checkUserCacheUseCase) : super(InitialState()) {
+  final AuthEventService _authEventService;
+  StreamSubscription? _loginSubscription;
+  StreamSubscription? _logoutSubscription;
+  HomeViewModel(this._checkUserCacheUseCase, this._authEventService) : super(InitialState()) {
     _providerContainer = providerContainer;
     _initFunction();
+    _loginSubscription = _authEventService.onLoginSuccess.listen((user) {
+      resetUsageWhenLogin();
+    });
+    _logoutSubscription = _authEventService.onLogoutSuccess.listen((event) {
+      state = InitialState();
+      _providerContainer.read(appUsageProvider.notifier).clearProvider();
+      _initFunction();
+
+    },);
+  }
+  @override
+  void dispose() {
+    _loginSubscription?.cancel();
+    _logoutSubscription?.cancel();
+    super.dispose();
   }
   Future<void> openCalender(BuildContext context) async {
     final now = DateTime.now();
@@ -177,6 +196,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     if (!isBarChart) {
       _getCompareText(pickedDate, changeDateMode);
     }
+    _updateBarData(pickedDate);
     state = UsageUpdated();
   }
   void resetUsageWhenLogin()
@@ -186,9 +206,8 @@ class HomeViewModel extends StateNotifier<HomeState> {
     appsList.sort((a, b) => b.usageTime.compareTo(a.usageTime));
     if (!isBarChart) {
       _getCompareText(pickedDate, changeDateMode);
-    }else{
-      _updateBarData(pickedDate);
     }
+    _updateBarData(pickedDate);
     state = UsageUpdated();
   }
   List<AppUsageData> _getUsageInfo(

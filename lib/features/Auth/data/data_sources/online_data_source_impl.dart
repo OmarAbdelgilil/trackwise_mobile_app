@@ -5,6 +5,7 @@ import 'package:track_wise_mobile_app/core/common/result.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/contracts/online_data_source.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/models/request/login_request.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/models/request/register_request.dart';
+import 'package:track_wise_mobile_app/features/Auth/data/models/response/login_response.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
 
 @Injectable(as: OnlineDataSource)
@@ -13,11 +14,11 @@ class OnlineDataSourceImpl implements OnlineDataSource {
   OnlineDataSourceImpl(this._apiManager);
 
   @override
-  Future<Result<String>> login(String email, String password) async{
+  Future<Result<LoginResponse>> login(String email, String password) async{
     return await executeApi(() async {
       final loginRequest = LoginRequest(email: email, password: password);
       final result = await _apiManager.login(loginRequest);
-      return result.token!;
+      return result;
     });
   }
   @override

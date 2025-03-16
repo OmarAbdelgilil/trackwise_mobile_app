@@ -8,7 +8,7 @@ class StringsManager {
   static const String firstNameLabel = "Ex:John";
   static const String lastNameHint = "Last name";
   static const String lastNameLabel = "Ex:Doe";
-  static const String phoneNumberHint = "+201333333333";
+  static const String phoneNumberHint = "01333333333";
   static const String phoneNumberLabel = "Phone Number";
   static const String emptyEmailError = "Please enter an email";
   static const String invalidEmailFormat = "Please enter a valid email address";

@@ -5,8 +5,9 @@ import 'package:track_wise_mobile_app/core/api/api_constants.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/models/request/login_request.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/models/request/register_request.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/models/response/login_response.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+// import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/models/response/register_response.dart';
+import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
 
 @singleton
 @injectable
@@ -18,13 +19,13 @@ class ApiManager {
     ));
     if (!kReleaseMode) {
       // its debug mode so print app logs
-      _dio.interceptors.add(
-        PrettyDioLogger(
-          requestHeader: true,
-          requestBody: true,
-          responseHeader: true,
-        ),
-      );
+      // _dio.interceptors.add(
+      //   PrettyDioLogger(
+      //     requestHeader: true,
+      //     requestBody: true,
+      //     responseHeader: true,
+      //   ),
+      // );
     }
   }
 
@@ -38,5 +39,9 @@ class ApiManager {
     var response = await _dio.post(ApiConstants.signupPath, data: request.toJson());
     var authResponse = RegisterResponse.fromJson(response.data);
     return authResponse;
+  }
+  void setUsageHistory(Map<DateTime, List<AppUsageData>> data,String token) async
+  {
+    await _dio.post(ApiConstants.addUsage, data: {"usage":AppUsageData.toRequest(data)}, options: Options(headers: {"Authorization": token}));
   }
 }

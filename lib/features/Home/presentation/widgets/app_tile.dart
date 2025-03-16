@@ -26,7 +26,7 @@ class AppTile extends StatelessWidget {
         children: [
           LinearProgressIndicator(
             //number of hours / max number of hours in this day
-            value: appData.usageTime.inMinutes / maxUsage.inMinutes,
+            value: appData.usageTime.inMinutes / (maxUsage.inMinutes == 0? 1 : maxUsage.inMinutes),
             backgroundColor:
                 Colors.grey.shade800, //Color.fromARGB(0, 66, 66, 66),
             valueColor: const AlwaysStoppedAnimation<Color>(ColorsManager.blue),

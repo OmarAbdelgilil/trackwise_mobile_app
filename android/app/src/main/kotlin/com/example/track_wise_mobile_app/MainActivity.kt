@@ -132,6 +132,10 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
             }else if (call.method == "isBackgroundServiceRunning") {
                 val isRunning = BackgroundService.isServiceRunning(this)
                 result.success(isRunning)
+            }else if (call.method == "getIcon") {
+                 val packageName = call.argument<String>("packageName") ?: ""
+                val icon = getAppIconAsBase64(packageName)
+                result.success(icon)
             }
             else if (call.method == "getSteps") {
                 val date = call.argument<String>("date") ?: ""
@@ -275,6 +279,7 @@ private fun requestExactAlarmPermission() {
                 mapOf(
                     "appName" to appName,
                     "usageMinutes" to usageTime / (1000.0 * 60), // Convert to minutes
+                    "packageName" to packageName,
                     "appIcon" to appIcon
                 )
             )
@@ -285,7 +290,7 @@ private fun requestExactAlarmPermission() {
 
 
 
-    private fun getAppIconAsBase64(packageName: String): String {
+    fun getAppIconAsBase64(packageName: String): String {
     return try {
         val pm: PackageManager = applicationContext.packageManager
         val drawable = pm.getApplicationIcon(packageName)

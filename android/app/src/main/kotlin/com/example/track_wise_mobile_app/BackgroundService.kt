@@ -96,7 +96,7 @@ class BackgroundService : Service() {
         return null
     }
     private fun sendPostRequest(jsonData: String, userToken: String?) {
-        val urlString = "https://your-api-endpoint.com/usage-stats"
+        val urlString = "http://192.168.100.3:3000/api/updateUsage"
         val token = userToken ?: ""
         
         Thread {
@@ -106,7 +106,7 @@ class BackgroundService : Service() {
                 connection.requestMethod = "POST"
                 connection.doOutput = true
                 connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
-                connection.setRequestProperty("Authorization", "Bearer $token")
+                connection.setRequestProperty("Authorization", "$token")
 
                 // Write data
                 val outputStream = connection.outputStream
@@ -118,7 +118,7 @@ class BackgroundService : Service() {
                 val responseCode = connection.responseCode
                 val response = connection.inputStream.bufferedReader().use { it.readText() }
 
-                Log.d(TAG, "Server response: $responseCode - $response")
+                //Log.d(TAG, "Server response: $responseCode - $response")
 
                 connection.disconnect()
             } catch (e: IOException) {
@@ -150,13 +150,16 @@ class BackgroundService : Service() {
         calendar.set(Calendar.MILLISECOND, 0)
 
         val startTime = calendar.timeInMillis
+        val startDate = calendar.time
+        val formattedDate = java.text.SimpleDateFormat("d-M-yyyy", Locale.getDefault()).format(startDate)
+        Log.d(TAG, "Start date: $formattedDate")
         
-        val stats = getUsageStats(usageStatsManager, startTime, endTime)
-        val jsonData = Gson().toJson(stats)
+        val stats = getUsageStats(usageStatsManager, startTime, endTime).filter { it["usageMinutes"] as Double >= 1.0 }
+        val finalJsonData = Gson().toJson(mapOf("date" to formattedDate, "usageData" to stats))
         // Send data to server
-        // sendPostRequest(jsonData, userToken)
+        sendPostRequest(finalJsonData, userToken)
         // Just log the results
-        Log.d(TAG, "Collected ${stats.size} app usage entries ${userToken}")
+        Log.d(TAG, "Collected ${stats.size} app usage entries")
         stats.forEach { appData ->
             Log.d(TAG, "App: ${appData["appName"]}, Usage: ${appData["usageMinutes"]} minutes")
         }
@@ -209,6 +212,7 @@ class BackgroundService : Service() {
                 mapOf(
                     "appName" to appName,
                     "usageMinutes" to usageTime / (1000.0 * 60), // Convert to minutes
+                    "packageName" to packageName,
                     "appIcon" to appIcon
                 )
             )

@@ -36,6 +36,7 @@ import '../../features/steps/presentation/steps_viewmodel.dart' as _i1071;
 import '../api/api_manager.dart' as _i1047;
 import '../local/hive_manager.dart' as _i587;
 import '../modules/shared_prefs_module.dart' as _i998;
+import '../provider/steps_provider.dart' as _i1021;
 import '../provider/usage_provider.dart' as _i229;
 import '../provider/user_provider.dart' as _i505;
 
@@ -51,17 +52,20 @@ extension GetItInjectableX on _i174.GetIt {
       environmentFilter,
     );
     final sharedPrefsModule = _$SharedPrefsModule();
-    gh.factory<_i587.HiveManager>(() => _i587.HiveManager());
     await gh.factoryAsync<_i460.SharedPreferences>(
       () => sharedPrefsModule.prefs,
       preResolve: true,
     );
     gh.singleton<_i1047.ApiManager>(() => _i1047.ApiManager());
+    gh.singleton<_i587.HiveManager>(() => _i587.HiveManager());
+    gh.singleton<_i481.AuthEventService>(() => _i481.AuthEventService());
     gh.lazySingleton<_i505.UserNotifier>(() => _i505.UserNotifier());
     gh.factory<_i537.OfflineDataSource>(
         () => _i553.OfflineDataSourceImpl(gh<_i460.SharedPreferences>()));
     gh.factory<_i1071.StepsViewmodel>(
         () => _i1071.StepsViewmodel(gh<_i460.SharedPreferences>()));
+    gh.factory<_i1021.StepsNotifier>(
+        () => _i1021.StepsNotifier(gh<_i587.HiveManager>()));
     gh.factory<_i229.AppUsageNotifier>(
         () => _i229.AppUsageNotifier(gh<_i587.HiveManager>()));
     gh.factory<_i597.OnlineDataSource>(
@@ -69,6 +73,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i492.AuthRepository>(() => _i481.AuthRepositoryImpl(
           gh<_i597.OnlineDataSource>(),
           gh<_i537.OfflineDataSource>(),
+          gh<_i587.HiveManager>(),
+          gh<_i481.AuthEventService>(),
         ));
     gh.factory<_i513.CheckUserCacheUseCase>(
         () => _i513.CheckUserCacheUseCase(gh<_i492.AuthRepository>()));
@@ -78,10 +84,12 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i1054.LogoutUseCase(gh<_i492.AuthRepository>()));
     gh.factory<_i228.RegisterUseCase>(
         () => _i228.RegisterUseCase(gh<_i492.AuthRepository>()));
+    gh.factory<_i286.HomeViewModel>(() => _i286.HomeViewModel(
+          gh<_i513.CheckUserCacheUseCase>(),
+          gh<_i481.AuthEventService>(),
+        ));
     gh.factory<_i668.ProfileViewModel>(
         () => _i668.ProfileViewModel(gh<_i1054.LogoutUseCase>()));
-    gh.factory<_i286.HomeViewModel>(
-        () => _i286.HomeViewModel(gh<_i513.CheckUserCacheUseCase>()));
     gh.factory<_i902.RegisterViewmodel>(
         () => _i902.RegisterViewmodel(gh<_i228.RegisterUseCase>()));
     gh.factory<_i641.LoginViewmodel>(

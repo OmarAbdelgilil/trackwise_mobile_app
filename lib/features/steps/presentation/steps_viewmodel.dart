@@ -92,8 +92,10 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     state = BarDataUpdated();
   }
 
-  void setStepsData({required int myWeight,required int myDailyTarget, required double heightCm})
-  {
+  void setStepsData(
+      {required int myWeight,
+      required int myDailyTarget,
+      required double heightCm}) {
     weight = myWeight;
     dailyTarget = myDailyTarget;
     strideLength = heightCm * 0.01 * 0.414;
@@ -102,6 +104,7 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     _prefs.setDouble('strideLength', strideLength);
     state = StepsDataUpdated();
   }
+
   int _getUsageInfo(
       DateTime startPickedDate, ChangeDateMode currentChangeDateMode) {
     ////////******** don't update apps list or state here */
@@ -117,15 +120,24 @@ class StepsViewmodel extends StateNotifier<StepsState> {
                 )).duration.inDays;
     int totalUsage = 0;
     final prov = _providerContainer.read(stepsProvider.notifier);
+
     if (currentChangeDateMode == ChangeDateMode.monthly) {
       startPickedDate =
           DateTime(startPickedDate.year, startPickedDate.month, 1);
     }
     for (int i = 0; i < length; i++) {
       final date = startPickedDate.add(Duration(days: i));
-      final dayUsage = prov.getStepsUsageState(date);
+      int dayUsage = 0;
+      prov.getStepsUsageData(date, date).then(
+        (value) {
+          dayUsage = value;
+          pickedDateStepsData = totalUsage + (dayUsage);
+          state = StepsDataUpdated();
+        },
+      );
+      //final dayUsage = prov.getStepsUsageState(date);
       //to be dynamic
-      totalUsage = totalUsage + (dayUsage ?? 10000);
+      totalUsage = totalUsage + (dayUsage);
     }
     return totalUsage;
   }

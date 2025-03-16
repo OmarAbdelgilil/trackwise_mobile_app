@@ -7,6 +7,14 @@ xmlns:tools="http://schemas.android.com/tools"
         <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
         <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
         <uses-permission android:name="android.permission.WAKE_LOCK" />
+        <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+        <uses-permission android:name="android.permission.BODY_SENSORS"/>
+        <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS"/>
+        <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+        <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
+        <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+   
+
     <application
         android:label="track_wise_mobile_app"
         android:name="${applicationName}"
@@ -41,7 +49,10 @@ xmlns:tools="http://schemas.android.com/tools"
         <service
             android:name=".BackgroundService"
             android:exported="false" />
-        
+        <service
+    android:name=".StepCounterService"
+    android:foregroundServiceType="health"
+    android:exported="false"/>
         <!-- For auto-starting service -->
         <receiver
             android:name=".BootReceiver"
@@ -50,6 +61,8 @@ xmlns:tools="http://schemas.android.com/tools"
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".ResetStepReceiver" android:exported="false"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

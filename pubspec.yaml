@@ -61,6 +61,7 @@ dependencies:
   path_provider: ^2.1.5
   page_view_dot_indicator: ^2.3.0
   carousel_slider: ^5.0.0
+  permission_handler: ^11.4.0
 
 dev_dependencies:
   flutter_test:

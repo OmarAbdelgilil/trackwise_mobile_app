@@ -10,9 +10,8 @@ class ResetStepReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         context?.let {
             val sharedPreferences = it.getSharedPreferences("StepData", Context.MODE_PRIVATE)
-            val lastRecordedSteps = sharedPreferences.getInt("lastRecordedSteps", 0)
-            val initialSteps = sharedPreferences.getInt("initialSteps", -1)
-
+            val lastRecordedSteps = sharedPreferences.getInt("lastRecordedSteps2", 0)
+            val lastReading =  sharedPreferences.getInt("lastReading", 0)
             val yesterday = Calendar.getInstance().apply {
                 add(Calendar.DAY_OF_YEAR, -1)
             }
@@ -20,12 +19,14 @@ class ResetStepReceiver : BroadcastReceiver() {
             val yesterdayDate = dateFormat.format(yesterday.time)
             
             // Calculate yesterday’s steps correctly
-            val stepsYesterday = if (initialSteps >= 0) lastRecordedSteps - initialSteps else 0
-            Log.d("Date", yesterdayDate)
+            val stepsYesterday = lastRecordedSteps
+            Log.d("StepCounterService",lastReading.toString())
             // Save yesterday's steps and reset for today
             sharedPreferences.edit()
                 .putInt(yesterdayDate, stepsYesterday)
-                .putInt("initialSteps", lastRecordedSteps)
+                .putInt("initialSteps", lastReading)
+                .putInt("lastRecordedSteps2", 0)
+                .putBoolean("reboot", false)
                 .apply()
         }
     }

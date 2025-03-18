@@ -146,6 +146,7 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
                 }
                 
                 if (date == todayDate) {
+                    lastRecordedSteps = sharedPreferences.getInt("lastRecordedSteps2", 0)
                     result.success(lastRecordedSteps)
                 } else {
                     val storedSteps = sharedPreferences.getInt(date, 0)
@@ -174,30 +175,7 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
     }
 
 override fun onSensorChanged(event: SensorEvent?) {
-            if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
-                val currentSteps = event.values[0].toInt()
-
-                // If first time setting initialSteps today, store it
-                if (initialSteps == -1) {
-                    initialSteps = currentSteps
-
-                    // Save it persistently
-                    val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
-                    sharedPreferences.edit()
-                        .putInt("initialSteps", initialSteps)
-                        .apply()
-                }
-
-                lastRecordedSteps = currentSteps - initialSteps
-   
-                // Save updated steps
-                val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
-                 Log.d("tttt", sharedPreferences.getInt("15-03-2025", 0).toString())
-
-                sharedPreferences.edit()
-                    .putInt("lastRecordedSteps2", lastRecordedSteps)
-                    .apply()
-            }
+           
         }
 
        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {

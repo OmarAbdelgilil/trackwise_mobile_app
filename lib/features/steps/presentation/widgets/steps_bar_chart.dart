@@ -17,23 +17,34 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
   int touchedBarGroupIndex = -1;
   @override
   Widget build(BuildContext context) {
-    final formater = NumberFormat.decimalPatternDigits(locale: 'en_us', decimalDigits: 0);
+    final formater =
+        NumberFormat.decimalPatternDigits(locale: 'en_us', decimalDigits: 0);
     ref.watch(stepsViewModelProvider);
     final prov = ref.read(stepsViewModelProvider.notifier);
     if (prov.barData.isEmpty) {
       return const Placeholder();
     }
     final dates = prov.barData.keys.toList();
-    final durations = prov.barData.values.toList();
     if (touchedBarGroupIndex != dates.indexOf(prov.pickedDate)) {
       setState(() {
         touchedBarGroupIndex = dates.indexOf(prov.pickedDate);
       });
     }
-    final avgInHours = durations.reduce(
-          (a, b) => a + b,
-        ) /
-        durations.length;
+
+    final maxBarValue = prov.barData.values.isNotEmpty
+        ? prov.barData.values.reduce((a, b) => a > b ? a : b)
+        : prov.dailyTarget;
+
+    final avgMultiplier = prov.changeDateMode == ChangeDateMode.weekly
+        ? 7
+        : prov.changeDateMode == ChangeDateMode.monthly
+            ? 30
+            : 1;
+
+    final avgInHours = ((prov.dailyTarget * avgMultiplier).toDouble() /
+            (prov.dailyTarget + maxBarValue)) *
+        maxBarValue;
+
     return Padding(
       padding: const EdgeInsets.only(top: 15.0, bottom: 25),
       child: AspectRatio(
@@ -74,7 +85,8 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
                   alignment: Alignment.centerRight,
                   padding: const EdgeInsets.only(bottom: 20),
                   show: true,
-                  labelResolver: (line) => '${formater.format(line.y.toInt())} steps',
+                  labelResolver: (line) =>
+                      '${formater.format(prov.dailyTarget * avgMultiplier)} steps',
                   style: const TextStyle(
                       color: ColorsManager.blue, fontWeight: FontWeight.bold),
                 ),

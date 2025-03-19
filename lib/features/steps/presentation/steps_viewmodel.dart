@@ -12,7 +12,7 @@ class StepsViewmodel extends StateNotifier<StepsState> {
   late final ProviderContainer _providerContainer;
   final SharedPreferences _prefs;
   late DateTime pickedDate;
-  int pickedDateStepsData = 15000;
+  int pickedDateStepsData = 0;
   int dailyTarget = 6000;
   int weight = 70;
   double strideLength = 0.75;
@@ -23,18 +23,21 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     initFunction();
   }
 
-  void initFunction() async
-  {
+  void initFunction() async {
     final prov = _providerContainer.read(stepsProvider.notifier);
     final now = DateTime.now();
     pickedDate = DateTime(now.year, now.month, now.day);
-    pickedDateStepsData = _getUsageInfo(pickedDate, changeDateMode);
+
+    pickedDateStepsData = await _getUsageInfo(pickedDate, changeDateMode);
     await prov.addCachedDataToProvider();
+
     dailyTarget = _prefs.getInt('dailyTarget') ?? dailyTarget;
     weight = _prefs.getInt('weight') ?? weight;
     strideLength = _prefs.getDouble('strideLength') ?? strideLength;
-    _updateBarData(pickedDate);
+
+    await _updateBarData(pickedDate);
   }
+
   Future<void> openCalender(BuildContext context) async {
     final now = DateTime.now();
     DateTime? pickedDateTemp = await (changeDateMode != ChangeDateMode.monthly
@@ -53,29 +56,30 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     if (pickedDateTemp == null) {
       return;
     }
+
     pickedDate = pickedDateTemp;
-    pickedDateStepsData = _getUsageInfo(pickedDate, changeDateMode);
-    _updateBarData(pickedDate);
+    pickedDateStepsData = await _getUsageInfo(pickedDate, changeDateMode);
+    await _updateBarData(pickedDate);
+
     state = DatePicked();
   }
 
-  void toggleBarTouch(DateTime date) {
+  void toggleBarTouch(DateTime date) async {
     pickedDate = date;
-    //update list
-    pickedDateStepsData = _getUsageInfo(pickedDate, changeDateMode);
+    pickedDateStepsData = await _getUsageInfo(pickedDate, changeDateMode);
     state = DatePicked();
   }
 
   void toggleDateMode(ChangeDateMode mode) async {
     if (changeDateMode != mode) {
       changeDateMode = mode;
-      pickedDateStepsData = _getUsageInfo(pickedDate, changeDateMode);
-      _updateBarData(pickedDate);
+      pickedDateStepsData = await _getUsageInfo(pickedDate, changeDateMode);
+      await _updateBarData(pickedDate);
       state = DateModeChanged();
     }
   }
 
-  void _updateBarData(DateTime pickedDateEndBar) {
+  Future<void> _updateBarData(DateTime pickedDateEndBar) async {
     Map<DateTime, int> result = {};
     int length = changeDateMode == ChangeDateMode.daily ? 7 : 4;
     for (int i = 1; i <= length; i++) {
@@ -92,7 +96,7 @@ class StepsViewmodel extends StateNotifier<StepsState> {
               pickedDateEndBar.month - (length - i), pickedDateEndBar.day);
           break;
       }
-      final usage = _getUsageInfo(date, changeDateMode);
+      final usage = await _getUsageInfo(date, changeDateMode);
       result.addAll({date: usage});
     }
     barData = result;
@@ -112,9 +116,8 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     state = StepsDataUpdated();
   }
 
-  int _getUsageInfo(
-      DateTime startPickedDate, ChangeDateMode currentChangeDateMode) {
-    ////////******** don't update apps list or state here */
+  Future<int> _getUsageInfo(
+      DateTime startPickedDate, ChangeDateMode currentChangeDateMode) async {
     int length = currentChangeDateMode == ChangeDateMode.daily
         ? 1
         : currentChangeDateMode == ChangeDateMode.weekly
@@ -125,6 +128,7 @@ class StepsViewmodel extends StateNotifier<StepsState> {
                   startPickedDate.year,
                   startPickedDate.month + 1,
                 )).duration.inDays;
+
     int totalUsage = 0;
     final prov = _providerContainer.read(stepsProvider.notifier);
 
@@ -132,20 +136,13 @@ class StepsViewmodel extends StateNotifier<StepsState> {
       startPickedDate =
           DateTime(startPickedDate.year, startPickedDate.month, 1);
     }
+
     for (int i = 0; i < length; i++) {
       final date = startPickedDate.add(Duration(days: i));
-      int dayUsage = 0;
-      prov.getStepsUsageData(date, date).then(
-        (value) {
-          dayUsage = value;
-          pickedDateStepsData = totalUsage + (dayUsage);
-          state = StepsDataUpdated();
-        },
-      );
-      //final dayUsage = prov.getStepsUsageState(date);
-      //to be dynamic
-      totalUsage = totalUsage + (dayUsage);
+      int dayUsage = await prov.getStepsUsageData(date, date);
+      totalUsage += dayUsage;
     }
+
     return totalUsage;
   }
 }

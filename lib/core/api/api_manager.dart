@@ -44,4 +44,8 @@ class ApiManager {
   {
     await _dio.post(ApiConstants.addUsage, data: {"usage":AppUsageData.toRequest(data)}, options: Options(headers: {"Authorization": token}));
   }
+  void setStepsHistory(Map<DateTime, int> data,String token) async
+  {
+    await _dio.post(ApiConstants.addSteps, data: {"steps": data}, options: Options(headers: {"Authorization": token}));
+  }
 }

@@ -28,6 +28,13 @@ class OnlineDataSourceImpl implements OnlineDataSource {
       _apiManager.setUsageHistory(usageData, token);
     });
    }
+   @override
+   void setStepsHistory(Map<DateTime, int> stepsData, String token)
+   {
+    executeApi(() async {
+      _apiManager.setStepsHistory(stepsData, token);
+    });
+   }
 
   @override
   Future<Result<void>> register(String email, String firstName, String lastName, String phoneNumber, String password, String confirmPassword) async {

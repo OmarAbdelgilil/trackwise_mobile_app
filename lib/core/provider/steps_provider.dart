@@ -13,7 +13,7 @@ class StepsNotifier extends StateNotifier<Map<DateTime, int>> {
   StepsNotifier(this._hiveManager) : super({});
   final HiveManager _hiveManager;
 
-  Future<int> getStepsUsageData(DateTime startDate, DateTime endDate) async {
+  Future<int> getStepsUsageData(DateTime startDate) async {
     await Permission.activityRecognition.request();
     if (state.containsKey(startDate)) {
       return state[startDate]!;
@@ -25,10 +25,15 @@ class StepsNotifier extends StateNotifier<Map<DateTime, int>> {
     try {
       steps = await platform.invokeMethod('getSteps', {"date": formattedDate});
       print(steps);
+        executeHive(
+          () async {
+            _hiveManager.addStepsDateToCache(startDate, steps);
+          },
+        );
+      state = {...state, startDate: steps};
     } on PlatformException catch (e) {
       print("Failed to get step count: '${e.message}'.");
     }
-    print("in");
     //to be dynamic
     return steps;
     // try {
@@ -51,12 +56,16 @@ class StepsNotifier extends StateNotifier<Map<DateTime, int>> {
     //   rethrow;
     // }
   }
-
-  int? getStepsUsageState(DateTime date) {
-    //check cache here
-    return state[date];
+  void resetStepsProvider(Map<DateTime, int> data) {
+    final now = DateTime.now();
+    final todayDate = DateTime(now.year, now.month, now.day);
+    data.remove(todayDate);
+    if(state.containsKey(todayDate) && state[todayDate] != null)
+    {
+      data[todayDate] = state[todayDate]!;
+    }
+    state = data;
   }
-
   Future<void> addCachedDataToProvider() async {
     final result = await executeHive(
       () async {
@@ -66,6 +75,10 @@ class StepsNotifier extends StateNotifier<Map<DateTime, int>> {
     if (result is Success<Map<DateTime, int>>) {
       state = {...state, ...result.data!};
     }
+  }
+  void clearProvider()
+  {
+    state = {};
   }
 }
 

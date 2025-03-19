@@ -4,9 +4,11 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
+import 'package:intl/intl.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:track_wise_mobile_app/core/common/result.dart';
 import 'package:track_wise_mobile_app/core/local/hive_manager.dart';
+import 'package:track_wise_mobile_app/core/provider/steps_provider.dart';
 import 'package:track_wise_mobile_app/core/provider/usage_provider.dart';
 import 'package:track_wise_mobile_app/core/provider/user_provider.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/contracts/offline_data_source.dart';
@@ -57,6 +59,26 @@ class AuthRepositoryImpl implements AuthRepository {
       } catch (e) {
         print(e);
       }
+      try {
+        if (
+            result.data!.steps == null ||
+            (result.data!.steps as Map<String, dynamic>).isEmpty) {
+          _onlineDataSource.setStepsHistory(_providerContainer.read(stepsProvider), token);
+        } else {
+          final resultMap = <DateTime, int>{};
+          final data = result.data!.steps!;
+          for (var entry in data.entries) {
+            final date = DateFormat('d-M-yyyy').parse(entry.key);
+            resultMap[date] = data[entry.key] as int;
+          }
+          await _hiveManager.clearStepsCache();
+          await _hiveManager.addAllStepsToCache(resultMap);
+          _providerContainer.read(stepsProvider.notifier).resetStepsProvider(resultMap);
+          _authEventService.emitLoginSuccess(user);
+        }
+      } catch (e) {
+        print(e);
+      }
       platform.invokeMethod('startBackgroundService', {'token': token});
       return Success(user);
     }
@@ -93,6 +115,7 @@ class AuthRepositoryImpl implements AuthRepository {
     _providerContainer.read(userProvider.notifier).clearUser();
     await _offlineDataSource.clearToken();
     await _hiveManager.clearUsageCache();
+    await _hiveManager.clearStepsCache();
     _authEventService.emitLogoutSuccess();
     platform.invokeMethod('stopBackgroundService');
   }

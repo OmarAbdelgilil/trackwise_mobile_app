@@ -44,7 +44,7 @@ class _BarChartWidgetState extends ConsumerState<BarChartWidget> {
             barTouchData: BarTouchData(
                 touchCallback: (FlTouchEvent event, barTouchResponse) {
                   if (barTouchResponse != null &&
-                      barTouchResponse.spot != null) {
+                      barTouchResponse.spot != null && touchedBarGroupIndex != barTouchResponse.spot!.touchedBarGroupIndex) {
                     setState(() {
                       touchedBarGroupIndex =
                           barTouchResponse.spot!.touchedBarGroupIndex;

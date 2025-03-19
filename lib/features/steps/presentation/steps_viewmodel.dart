@@ -17,7 +17,6 @@ class StepsViewmodel extends StateNotifier<StepsState> {
   final SharedPreferences _prefs;
   late DateTime pickedDate;
   int pickedDateStepsData = 0;
-  int pickedDateStepsData = 0;
   int dailyTarget = 6000;
   int weight = 70;
   double strideLength = 0.75;
@@ -97,12 +96,12 @@ class StepsViewmodel extends StateNotifier<StepsState> {
       changeDateMode = mode;
        state = LoadingStepsData();
       pickedDateStepsData = await _getUsageInfo(pickedDate, changeDateMode);
-      _updateBarData(pickedDate);
+      await _updateBarData(pickedDate);
       state = DateModeChanged();
     }
   }
 
-  void _updateBarData(DateTime pickedDateEndBar) async{
+  Future<void> _updateBarData(DateTime pickedDateEndBar) async{
     Map<DateTime, int> result = {};
     int length = changeDateMode == ChangeDateMode.daily ? 7 : 4;
     for (int i = 1; i <= length; i++) {
@@ -170,8 +169,7 @@ class StepsViewmodel extends StateNotifier<StepsState> {
 
     for (int i = 0; i < length; i++) {
       final date = startPickedDate.add(Duration(days: i));
-      
-      int dayUsage = (await prov.getStepsUsageData(date));
+      int dayUsage = await prov.getStepsUsageData(date);
       totalUsage = totalUsage + dayUsage;
     }
 

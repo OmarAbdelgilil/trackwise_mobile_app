@@ -25,25 +25,29 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
       return const Placeholder();
     }
     final dates = prov.barData.keys.toList();
+    final durations = prov.barData.values.toList();
     if (touchedBarGroupIndex != dates.indexOf(prov.pickedDate)) {
       setState(() {
         touchedBarGroupIndex = dates.indexOf(prov.pickedDate);
       });
     }
+    final avgInHours = durations.reduce(
+           (a, b) => a + b,
+         ) /
+         durations.length;
+    // final maxBarValue = prov.barData.values.isNotEmpty
+    //     ? prov.barData.values.reduce((a, b) => a > b ? a : b)
+    //     : prov.dailyTarget;
 
-    final maxBarValue = prov.barData.values.isNotEmpty
-        ? prov.barData.values.reduce((a, b) => a > b ? a : b)
-        : prov.dailyTarget;
+    // final avgMultiplier = prov.changeDateMode == ChangeDateMode.weekly
+    //     ? 7
+    //     : prov.changeDateMode == ChangeDateMode.monthly
+    //         ? 30
+    //         : 1;
 
-    final avgMultiplier = prov.changeDateMode == ChangeDateMode.weekly
-        ? 7
-        : prov.changeDateMode == ChangeDateMode.monthly
-            ? 30
-            : 1;
-
-    final avgInHours = ((prov.dailyTarget * avgMultiplier).toDouble() /
-            (prov.dailyTarget + maxBarValue)) *
-        maxBarValue;
+    // final avgInHours = ((prov.dailyTarget * avgMultiplier).toDouble() /
+    //         (prov.dailyTarget + maxBarValue)) *
+    //     maxBarValue;
 
     return Padding(
       padding: const EdgeInsets.only(top: 15.0, bottom: 25),
@@ -54,7 +58,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
             barTouchData: BarTouchData(
                 touchCallback: (FlTouchEvent event, barTouchResponse) {
                   if (barTouchResponse != null &&
-                      barTouchResponse.spot != null) {
+                      barTouchResponse.spot != null && touchedBarGroupIndex != barTouchResponse.spot!.touchedBarGroupIndex) {
                     setState(() {
                       touchedBarGroupIndex =
                           barTouchResponse.spot!.touchedBarGroupIndex;
@@ -86,7 +90,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
                   padding: const EdgeInsets.only(bottom: 20),
                   show: true,
                   labelResolver: (line) =>
-                      '${formater.format(prov.dailyTarget * avgMultiplier)} steps',
+                      'avg: ${formater.format(line.y.toInt())}',
                   style: const TextStyle(
                       color: ColorsManager.blue, fontWeight: FontWeight.bold),
                 ),

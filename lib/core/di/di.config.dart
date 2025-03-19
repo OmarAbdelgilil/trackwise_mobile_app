@@ -62,12 +62,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i505.UserNotifier>(() => _i505.UserNotifier());
     gh.factory<_i537.OfflineDataSource>(
         () => _i553.OfflineDataSourceImpl(gh<_i460.SharedPreferences>()));
-    gh.factory<_i1071.StepsViewmodel>(
-        () => _i1071.StepsViewmodel(gh<_i460.SharedPreferences>()));
     gh.factory<_i1021.StepsNotifier>(
         () => _i1021.StepsNotifier(gh<_i587.HiveManager>()));
     gh.factory<_i229.AppUsageNotifier>(
         () => _i229.AppUsageNotifier(gh<_i587.HiveManager>()));
+    gh.factory<_i1071.StepsViewmodel>(() => _i1071.StepsViewmodel(
+          gh<_i460.SharedPreferences>(),
+          gh<_i481.AuthEventService>(),
+        ));
     gh.factory<_i597.OnlineDataSource>(
         () => _i163.OnlineDataSourceImpl(gh<_i1047.ApiManager>()));
     gh.factory<_i492.AuthRepository>(() => _i481.AuthRepositoryImpl(

@@ -28,7 +28,11 @@ class AnimatedBarCircleSwitchState extends State<AnimatedBarCircleSwitch> {
             });
           });
   }
-
+  @override
+  void dispose() {
+    super.dispose();
+    _pageController.dispose();
+  }
   void _onPageChanged(int index) {
     widget.prov.toggleCharts();
   }

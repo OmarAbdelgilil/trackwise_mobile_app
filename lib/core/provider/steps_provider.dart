@@ -24,11 +24,9 @@ class StepsNotifier extends StateNotifier<Map<DateTime, int>> {
     String formattedDate = DateFormat('dd-MM-yyyy').format(startDate);
     try {
       steps = await platform.invokeMethod('getSteps', {"date": formattedDate});
-      print(steps);
     } on PlatformException catch (e) {
       print("Failed to get step count: '${e.message}'.");
     }
-    print("in");
     //to be dynamic
     return steps;
     // try {

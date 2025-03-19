@@ -11,7 +11,8 @@ class StepsDataContainer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final formater = NumberFormat.decimalPatternDigits(locale: 'en_us', decimalDigits: 0);
+    final formater =
+        NumberFormat.decimalPatternDigits(locale: 'en_us', decimalDigits: 0);
     ref.watch(stepsViewModelProvider);
     final prov = ref.read(stepsViewModelProvider.notifier);
     final distanceKm = (prov.pickedDateStepsData * prov.strideLength) / 1000;

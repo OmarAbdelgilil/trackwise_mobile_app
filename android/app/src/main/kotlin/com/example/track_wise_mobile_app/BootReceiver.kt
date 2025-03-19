@@ -7,14 +7,37 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import java.util.*
+import android.util.Log
 
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
+            Log.d("StepCounterService", "Boot completed - receiver triggered")
             context?.let {
+                setRebootvalue(it)
                 scheduleMidnightReset(it)
+                startStepCounterService(it)
             }
         }
+    }
+
+    private fun startStepCounterService(context: Context) {
+    val serviceIntent = Intent(context, StepCounterService::class.java)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        context.startForegroundService(serviceIntent)
+    } else {
+        context.startService(serviceIntent)
+    }
+}
+
+    private fun setRebootvalue(context: Context) {
+        val sharedPreferences = context.getSharedPreferences("StepData", Context.MODE_PRIVATE)
+            sharedPreferences.edit()
+            .putBoolean("reboot", true).putInt("initialSteps", -1)
+            .apply()
+           
+            Log.d("StepCounterService",  sharedPreferences.getInt("initialSteps",0).toString())
+        
     }
 
     private fun scheduleMidnightReset(context: Context) {
@@ -32,10 +55,6 @@ class BootReceiver : BroadcastReceiver() {
             if (timeInMillis < System.currentTimeMillis()) {
                 add(Calendar.DAY_OF_YEAR, 1)
             }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            alarmManager.canScheduleExactAlarms()
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

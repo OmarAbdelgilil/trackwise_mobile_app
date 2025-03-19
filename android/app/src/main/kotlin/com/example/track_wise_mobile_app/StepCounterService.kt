@@ -13,23 +13,35 @@ import androidx.core.app.NotificationCompat
 import java.text.SimpleDateFormat
 import java.util.*
 import android.util.Log
+import android.os.Handler
+import android.os.Looper
 
 class StepCounterService : Service(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
-override fun onCreate() {
+    private var initialSteps = -1
+    private var lastRecordedSteps = 0
+    private var lastRecordedSteps2 = 0
+    override fun onCreate() {
     super.onCreate()
     Log.d("StepCounterService", "onCreate() called - Service started")
-    sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
-    stepSensor?.let {
-        sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
-    }
-    startForegroundService()
-     resetStepsAtMidnight()
+    val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
+    lastRecordedSteps = sharedPreferences.getInt("lastRecordedSteps2", 0)
+    lastRecordedSteps2 = lastRecordedSteps
+    Handler(Looper.getMainLooper()).postDelayed({
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+
+        stepSensor?.let {
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
+        }
+           startForegroundService()
+           resetStepsAtMidnight()
+    }, 5000) 
 }
+
 
 
     private fun startForegroundService() {
@@ -52,15 +64,37 @@ override fun onCreate() {
         startForeground(1, notification)
     }
 
-    override fun onSensorChanged(event: SensorEvent?) {
-        if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
-            val stepCount = event.values[0].toInt()
-     
-            println(stepCount)
-            val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
-            sharedPreferences.edit().putInt("lastRecordedSteps", stepCount).apply()
+
+override fun onSensorChanged(event: SensorEvent?) {
+            if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
+                val currentSteps = event.values[0].toInt()
+                val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
+                initialSteps = sharedPreferences.getInt("initialSteps", -1)
+                // If first time setting initialSteps today, store it
+                if (initialSteps == -1) {
+                    initialSteps = currentSteps
+
+                    // Save it persistently
+                    
+                    sharedPreferences.edit()
+                        .putInt("initialSteps", initialSteps)
+                        .apply()
+                }
+                val isRebooted = sharedPreferences.getBoolean("reboot", false)
+                 Log.d("StepCounterService", isRebooted.toString())
+                if(isRebooted)
+                {
+                    lastRecordedSteps = lastRecordedSteps2 + (currentSteps - initialSteps)
+                }
+                else{
+                    lastRecordedSteps = currentSteps - initialSteps
+                }
+                
+                sharedPreferences.edit()
+                    .putInt("lastRecordedSteps2", lastRecordedSteps).putInt("lastReading", currentSteps)
+                    .apply()
+            }
         }
-    }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
@@ -68,7 +102,7 @@ override fun onCreate() {
            Log.d("StepCounterService", "scheduleTestReset() called")
 
     val calendar = Calendar.getInstance().apply {
-        add(Calendar.MINUTE, 2) // ⏳ Schedule reset in 2 minutes for testing
+        add(Calendar.MINUTE, 5) // ⏳ Schedule reset in 2 minutes for testing
     }
            println("ss")
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager

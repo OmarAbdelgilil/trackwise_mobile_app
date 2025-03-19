@@ -17,6 +17,7 @@ class StepsViewmodel extends StateNotifier<StepsState> {
   final SharedPreferences _prefs;
   late DateTime pickedDate;
   int pickedDateStepsData = 0;
+  int pickedDateStepsData = 0;
   int dailyTarget = 6000;
   int weight = 70;
   double strideLength = 0.75;
@@ -57,6 +58,7 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     strideLength = _prefs.getDouble('strideLength') ?? strideLength;
     _updateBarData(pickedDate);
   }
+
   Future<void> openCalender(BuildContext context) async {
     final now = DateTime.now();
     DateTime? pickedDateTemp = await (changeDateMode != ChangeDateMode.monthly
@@ -75,6 +77,7 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     if (pickedDateTemp == null) {
       return;
     }
+
     pickedDate = pickedDateTemp;
     state = LoadingStepsData();
     pickedDateStepsData = await _getUsageInfo(pickedDate, changeDateMode);
@@ -156,6 +159,7 @@ class StepsViewmodel extends StateNotifier<StepsState> {
                   startPickedDate.year,
                   startPickedDate.month + 1,
                 )).duration.inDays;
+
     int totalUsage = 0;
     final prov = _providerContainer.read(stepsProvider.notifier);
 
@@ -163,12 +167,14 @@ class StepsViewmodel extends StateNotifier<StepsState> {
       startPickedDate =
           DateTime(startPickedDate.year, startPickedDate.month, 1);
     }
+
     for (int i = 0; i < length; i++) {
       final date = startPickedDate.add(Duration(days: i));
       
       int dayUsage = (await prov.getStepsUsageData(date));
       totalUsage = totalUsage + dayUsage;
     }
+
     return totalUsage;
   }
 }

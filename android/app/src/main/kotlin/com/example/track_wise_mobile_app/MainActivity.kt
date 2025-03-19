@@ -36,10 +36,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.os.SystemClock
 
 
 
-class MainActivity: FlutterActivity(),SensorEventListener {
+class MainActivity: FlutterActivity() {
      private val CHANNEL = "usage_stats"
     companion object {
         private var instance: MainActivity? = null
@@ -48,27 +49,14 @@ class MainActivity: FlutterActivity(),SensorEventListener {
             return instance
         }
     }
-    private lateinit var sensorManager: SensorManager
-    private var stepSensor: Sensor? = null
-    private var initialSteps = -1
     private var lastRecordedSteps = 0
-
+    
     
     // ADDED: Set instance in onCreate
 override fun onCreate(savedInstanceState: android.os.Bundle?) {
     super.onCreate(savedInstanceState)
     instance = this
-    val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
-    initialSteps = sharedPreferences.getInt("initialSteps", -1)
-    lastRecordedSteps = sharedPreferences.getInt("lastRecordedSteps2", 0)
 
-    // Initialize sensor manager
-    sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-    stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-
-    if (stepSensor != null) {
-        sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_UI)
-    }
 
     // 🔹 Check for ACTIVITY_RECOGNITION permission (Android 10+)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -77,12 +65,7 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
         }
     }
 
-    val serviceIntent = Intent(this, StepCounterService::class.java)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        startForegroundService(serviceIntent)
-    } else {
-        startService(serviceIntent)
-    }
+   scheduleServiceStart()
 
     // Check for exact alarm permission (Android 12+)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -96,6 +79,20 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
     override fun onResume() {
     super.onResume()
 }
+
+private fun scheduleServiceStart() {
+    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    val intent = Intent(this, StepCounterService::class.java)
+    val pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+    val triggerTime = SystemClock.elapsedRealtime() +  10 * 1000 
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, pendingIntent)
+    } else {
+        alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, pendingIntent)
+    }
+}
     
     // ADDED: Clear instance in onDestroy
     override fun onDestroy() {
@@ -103,7 +100,6 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
         if (instance == this) {
             instance = null
         }
-        sensorManager.unregisterListener(this)
     }
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -140,12 +136,13 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
             else if (call.method == "getSteps") {
                 val date = call.argument<String>("date") ?: ""
                 val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
-     
                 val todayDate = Calendar.getInstance().let {
                     "${String.format("%02d", it.get(Calendar.DAY_OF_MONTH))}-${String.format("%02d", it.get(Calendar.MONTH) + 1)}-${it.get(Calendar.YEAR)}"
                 }
                 
                 if (date == todayDate) {
+                    
+                    lastRecordedSteps = sharedPreferences.getInt("lastRecordedSteps2", 0)
                     result.success(lastRecordedSteps)
                 } else {
                     val storedSteps = sharedPreferences.getInt(date, 0)
@@ -173,36 +170,7 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
         stopService(serviceIntent)
     }
 
-override fun onSensorChanged(event: SensorEvent?) {
-            if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
-                val currentSteps = event.values[0].toInt()
 
-                // If first time setting initialSteps today, store it
-                if (initialSteps == -1) {
-                    initialSteps = currentSteps
-
-                    // Save it persistently
-                    val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
-                    sharedPreferences.edit()
-                        .putInt("initialSteps", initialSteps)
-                        .apply()
-                }
-
-                lastRecordedSteps = currentSteps - initialSteps
-   
-                // Save updated steps
-                val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
-                 Log.d("tttt", sharedPreferences.getInt("15-03-2025", 0).toString())
-
-                sharedPreferences.edit()
-                    .putInt("lastRecordedSteps2", lastRecordedSteps)
-                    .apply()
-            }
-        }
-
-       override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Not needed
-    }
 private fun requestExactAlarmPermission() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {  // API 31+ (Android 12+)
         val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager

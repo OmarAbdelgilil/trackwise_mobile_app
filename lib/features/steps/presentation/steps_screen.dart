@@ -19,57 +19,61 @@ class StepsScreen extends ConsumerWidget {
     if (stepsScreenState is InitialState) {
       return const Center(child: CircularProgressIndicator());
     }
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 18.0.h),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              HomeToggleButton(
-                  prov: prov,
-                  text: StringsManager.daily,
-                  toggle: ChangeDateMode.daily),
-              const SizedBox(
-                width: 2,
-              ),
-              HomeToggleButton(
-                  prov: prov,
-                  text: StringsManager.weekly,
-                  toggle: ChangeDateMode.weekly),
-              const SizedBox(
-                width: 2,
-              ),
-              HomeToggleButton(
-                  prov: prov,
-                  text: StringsManager.monthly,
-                  toggle: ChangeDateMode.monthly),
-            ],
-          ),
-          Row(
-            children: [
-              const Spacer(),
-              IconButton(
-                  onPressed: () async {
-                    await prov.openCalender(context);
-                  },
-                  icon: const Icon(Icons.calendar_month))
-            ],
-          ),
-          const StepsBarChart(),
-          SizedBox(
-            height: 20.h,
-          ),
-          const StepsDataContainer(),
-          const SizedBox(height: 4),
-          TextButton(
-              onPressed: (){showStepsDataDialogDialog(context, prov);},
-              child: const Text(
-                "Enter weight and height for better readings",
-                style: TextStyle(color: Colors.blue, fontSize: 14),
-              )),
-        ],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 18.0.h),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                HomeToggleButton(
+                    prov: prov,
+                    text: StringsManager.daily,
+                    toggle: ChangeDateMode.daily),
+                const SizedBox(
+                  width: 2,
+                ),
+                HomeToggleButton(
+                    prov: prov,
+                    text: StringsManager.weekly,
+                    toggle: ChangeDateMode.weekly),
+                const SizedBox(
+                  width: 2,
+                ),
+                HomeToggleButton(
+                    prov: prov,
+                    text: StringsManager.monthly,
+                    toggle: ChangeDateMode.monthly),
+              ],
+            ),
+            Row(
+              children: [
+                const Spacer(),
+                IconButton(
+                    onPressed: () async {
+                      await prov.openCalender(context);
+                    },
+                    icon: const Icon(Icons.calendar_month))
+              ],
+            ),
+            const StepsBarChart(),
+            SizedBox(
+              height: 20.h,
+            ),
+            const StepsDataContainer(),
+            const SizedBox(height: 4),
+            TextButton(
+                onPressed: () {
+                  showStepsDataDialogDialog(context, prov);
+                },
+                child: const Text(
+                  "Enter weight and height for better readings",
+                  style: TextStyle(color: Colors.blue, fontSize: 14),
+                )),
+          ],
+        ),
       ),
     );
   }

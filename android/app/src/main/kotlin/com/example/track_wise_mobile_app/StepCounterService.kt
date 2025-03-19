@@ -13,6 +13,8 @@ import androidx.core.app.NotificationCompat
 import java.text.SimpleDateFormat
 import java.util.*
 import android.util.Log
+import android.os.Handler
+import android.os.Looper
 
 class StepCounterService : Service(), SensorEventListener {
 
@@ -20,20 +22,26 @@ class StepCounterService : Service(), SensorEventListener {
     private var stepSensor: Sensor? = null
     private var initialSteps = -1
     private var lastRecordedSteps = 0
-override fun onCreate() {
+    private var lastRecordedSteps2 = 0
+    override fun onCreate() {
     super.onCreate()
     Log.d("StepCounterService", "onCreate() called - Service started")
+
     val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
     lastRecordedSteps = sharedPreferences.getInt("lastRecordedSteps2", 0)
-    sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-   
-    stepSensor?.let {
-        sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
-    }
-    startForegroundService()
-    resetStepsAtMidnight()
+    lastRecordedSteps2 = lastRecordedSteps
+    Handler(Looper.getMainLooper()).postDelayed({
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+
+        stepSensor?.let {
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
+        }
+           startForegroundService()
+           resetStepsAtMidnight()
+    }, 5000) 
 }
+
 
 
     private fun startForegroundService() {
@@ -76,7 +84,7 @@ override fun onSensorChanged(event: SensorEvent?) {
                  Log.d("StepCounterService", isRebooted.toString())
                 if(isRebooted)
                 {
-                    lastRecordedSteps = lastRecordedSteps + (currentSteps - initialSteps)
+                    lastRecordedSteps = lastRecordedSteps2 + (currentSteps - initialSteps)
                 }
                 else{
                     lastRecordedSteps = currentSteps - initialSteps

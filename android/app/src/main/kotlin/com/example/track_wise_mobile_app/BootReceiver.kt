@@ -35,6 +35,8 @@ class BootReceiver : BroadcastReceiver() {
             sharedPreferences.edit()
             .putBoolean("reboot", true).putInt("initialSteps", -1)
             .apply()
+           
+            Log.d("StepCounterService",  sharedPreferences.getInt("initialSteps",0).toString())
         
     }
 

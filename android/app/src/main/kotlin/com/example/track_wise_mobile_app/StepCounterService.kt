@@ -38,7 +38,7 @@ class StepCounterService : Service(), SensorEventListener {
             sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
         }
            startForegroundService()
-           resetStepsAtMidnight()
+           scheduleTestReset()
     }, 5000) 
 }
 
@@ -139,11 +139,23 @@ private fun resetStepsAtMidnight() {
 
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val intent = Intent(this, ResetStepReceiver::class.java)
+
+    // Check if an alarm is already set
+    val pendingIntentCheck = PendingIntent.getBroadcast(
+        this, 1001, intent, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+    )
+
+    if (pendingIntentCheck != null) {
+        Log.d("StepCounterService", "🚀 Midnight reset alarm already set, skipping reschedule.")
+        return
+    }
+
+    // Create a new PendingIntent for the alarm
     val pendingIntent = PendingIntent.getBroadcast(
         this, 1001, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
-    Log.d("StepCounterService", "Reset scheduled for: ${calendar.time}")
+    Log.d("StepCounterService", "🕛 Scheduling midnight reset at: ${calendar.time}")
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         alarmManager.setExactAndAllowWhileIdle(
@@ -153,8 +165,9 @@ private fun resetStepsAtMidnight() {
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
 
-    Log.d("StepCounterService", "🚀 Midnight reset scheduled")
+    Log.d("StepCounterService", "✅ Midnight reset scheduled successfully.")
 }
+
 
 
     override fun onBind(intent: Intent?): IBinder? {

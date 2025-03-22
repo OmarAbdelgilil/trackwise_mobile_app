@@ -40,9 +40,21 @@ class BootReceiver : BroadcastReceiver() {
         
     }
 
-    private fun scheduleMidnightReset(context: Context) {
+        private fun scheduleMidnightReset(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, ResetStepReceiver::class.java)
+        
+        // Check if the alarm is already set
+        val pendingIntentCheck = PendingIntent.getBroadcast(
+            context, 0, intent, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        if (pendingIntentCheck != null) {
+            Log.d("StepCounterService", "🚀 Midnight reset alarm already set, skipping reschedule.")
+            return
+        }
+
+        // Create a new PendingIntent for the alarm
         val pendingIntent = PendingIntent.getBroadcast(
             context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -52,10 +64,14 @@ class BootReceiver : BroadcastReceiver() {
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
-            if (timeInMillis < System.currentTimeMillis()) {
+
+            // If midnight has already passed, schedule for the next day
+            if (timeInMillis <= System.currentTimeMillis()) {
                 add(Calendar.DAY_OF_YEAR, 1)
             }
         }
+
+        Log.d("StepCounterService", "🕛 Scheduling midnight reset at: ${calendar.time}")
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(
@@ -70,5 +86,8 @@ class BootReceiver : BroadcastReceiver() {
                 pendingIntent
             )
         }
+
+        Log.d("StepCounterService", "✅ Midnight reset scheduled successfully.")
     }
+
 }

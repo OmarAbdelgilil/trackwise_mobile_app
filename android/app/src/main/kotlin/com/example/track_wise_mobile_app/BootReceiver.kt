@@ -15,7 +15,6 @@ class BootReceiver : BroadcastReceiver() {
             Log.d("StepCounterService", "Boot completed - receiver triggered")
             context?.let {
                 setRebootvalue(it)
-                scheduleMidnightReset(it)
                 startStepCounterService(it)
             }
         }
@@ -40,54 +39,5 @@ class BootReceiver : BroadcastReceiver() {
         
     }
 
-        private fun scheduleMidnightReset(context: Context) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, ResetStepReceiver::class.java)
-        
-        // Check if the alarm is already set
-        val pendingIntentCheck = PendingIntent.getBroadcast(
-            context, 0, intent, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-        )
-        
-        if (pendingIntentCheck != null) {
-            Log.d("StepCounterService", "🚀 Midnight reset alarm already set, skipping reschedule.")
-            return
-        }
-
-        // Create a new PendingIntent for the alarm
-        val pendingIntent = PendingIntent.getBroadcast(
-            context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-
-            // If midnight has already passed, schedule for the next day
-            if (timeInMillis <= System.currentTimeMillis()) {
-                add(Calendar.DAY_OF_YEAR, 1)
-            }
-        }
-
-        Log.d("StepCounterService", "🕛 Scheduling midnight reset at: ${calendar.time}")
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
-                pendingIntent
-            )
-        } else {
-            alarmManager.setExact(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
-                pendingIntent
-            )
-        }
-
-        Log.d("StepCounterService", "✅ Midnight reset scheduled successfully.")
-    }
 
 }

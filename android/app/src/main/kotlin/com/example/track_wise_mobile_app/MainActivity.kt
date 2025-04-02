@@ -37,7 +37,8 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.os.SystemClock
-
+import android.os.Handler
+import android.os.Looper
 
 
 class MainActivity: FlutterActivity() {
@@ -67,13 +68,6 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
 
    scheduleServiceStart()
 
-    // Check for exact alarm permission (Android 12+)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        if (checkSelfPermission(android.Manifest.permission.SCHEDULE_EXACT_ALARM) == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            requestExactAlarmPermission()
-        }
-    } 
 }
 
     override fun onResume() {
@@ -81,18 +75,12 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
 }
 
 private fun scheduleServiceStart() {
-    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val intent = Intent(this, StepCounterService::class.java)
-    val pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-    val triggerTime = SystemClock.elapsedRealtime() +  10 * 1000 
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, pendingIntent)
-    } else {
-        alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, pendingIntent)
-    }
+    Handler(Looper.getMainLooper()).postDelayed({
+        val intent = Intent(this, StepCounterService::class.java)
+        startService(intent)
+    }, 10 * 1000) // 10 seconds delay
 }
+
     
     // ADDED: Clear instance in onDestroy
     override fun onDestroy() {

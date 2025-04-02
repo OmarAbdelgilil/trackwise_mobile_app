@@ -23,10 +23,19 @@ class StepCounterService : Service(), SensorEventListener {
     private var initialSteps = -1
     private var lastRecordedSteps = 0
     private var lastRecordedSteps2 = 0
+
+        private val handler = Handler(Looper.getMainLooper())
+    private val checkMidnightRunnable = object : Runnable {
+        override fun run() {
+            checkIfPastMidnight()
+            handler.postDelayed(this, 10 * 60 * 1000)
+        }
+    }
+
     override fun onCreate() {
     super.onCreate()
     Log.d("StepCounterService", "onCreate() called - Service started")
-
+    handler.post(checkMidnightRunnable)
     val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
     lastRecordedSteps = sharedPreferences.getInt("lastRecordedSteps2", 0)
     lastRecordedSteps2 = lastRecordedSteps
@@ -38,7 +47,6 @@ class StepCounterService : Service(), SensorEventListener {
             sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
         }
            startForegroundService()
-           scheduleTestReset()
     }, 5000) 
 }
 
@@ -98,76 +106,40 @@ override fun onSensorChanged(event: SensorEvent?) {
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
- private fun scheduleTestReset() {
-           Log.d("StepCounterService", "scheduleTestReset() called")
 
-    val calendar = Calendar.getInstance().apply {
-        add(Calendar.MINUTE, 5) // ⏳ Schedule reset in 2 minutes for testing
-    }
-           println("ss")
-    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val intent = Intent(this, ResetStepReceiver::class.java)
-    val pendingIntent = PendingIntent.getBroadcast(
-        this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
-           println("ss")
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent
-        )
-    } else {
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-    }
+    private fun checkIfPastMidnight() {
+        val calendar = Calendar.getInstance()
+        val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
 
-    println("🚀 Scheduled reset in 2 minutes") // Debug Log
-}
+        val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
+        val hasRunToday = sharedPreferences.getBoolean("hasRunToday", false)
 
-private fun resetStepsAtMidnight() {
-    Log.d("StepCounterService", "resetStepsAtMidnight() called")
+        if (currentHour == 0 && !hasRunToday) { 
 
-    val calendar = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
+            val lastRecordedSteps = sharedPreferences.getInt("lastRecordedSteps2", 0)
+            val lastReading = sharedPreferences.getInt("lastReading", 0)
 
-        // If it's already past midnight, schedule for the next day
-        if (timeInMillis <= System.currentTimeMillis()) {
-            add(Calendar.DAY_OF_YEAR, 1)
+            val yesterday = Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_YEAR, -1)
+            }
+            val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+            val yesterdayDate = dateFormat.format(yesterday.time)
+
+            sharedPreferences.edit()
+                .putInt(yesterdayDate, lastRecordedSteps) 
+                .putInt("initialSteps", lastReading) 
+                .putInt("lastRecordedSteps2", 0) 
+                .putBoolean("reboot", false)
+                .putBoolean("hasRunToday", true) 
+                .apply()
+
+            Log.d("StepCounterService", "Steps reset at midnight")
         }
-    }
-
-    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val intent = Intent(this, ResetStepReceiver::class.java)
-
-    // Check if an alarm is already set
-    val pendingIntentCheck = PendingIntent.getBroadcast(
-        this, 1001, intent, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-    )
-
-    if (pendingIntentCheck != null) {
-        Log.d("StepCounterService", "🚀 Midnight reset alarm already set, skipping reschedule.")
-        return
-    }
-
-    // Create a new PendingIntent for the alarm
-    val pendingIntent = PendingIntent.getBroadcast(
-        this, 1001, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
-
-    Log.d("StepCounterService", "🕛 Scheduling midnight reset at: ${calendar.time}")
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent
-        )
-    } else {
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-    }
-
-    Log.d("StepCounterService", "✅ Midnight reset scheduled successfully.")
+        if (currentHour == 1) {
+            sharedPreferences.edit().putBoolean("hasRunToday", false).apply()
+            Log.d("StepCounterService", "hasRunToday reset")
+        }
 }
-
 
 
     override fun onBind(intent: Intent?): IBinder? {

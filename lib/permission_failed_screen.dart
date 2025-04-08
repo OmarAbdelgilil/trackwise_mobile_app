@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:track_wise_mobile_app/core/provider/permission_noti.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
@@ -14,10 +15,31 @@ class PermissionFailedScreen extends StatefulWidget {
 
 class _PermissionFailedScreenState extends State<PermissionFailedScreen>
     with WidgetsBindingObserver {
+      PermissionStatus? stepsPermission;
+      bool usagePermission = false;
+      bool isLoading = true;
   static const platform = MethodChannel('usage_stats');
+  _checkStepsPermission() async
+  {
+    stepsPermission = await Permission.activityRecognition.request();
+    if(!stepsPermission!.isGranted)
+    {
+      openAppSettings();
+    }else{
+      kPermission.value = (usagePermission && stepsPermission != null && stepsPermission!.isGranted);
+    }
+  }
+  _initFunction() async{
+    usagePermission = await platform.invokeMethod('checkUsageAccess');
+    stepsPermission = await Permission.activityRecognition.request();
+    setState(() {
+      isLoading = false;
+    });
+  }
   @override
   void initState() {
     super.initState();
+    _initFunction();
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -30,7 +52,9 @@ class _PermissionFailedScreenState extends State<PermissionFailedScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
-      kPermission.value = await platform.invokeMethod('checkUsageAccess');
+      usagePermission = await platform.invokeMethod('checkUsageAccess');
+      stepsPermission = await Permission.activityRecognition.status;
+      kPermission.value = (usagePermission && stepsPermission != null && stepsPermission!.isGranted);
     }
   }
 
@@ -40,7 +64,7 @@ class _PermissionFailedScreenState extends State<PermissionFailedScreen>
       backgroundColor: ColorsManager.backgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 60.0, horizontal: 16),
-        child: Column(
+        child: isLoading? const Center(child: CircularProgressIndicator(),) : Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
@@ -52,9 +76,9 @@ class _PermissionFailedScreenState extends State<PermissionFailedScreen>
                       fontWeight: FontWeight.bold)),
             ),
             Text(
-              'sorry you have to grant usage access',
+              'sorry you have to grant usage and steps access',
               style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 15.sp,
                   color: Colors.white,
                   fontWeight: FontWeight.bold),
             ),
@@ -65,6 +89,8 @@ class _PermissionFailedScreenState extends State<PermissionFailedScreen>
             const SizedBox(
               height: 20,
             ),
+            if(!usagePermission)
+            ...[
             SizedBox(
               height: 30.h,
             ),
@@ -77,15 +103,34 @@ class _PermissionFailedScreenState extends State<PermissionFailedScreen>
                       foregroundColor: Colors.white),
                   onPressed: () async {
                     await platform.invokeMethod('openUsageAccessSettings');
-                    //
-                    //print(kPermission.value);
                   },
                   child: Text(
-                    'Grant access',
+                    'Grant access For Usage',
                     style:
                         TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
                   )),
-            )
+            ),
+            ],
+            if(stepsPermission == null || !stepsPermission!.isGranted)
+            ...[
+              SizedBox(
+              height: 30.h,
+            ),
+            SizedBox(
+              width: double.infinity,
+              height: 50.h,
+              child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorsManager.blue,
+                      foregroundColor: Colors.white),
+                  onPressed: _checkStepsPermission,
+                  child: Text(
+                    'Grant access For Steps',
+                    style:
+                        TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+                  )),
+            ),
+            ]
           ],
         ),
       ),

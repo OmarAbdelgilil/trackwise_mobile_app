@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
 // import 'package:track_wise_mobile_app/features/Auth/presentation/login/login_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -36,12 +37,17 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   static const platform = MethodChannel('usage_stats');
+  Future<bool> _checkPermission() async {
+    final usage = await platform.invokeMethod('checkUsageAccess');
+    final steps = await Permission.activityRecognition.request();
+    return usage && steps.isGranted;
+  }
   @override
   void initState() {
     super.initState();
-    platform.invokeMethod('checkUsageAccess').then((result) {
+    _checkPermission().then((isGranted) {
       setState(() {
-        kPermission.value = result;
+        kPermission.value = isGranted;
       });
     });
   }

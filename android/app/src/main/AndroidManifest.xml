@@ -18,6 +18,7 @@ xmlns:tools="http://schemas.android.com/tools"
     <application
         android:label="track_wise_mobile_app"
         android:name="${applicationName}"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
@@ -49,20 +50,6 @@ xmlns:tools="http://schemas.android.com/tools"
         <service
             android:name=".BackgroundService"
             android:exported="false" />
-        <service
-    android:name=".StepCounterService"
-    android:foregroundServiceType="health"
-    android:exported="false"/>
-        <!-- For auto-starting service -->
-        <receiver
-            android:name=".BootReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver android:name=".ResetStepReceiver" android:exported="false"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

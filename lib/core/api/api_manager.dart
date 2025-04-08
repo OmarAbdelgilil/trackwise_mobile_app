@@ -42,10 +42,10 @@ class ApiManager {
   }
   void setUsageHistory(Map<DateTime, List<AppUsageData>> data,String token) async
   {
-    await _dio.post(ApiConstants.addUsage, data: {"usage":AppUsageData.toRequest(data)}, options: Options(headers: {"Authorization": token}));
+    await _dio.post(ApiConstants.addUsage, data: {"usage":AppUsageData.toRequest(data)}, options: Options(headers: {"Authorization": "Bearer $token"}));
   }
-  void setStepsHistory(Map<DateTime, int> data,String token) async
+  void setStepsHistory(Map<String, int> data, String token) async
   {
-    await _dio.post(ApiConstants.addSteps, data: {"steps": data}, options: Options(headers: {"Authorization": token}));
+    await _dio.post(ApiConstants.addSteps, data: {"steps": data}, options: Options(headers: {"Authorization": "Bearer $token"}));
   }
 }

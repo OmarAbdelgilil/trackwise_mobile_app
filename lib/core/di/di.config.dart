@@ -52,12 +52,12 @@ extension GetItInjectableX on _i174.GetIt {
       environmentFilter,
     );
     final sharedPrefsModule = _$SharedPrefsModule();
+    gh.factory<_i587.HiveManager>(() => _i587.HiveManager());
     await gh.factoryAsync<_i460.SharedPreferences>(
       () => sharedPrefsModule.prefs,
       preResolve: true,
     );
     gh.singleton<_i1047.ApiManager>(() => _i1047.ApiManager());
-    gh.singleton<_i587.HiveManager>(() => _i587.HiveManager());
     gh.singleton<_i481.AuthEventService>(() => _i481.AuthEventService());
     gh.lazySingleton<_i505.UserNotifier>(() => _i505.UserNotifier());
     gh.factory<_i537.OfflineDataSource>(

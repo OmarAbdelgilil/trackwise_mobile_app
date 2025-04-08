@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:injectable/injectable.dart';
 import 'package:track_wise_mobile_app/core/common/result.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
@@ -14,17 +13,14 @@ class StepsNotifier extends StateNotifier<Map<DateTime, int>> {
   final HiveManager _hiveManager;
 
   Future<int> getStepsUsageData(DateTime startDate) async {
-    await Permission.activityRecognition.request();
     if (state.containsKey(startDate)) {
       return state[startDate]!;
     }
     const platform = MethodChannel('usage_stats');
-    // int _steps = 0;
     int steps = 0;
-    String formattedDate = DateFormat('dd-MM-yyyy').format(startDate);
+    String formattedDate = DateFormat('d-M-yyyy').format(startDate);
     try {
-      steps = await platform.invokeMethod('getSteps', {"date": formattedDate});
-      print(steps);
+      steps = (await platform.invokeMethod('getSteps', {"date": formattedDate})).toInt();
         executeHive(
           () async {
             _hiveManager.addStepsDateToCache(startDate, steps);
@@ -34,27 +30,7 @@ class StepsNotifier extends StateNotifier<Map<DateTime, int>> {
     } on PlatformException catch (e) {
       print("Failed to get step count: '${e.message}'.");
     }
-    //to be dynamic
     return steps;
-    // try {
-    //   late List<Map<dynamic, dynamic>>? Steps;
-    //   appsUsage = [];
-    //   List<AppUsageData> infoList = [];
-    //   if (appsUsage != null && appsUsage.isNotEmpty) {
-    //     infoList = appsUsage.map((e) => AppUsageData.fromJson(e)).where((element) => element.usageTime.inMinutes != 0).toList();
-    //   }
-    // if (infoList.isNotEmpty) {
-    //   executeHive(
-    //     () async {
-    //       _hiveManager.addStepsDateToCache(startDate, );
-    //     },
-    //   );
-    // }
-    //   state = {...state, startDate: infoList};
-    //   return infoList;
-    // } catch (e) {
-    //   rethrow;
-    // }
   }
   void resetStepsProvider(Map<DateTime, int> data) {
     final now = DateTime.now();
@@ -84,30 +60,3 @@ class StepsNotifier extends StateNotifier<Map<DateTime, int>> {
 
 final stepsProvider = StateNotifierProvider<StepsNotifier, Map<DateTime, int>>(
     (ref) => getIt<StepsNotifier>());
-
-
-// health.isHealthConnectAvailable().then(
-//           (bool isAvailable) async {
-//             print('isAvailable $isAvailable');
-//             if (!isAvailable) {
-//               print("Health Connect is not installed. Prompting the user...");
-//               await health.installHealthConnect();
-//             }
-//             health
-//                 .requestAuthorization(types, permissions: permissions)
-//                 .then((bool granted) async {
-//               print('granted $granted');
-//               if (granted) {
-//                 DateTime startDate = DateTime.now().subtract(Duration(days: 1));
-//                 DateTime endDate = DateTime.now();
-//                 List<HealthDataPoint> healthData =
-//                     await health.getHealthDataFromTypes(
-//                   types: types,
-//                   startTime: startDate,
-//                   endTime: endDate,
-//                 );
-//                 print(healthData[0].metadata);
-//               }
-//             });
-//           },
-//         );

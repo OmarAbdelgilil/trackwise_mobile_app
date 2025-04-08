@@ -35,6 +35,15 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
            (a, b) => a + b,
          ) /
          durations.length;
+        final stepsTarget = prov.dailyTarget.toDouble();
+        final maxBarValue = durations.isNotEmpty
+            ? durations.reduce((a, b) => a > b ? a : b).toDouble()
+            : 0;
+        final minBarValue = durations.isNotEmpty
+            ? durations.reduce((a, b) => a < b ? a : b).toDouble()
+            : 0;
+        final yMax = maxBarValue > stepsTarget ? maxBarValue : stepsTarget;
+        final yMin = minBarValue < 0 ? minBarValue : 0;
     // final maxBarValue = prov.barData.values.isNotEmpty
     //     ? prov.barData.values.reduce((a, b) => a > b ? a : b)
     //     : prov.dailyTarget;

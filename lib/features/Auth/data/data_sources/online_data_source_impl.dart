@@ -29,7 +29,7 @@ class OnlineDataSourceImpl implements OnlineDataSource {
     });
    }
    @override
-   void setStepsHistory(Map<DateTime, int> stepsData, String token)
+   void setStepsHistory(Map<String, int> stepsData, String token)
    {
     executeApi(() async {
       _apiManager.setStepsHistory(stepsData, token);

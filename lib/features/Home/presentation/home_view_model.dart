@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
+import 'package:track_wise_mobile_app/core/provider/steps_provider.dart';
 import 'package:track_wise_mobile_app/core/provider/usage_provider.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/repos/auth_repository_impl.dart';
 import 'package:track_wise_mobile_app/features/Auth/domain/entities/user.dart';
@@ -197,6 +198,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
       _getCompareText(pickedDate, changeDateMode);
     }
     _updateBarData(pickedDate);
+    await _providerContainer.read(stepsProvider.notifier).addCachedDataToProvider();
     state = UsageUpdated();
   }
   void resetUsageWhenLogin()

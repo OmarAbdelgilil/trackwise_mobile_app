@@ -49,7 +49,7 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     final prov = _providerContainer.read(stepsProvider.notifier);
     final now = DateTime.now();
     pickedDate = DateTime(now.year, now.month, now.day);
-    await prov.addCachedDataToProvider();
+    // await prov.addCachedDataToProvider();
     //should get all steps cached data
     pickedDateStepsData = await prov.getStepsUsageData(pickedDate);
     dailyTarget = _prefs.getInt('dailyTarget') ?? dailyTarget;

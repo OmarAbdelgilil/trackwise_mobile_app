@@ -26,19 +26,55 @@ import java.io.IOException
 import java.util.*
 import java.net.HttpURLConnection
 import java.net.URL
-
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import java.text.SimpleDateFormat
+import java.util.Locale
 private val CHANNEL_ID = "BackgroundServiceChannel"
 
 class BackgroundService : Service() {
     private val TAG = "BackgroundService"
     private val handler = Handler(Looper.getMainLooper())
-    private val interval = 500 * 1000L // 500 seconds interval
+    private val interval = 180 * 1000L // 180 seconds interval
+    private var counter = 0
     private var userToken: String? = null
     private val runnable = object : Runnable {
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun run() {
             Log.d(TAG, "Running usage stats collection at ${Date()}")
-            collectUsageStats()
+            val usageStats = collectUsageStats()
+            getSteps { steps ->
+                if (!userToken.isNullOrEmpty() && counter >= 3) {
+                    Log.d(TAG, "inside for sending data")
+                    counter = 0
+                    val currentDateFormatted = java.text.SimpleDateFormat("d-M-yyyy", Locale.getDefault()).format(Date())
+                    val finalJsonData = Gson().toJson(
+                    mapOf(
+                        "usage" to mapOf(
+                            currentDateFormatted to usageStats
+                        ),
+                        "steps" to mapOf(
+                            currentDateFormatted to steps
+                        ),
+                        
+                    ).filterValues { it != null })
+                    sendPostRequest(finalJsonData, userToken)
+                }
+                counter++
+                /////////////////////////notification
+                val totalUsageMinutes = usageStats?.sumOf { it["usageMinutes"] as Double } ?: 0.0
+                val hours = totalUsageMinutes.toInt() / 60
+                val minutes = totalUsageMinutes.toInt() % 60
+                val notificationMessage = if (hours > 0) {
+                    "Steps today: ${steps?.toInt() ?: 0} Step\nUsage time: ${hours}hr${minutes}mins"
+                } else {
+                    "Steps today: ${steps?.toInt() ?: 0} Step\nUsage time: ${minutes} mins"
+                }
+                updateNotification(notificationMessage)
+                /////////////////////////
+            }
             // Schedule the next execution
             handler.postDelayed(this, interval)
         }
@@ -70,12 +106,35 @@ class BackgroundService : Service() {
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Service Running")
-            .setContentText("Keep on the hard work")
+            .setContentTitle("Keep on the hard work")
+            .setContentText("Steps today: 0\nUsage time: 0 mins")
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentIntent(pendingIntent)
+            .setStyle(NotificationCompat.BigTextStyle().bigText("Steps today: 0\nUsage time: 0 mins"))
+            .setContentIntent(createPendingIntent())
             .build()
     }
+    private fun updateNotification(steps: String) {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // Create the updated notification with new step count
+        val updatedNotification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Keep on the hard work")
+            .setContentText(steps)  // Dynamic message with step count
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(steps))
+            .setContentIntent(createPendingIntent())
+            .build()
+
+        // Update the notification
+        notificationManager.notify(1, updatedNotification)
+    }
+    private fun createPendingIntent(): PendingIntent {
+        val intent = Intent(this, MainActivity::class.java)
+        return PendingIntent.getActivity(
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "Background service started")
         userToken = intent?.getStringExtra("TOKEN_KEY")
@@ -96,7 +155,7 @@ class BackgroundService : Service() {
         return null
     }
     private fun sendPostRequest(jsonData: String, userToken: String?) {
-        val urlString = "http://192.168.100.3:3000/api/updateUsage"
+        val urlString = "http://192.168.100.3:3000/api/updateUsage-Steps"
         val token = userToken ?: ""
         
         Thread {
@@ -106,7 +165,7 @@ class BackgroundService : Service() {
                 connection.requestMethod = "POST"
                 connection.doOutput = true
                 connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
-                connection.setRequestProperty("Authorization", "$token")
+                connection.setRequestProperty("Authorization", "Bearer $token")
 
                 // Write data
                 val outputStream = connection.outputStream
@@ -128,7 +187,7 @@ class BackgroundService : Service() {
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun collectUsageStats() {
+    private fun collectUsageStats(): List<Map<String, Any>>? {
 
         val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
@@ -140,7 +199,7 @@ class BackgroundService : Service() {
 
         if (mode != AppOpsManager.MODE_ALLOWED) {
             Log.e(TAG, "No usage stats permission")
-            return
+            return null
         }
         val endTime = System.currentTimeMillis()
         val calendar = Calendar.getInstance()
@@ -150,20 +209,9 @@ class BackgroundService : Service() {
         calendar.set(Calendar.MILLISECOND, 0)
 
         val startTime = calendar.timeInMillis
-        val startDate = calendar.time
-        val formattedDate = java.text.SimpleDateFormat("d-M-yyyy", Locale.getDefault()).format(startDate)
-        Log.d(TAG, "Start date: $formattedDate")
-        
+        val startDate = calendar.time        
         val stats = getUsageStats(usageStatsManager, startTime, endTime).filter { it["usageMinutes"] as Double >= 1.0 }
-        val finalJsonData = Gson().toJson(mapOf("date" to formattedDate, "usageData" to stats))
-        // Send data to server
-        sendPostRequest(finalJsonData, userToken)
-        // Just log the results
-        Log.d(TAG, "Collected ${stats.size} app usage entries")
-        stats.forEach { appData ->
-            Log.d(TAG, "App: ${appData["appName"]}, Usage: ${appData["usageMinutes"]} minutes")
-        }
-        
+        return stats
     }
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun getUsageStats(usageStatsManager: UsageStatsManager, startTime: Long, endTime: Long): List<Map<String, Any>> {
@@ -219,6 +267,59 @@ class BackgroundService : Service() {
         }
 
         return resultList
+    }
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    fun getSteps(callback: (Float?) -> Unit) {
+        val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        if (stepSensor == null) {
+            Log.d(TAG, "Step Counter sensor not available.")
+            callback(null)
+            return
+        }
+        val tempListener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent?) {
+                if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
+                    val steps = event.values[0]
+                    //Log.d(TAG, "Steps since reboot: $steps")
+                    ////////////////////////////////////////////////
+                    val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                    val currentDateSaved = sharedPreferences.getString("currentDateSaved", null)
+                    val currentBigNumber = sharedPreferences.getFloat("currentBigNumberSteps", 0f)
+                    val currentDateFormatted = java.text.SimpleDateFormat("d-M-yyyy", Locale.getDefault()).format(Date())
+                    var finalStepsData: Float? = null
+                    if (currentDateSaved != null && currentDateSaved == currentDateFormatted) {
+                        val stepsDifference = steps - currentBigNumber
+                        if(stepsDifference < 0)
+                        {
+                            // If a restart happened today, reset the steps data for today
+                            finalStepsData = steps
+                            sharedPreferences.edit().putFloat("steps:$currentDateFormatted", steps).apply()
+                            sharedPreferences.edit().putFloat("currentBigNumberSteps", steps).apply()
+                            Log.d(TAG, "Restart detected. Steps data reset for today.")
+                        }else{
+                            Log.d(TAG, "normal update")
+                            finalStepsData = stepsDifference
+                            sharedPreferences.edit().putFloat("steps:$currentDateFormatted", stepsDifference).apply()
+                        }
+                    } else {
+                        //update date and bignumber
+                        sharedPreferences.edit().putString("currentDateSaved", currentDateFormatted).apply()
+                        sharedPreferences.edit().putFloat("currentBigNumberSteps", steps).apply()
+                        Log.d(TAG, "date and big number changes")
+                    }
+                    ////////////////////////////////////////////////
+
+                    // Unregister to avoid keeping listener active
+                    sensorManager.unregisterListener(this)
+                    callback(finalStepsData)
+                }
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        }
+
+        sensorManager.registerListener(tempListener, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
     companion object {

@@ -63,7 +63,8 @@ class AuthRepositoryImpl implements AuthRepository {
         if (
             result.data!.steps == null ||
             (result.data!.steps as Map<String, dynamic>).isEmpty) {
-          _onlineDataSource.setStepsHistory(_providerContainer.read(stepsProvider), token);
+              final formattedData = _providerContainer.read(stepsProvider).map((key, value) => MapEntry(DateFormat('d-M-yyyy').format(key), value));
+              _onlineDataSource.setStepsHistory(formattedData, token);
         } else {
           final resultMap = <DateTime, int>{};
           final data = result.data!.steps!;
@@ -78,6 +79,10 @@ class AuthRepositoryImpl implements AuthRepository {
         }
       } catch (e) {
         print(e);
+      }
+      if(await platform.invokeMethod('isBackgroundServiceRunning'))
+      {
+        await platform.invokeMethod('stopBackgroundService');
       }
       platform.invokeMethod('startBackgroundService', {'token': token});
       return Success(user);
@@ -101,12 +106,13 @@ class AuthRepositoryImpl implements AuthRepository {
       final token = _offlineDataSource.getToken();
       if (token != null && user != null) {
         _providerContainer.read(userProvider.notifier).setUser(user, token);
-        platform.invokeMethod('isBackgroundServiceRunning').then((value) {
-          if (value == false) {
-            platform.invokeMethod('startBackgroundService', {'token': token});
-          }
-        });
       }
+      platform.invokeMethod('isBackgroundServiceRunning').then((value) {
+        if (value == false) {
+          platform.invokeMethod('startBackgroundService', {'token': token?? ''});
+        }
+      });
+      
     }
   }
 
@@ -117,7 +123,12 @@ class AuthRepositoryImpl implements AuthRepository {
     await _hiveManager.clearUsageCache();
     await _hiveManager.clearStepsCache();
     _authEventService.emitLogoutSuccess();
-    platform.invokeMethod('stopBackgroundService');
+    if(await platform.invokeMethod('isBackgroundServiceRunning'))
+    {
+      await platform.invokeMethod('stopBackgroundService');
+    }
+    await platform.invokeMethod('startBackgroundService', {'token': ''});
+    
   }
 }
 

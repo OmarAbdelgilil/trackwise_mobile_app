@@ -6,5 +6,5 @@ abstract class OnlineDataSource {
   Future<Result<LoginResponse>> login(String eamil, String password);
   Future<Result<void>> register(String email, String firstName, String lastName,String phoneNumber, String password, String confirmPassword);
   void setUsageHistory(Map<DateTime, List<AppUsageData>> usageData, String token);
-  void setStepsHistory(Map<DateTime, int> usageData, String token);
+  void setStepsHistory(Map<String, int> usageData, String token);
 }

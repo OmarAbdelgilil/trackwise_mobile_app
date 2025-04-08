@@ -49,7 +49,6 @@ class MainActivity: FlutterActivity() {
             return instance
         }
     }
-    private var lastRecordedSteps = 0
     
     
     // ADDED: Set instance in onCreate
@@ -64,34 +63,10 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
             requestPermissions(arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), 1001)
         }
     }
-
-   scheduleServiceStart()
-
-    // Check for exact alarm permission (Android 12+)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        if (checkSelfPermission(android.Manifest.permission.SCHEDULE_EXACT_ALARM) == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            requestExactAlarmPermission()
-        }
-    } 
 }
 
     override fun onResume() {
     super.onResume()
-}
-
-private fun scheduleServiceStart() {
-    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val intent = Intent(this, StepCounterService::class.java)
-    val pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-    val triggerTime = SystemClock.elapsedRealtime() +  10 * 1000 
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, pendingIntent)
-    } else {
-        alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, pendingIntent)
-    }
 }
     
     // ADDED: Clear instance in onDestroy
@@ -135,19 +110,9 @@ private fun scheduleServiceStart() {
             }
             else if (call.method == "getSteps") {
                 val date = call.argument<String>("date") ?: ""
-                val sharedPreferences = getSharedPreferences("StepData", Context.MODE_PRIVATE)
-                val todayDate = Calendar.getInstance().let {
-                    "${String.format("%02d", it.get(Calendar.DAY_OF_MONTH))}-${String.format("%02d", it.get(Calendar.MONTH) + 1)}-${it.get(Calendar.YEAR)}"
-                }
-                
-                if (date == todayDate) {
-                    
-                    lastRecordedSteps = sharedPreferences.getInt("lastRecordedSteps2", 0)
-                    result.success(lastRecordedSteps)
-                } else {
-                    val storedSteps = sharedPreferences.getInt(date, 0)
-                    result.success(storedSteps)
-                }
+                val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                val stepsData = sharedPreferences.getFloat("steps:$date", 0f)
+                result.success(stepsData)
             }
             else {
                 result.notImplemented()
@@ -169,18 +134,6 @@ private fun scheduleServiceStart() {
         val serviceIntent = Intent(this, BackgroundService::class.java)
         stopService(serviceIntent)
     }
-
-
-private fun requestExactAlarmPermission() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {  // API 31+ (Android 12+)
-        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        if (!alarmManager.canScheduleExactAlarms()) {
-            val intent = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-            startActivity(intent)
-        }
-    }
-}
-
 
 
     fun hasUsageAccessPermission(): Boolean {
@@ -255,7 +208,6 @@ private fun requestExactAlarmPermission() {
 
         return resultList
     }
-
 
 
     fun getAppIconAsBase64(packageName: String): String {

@@ -4,7 +4,8 @@ import 'package:track_wise_mobile_app/core/local/hive_constants.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
 import 'package:weekly_date_picker/datetime_apis.dart';
 
-@singleton
+
+@injectable
 class HiveManager {
   Future<Map<DateTime, List<AppUsageData>>> getAllCachedUsage() async {
     Map<DateTime, List<AppUsageData>> usageData = {};
@@ -25,6 +26,8 @@ class HiveManager {
   }
 
   Future<Map<DateTime, int>> getAllCachedSteps() async {
+    DateTime now = DateTime.now();
+    now = DateTime(now.year, now.month, now.day);
     Map<DateTime, int> stepsData = {};
     late Box box;
     if (Hive.isBoxOpen(HiveConstants.stepsBox)) {
@@ -34,8 +37,11 @@ class HiveManager {
     }
     for (var key in box.keys) {
       DateTime date = DateTime.parse(key);
-      int data = box.get(key);
-      stepsData[date] = data;
+      if(date.isBefore(now))
+      {
+        int data = box.get(key);
+        stepsData[date] = data;
+      }
     }
     return stepsData;
   }

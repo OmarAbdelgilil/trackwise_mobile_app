@@ -133,6 +133,7 @@ class AuthRepositoryImpl implements AuthRepository {
 }
 
 @singleton
+@injectable
 class AuthEventService {
   final _loginSuccessController = StreamController<User>.broadcast();
   final _logoutSuccessController = StreamController<void>.broadcast();

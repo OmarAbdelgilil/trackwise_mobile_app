@@ -31,10 +31,6 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
         touchedBarGroupIndex = dates.indexOf(prov.pickedDate);
       });
     }
-    final avgInHours = durations.reduce(
-          (a, b) => a + b,
-        ) /
-        durations.length;
     final stepsTarget = prov.dailyTarget.toDouble();
     final maxBarValue = durations.isNotEmpty
         ? durations.reduce((a, b) => a > b ? a : b).toDouble()
@@ -44,20 +40,6 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
         : 0;
     final yMax = maxBarValue > stepsTarget ? maxBarValue : stepsTarget;
     final yMin = minBarValue < 0 ? minBarValue : 0;
-
-    // final maxBarValue = prov.barData.values.isNotEmpty
-    //     ? prov.barData.values.reduce((a, b) => a > b ? a : b)
-    //     : prov.dailyTarget;
-
-    // final avgMultiplier = prov.changeDateMode == ChangeDateMode.weekly
-    //     ? 7
-    //     : prov.changeDateMode == ChangeDateMode.monthly
-    //         ? 30
-    //         : 1;
-
-    // final avgInHours = ((prov.dailyTarget * avgMultiplier).toDouble() /
-    //         (prov.dailyTarget + maxBarValue)) *
-    //     maxBarValue;
 
     return Padding(
       padding: const EdgeInsets.only(top: 15.0, bottom: 25),

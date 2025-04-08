@@ -32,18 +32,19 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
       });
     }
     final avgInHours = durations.reduce(
-           (a, b) => a + b,
-         ) /
-         durations.length;
-        final stepsTarget = prov.dailyTarget.toDouble();
-        final maxBarValue = durations.isNotEmpty
-            ? durations.reduce((a, b) => a > b ? a : b).toDouble()
-            : 0;
-        final minBarValue = durations.isNotEmpty
-            ? durations.reduce((a, b) => a < b ? a : b).toDouble()
-            : 0;
-        final yMax = maxBarValue > stepsTarget ? maxBarValue : stepsTarget;
-        final yMin = minBarValue < 0 ? minBarValue : 0;
+          (a, b) => a + b,
+        ) /
+        durations.length;
+    final stepsTarget = prov.dailyTarget.toDouble();
+    final maxBarValue = durations.isNotEmpty
+        ? durations.reduce((a, b) => a > b ? a : b).toDouble()
+        : 0;
+    final minBarValue = durations.isNotEmpty
+        ? durations.reduce((a, b) => a < b ? a : b).toDouble()
+        : 0;
+    final yMax = maxBarValue > stepsTarget ? maxBarValue : stepsTarget;
+    final yMin = minBarValue < 0 ? minBarValue : 0;
+
     // final maxBarValue = prov.barData.values.isNotEmpty
     //     ? prov.barData.values.reduce((a, b) => a > b ? a : b)
     //     : prov.dailyTarget;
@@ -67,7 +68,9 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
             barTouchData: BarTouchData(
                 touchCallback: (FlTouchEvent event, barTouchResponse) {
                   if (barTouchResponse != null &&
-                      barTouchResponse.spot != null && touchedBarGroupIndex != barTouchResponse.spot!.touchedBarGroupIndex) {
+                      barTouchResponse.spot != null &&
+                      touchedBarGroupIndex !=
+                          barTouchResponse.spot!.touchedBarGroupIndex) {
                     setState(() {
                       touchedBarGroupIndex =
                           barTouchResponse.spot!.touchedBarGroupIndex;
@@ -90,7 +93,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
                 )),
             extraLinesData: ExtraLinesData(horizontalLines: [
               HorizontalLine(
-                y: avgInHours,
+                y: stepsTarget,
                 color: ColorsManager.blue,
                 strokeWidth: 1.7,
                 dashArray: [3, 5],
@@ -99,7 +102,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
                   padding: const EdgeInsets.only(bottom: 20),
                   show: true,
                   labelResolver: (line) =>
-                      'avg: ${formater.format(line.y.toInt())}',
+                      'Target: ${formater.format(stepsTarget.toInt())}',
                   style: const TextStyle(
                       color: ColorsManager.blue, fontWeight: FontWeight.bold),
                 ),
@@ -112,7 +115,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
               ),
             ]),
             barGroups:
-                _chartGroups(avgInHours, prov.barData, touchedBarGroupIndex),
+                _chartGroups(stepsTarget, prov.barData, touchedBarGroupIndex),
             borderData: FlBorderData(
                 border: const Border(bottom: BorderSide(), left: BorderSide())),
             gridData: const FlGridData(show: false),
@@ -127,6 +130,8 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
               rightTitles:
                   const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
+            minY: yMin.toDouble(),
+            maxY: yMax.toDouble(),
           ),
         ),
       ),
@@ -143,7 +148,7 @@ List<BarChartGroupData> _chartGroups(
     data.add(BarChartGroupData(x: i, barRods: [
       BarChartRodData(
         toY: toY.toDouble(),
-        color: !(barData[dates[i]]! >= avg) ? ColorsManager.red : null,
+        color: toY >= avg ? null : ColorsManager.red,
         width: i == touchedBarGroupIndex ? 15 : 10,
       )
     ]));

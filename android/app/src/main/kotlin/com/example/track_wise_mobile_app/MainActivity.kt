@@ -37,7 +37,8 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.os.SystemClock
-
+import android.os.Handler
+import android.os.Looper
 
 
 class MainActivity: FlutterActivity() {

@@ -95,6 +95,8 @@ override fun onCreate(savedInstanceState: android.os.Bundle?) {
                 }
             else if (call.method == "startBackgroundService") {
                 val token = call.argument<String>("token") ?: ""
+                val sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                sharedPref.edit().putString("USER_TOKEN", token).apply()
                 startBackgroundService(token)
                 result.success("Background service started")
             }

@@ -46,6 +46,19 @@ class BackgroundService : Service() {
             Log.d(TAG, "Running usage stats collection at ${Date()}")
             val usageStats = collectUsageStats()
             getSteps { steps ->
+                /////////////////////////notification
+                val totalUsageMinutes = usageStats?.sumOf { it["usageMinutes"] as Double } ?: 0.0
+                val hours = totalUsageMinutes.toInt() / 60
+                val minutes = totalUsageMinutes.toInt() % 60
+                val notificationMessage = if (hours > 0) {
+                    "Steps today: ${steps?.toInt() ?: 0} Step\nUsage time: ${hours}hr${minutes}mins"
+                } else {
+                    "Steps today: ${steps?.toInt() ?: 0} Step\nUsage time: ${minutes} mins"
+                }
+                updateNotification(notificationMessage)
+                /////////////////////////
+                val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+                userToken = sharedPref.getString("USER_TOKEN", null)
                 if (!userToken.isNullOrEmpty() && counter >= 3) {
                     Log.d(TAG, "inside for sending data")
                     counter = 0
@@ -63,17 +76,6 @@ class BackgroundService : Service() {
                     sendPostRequest(finalJsonData, userToken)
                 }
                 counter++
-                /////////////////////////notification
-                val totalUsageMinutes = usageStats?.sumOf { it["usageMinutes"] as Double } ?: 0.0
-                val hours = totalUsageMinutes.toInt() / 60
-                val minutes = totalUsageMinutes.toInt() % 60
-                val notificationMessage = if (hours > 0) {
-                    "Steps today: ${steps?.toInt() ?: 0} Step\nUsage time: ${hours}hr${minutes}mins"
-                } else {
-                    "Steps today: ${steps?.toInt() ?: 0} Step\nUsage time: ${minutes} mins"
-                }
-                updateNotification(notificationMessage)
-                /////////////////////////
             }
             // Schedule the next execution
             handler.postDelayed(this, interval)

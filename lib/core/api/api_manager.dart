@@ -35,17 +35,24 @@ class ApiManager {
     var authResponse = LoginResponse.fromJson(response.data);
     return authResponse;
   }
+
   Future<RegisterResponse> register(RegisterRequest request) async {
-    var response = await _dio.post(ApiConstants.signupPath, data: request.toJson());
+    var response =
+        await _dio.post(ApiConstants.signupPath, data: request.toJson());
     var authResponse = RegisterResponse.fromJson(response.data);
     return authResponse;
   }
-  void setUsageHistory(Map<DateTime, List<AppUsageData>> data,String token) async
-  {
-    await _dio.post(ApiConstants.addUsage, data: {"usage":AppUsageData.toRequest(data)}, options: Options(headers: {"Authorization": "Bearer $token"}));
+
+  void setUsageHistory(
+      Map<DateTime, List<AppUsageData>> data, String token) async {
+    await _dio.post(ApiConstants.addUsage,
+        data: {"usage": AppUsageData.toRequest(data)},
+        options: Options(headers: {"Authorization": "Bearer $token"}));
   }
-  void setStepsHistory(Map<String, int> data, String token) async
-  {
-    await _dio.post(ApiConstants.addSteps, data: {"steps": data}, options: Options(headers: {"Authorization": "Bearer $token"}));
+
+  void setStepsHistory(Map<String, int> data, String token) async {
+    await _dio.post(ApiConstants.addSteps,
+        data: {"steps": data},
+        options: Options(headers: {"Authorization": "Bearer $token"}));
   }
 }

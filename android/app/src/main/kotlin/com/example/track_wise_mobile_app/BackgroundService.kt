@@ -80,13 +80,23 @@ class BackgroundService : Service() {
         }
     }
     
-    override fun onCreate() {
-        super.onCreate()
-        createNotificationChannel()
-        val notification = createNotification()
-        startForeground(1, notification) 
-        Log.d(TAG, "Background service created")
+  override fun onCreate() {
+    super.onCreate()
+    createNotificationChannel()
+    val notification = createNotification()
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14 (API 34)
+        startForeground(
+            1,
+            notification,
+            0x00000101 
+        )
+    } else {
+        startForeground(1, notification)
     }
+
+    Log.d(TAG, "Background service created")
+}
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val serviceChannel = NotificationChannel(
@@ -155,7 +165,7 @@ class BackgroundService : Service() {
         return null
     }
     private fun sendPostRequest(jsonData: String, userToken: String?) {
-        val urlString = "http://192.168.100.3:3000/api/updateUsage-Steps"
+        val urlString = "https://trackwise-backend-3m8o.onrender.com/api/updateUsage-Steps"
         val token = userToken ?: ""
         
         Thread {

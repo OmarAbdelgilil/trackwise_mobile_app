@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/home_view_model.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/bar_chart.dart';
@@ -15,18 +16,12 @@ class AnimatedBarCircleSwitch extends StatefulWidget {
 
 class AnimatedBarCircleSwitchState extends State<AnimatedBarCircleSwitch> {
   late PageController _pageController;
-  double _currentPage = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _pageController =
-        PageController(initialPage: widget.prov.isBarChart ? 1 : 0)
-          ..addListener(() {
-            setState(() {
-              _currentPage = _pageController.page!;
-            });
-          });
+    _pageController = PageController(initialPage: widget.prov.isBarChart ? 1 : 0);
+    
   }
   @override
   void dispose() {
@@ -44,26 +39,18 @@ class AnimatedBarCircleSwitchState extends State<AnimatedBarCircleSwitch> {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          height: widget.prov.isBarChart ? 300 : 350,
+          height: widget.prov.isBarChart ? 290.h : 350.h,
           width: double.infinity,
           child: PageView(
             controller: _pageController,
             onPageChanged: _onPageChanged,
             children: [
-              AnimatedOpacity(
-                duration: const Duration(milliseconds: 300),
-                opacity: 1 - (_currentPage - 0).abs() * 0.5,
-                child: GestureDetector(
-                    onTap: () async {
-                      await widget.prov.openCalender(context);
-                    },
-                    child: const CircleProgressBar()),
-              ),
-              AnimatedOpacity(
-                duration: const Duration(milliseconds: 300),
-                opacity: 1 - (_currentPage - 1).abs() * 0.5,
-                child: const BarChartWidget(),
-              ),
+              GestureDetector(
+                  onTap: () async {
+                    await widget.prov.openCalender(context);
+                  },
+                  child: const CircleProgressBar()),
+              const BarChartWidget(),
             ],
           ),
         ),

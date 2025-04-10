@@ -30,7 +30,7 @@ class CustomTextField extends StatefulWidget {
 
 class _CustomTextFieldState extends State<CustomTextField> {
   late bool _obscureText; // Controls the text visibility dynamically
-  Color labelColor = ColorsManager.primaryColor;
+  Color labelColor = ColorsManager.darkPrimary;
 
   @override
   void initState() {
@@ -49,7 +49,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       });
     } else {
       setState(() {
-        labelColor = ColorsManager.primaryColor;
+        labelColor = ColorsManager.darkPrimary;
       });
     }
     return error;
@@ -58,7 +58,18 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      keyboardType: widget.label == StringsManager.emailLabel? TextInputType.emailAddress : (widget.label == StringsManager.passwordLabel || widget.label == StringsManager.confirmPasswordLabel) ? TextInputType.visiblePassword : widget.label == StringsManager.phoneNumberLabel? TextInputType.phone :(widget.label == StringsManager.heightLabel || widget.label == StringsManager.weightLabel || widget.label == StringsManager.dailyTargetLabel)? TextInputType.number : null,
+      keyboardType: widget.label == StringsManager.emailLabel
+          ? TextInputType.emailAddress
+          : (widget.label == StringsManager.passwordLabel ||
+                  widget.label == StringsManager.confirmPasswordLabel)
+              ? TextInputType.visiblePassword
+              : widget.label == StringsManager.phoneNumberLabel
+                  ? TextInputType.phone
+                  : (widget.label == StringsManager.heightLabel ||
+                          widget.label == StringsManager.weightLabel ||
+                          widget.label == StringsManager.dailyTargetLabel)
+                      ? TextInputType.number
+                      : null,
       obscureText: _obscureText, // Use _obscureText to toggle visibility
       validator: _validate,
       readOnly: widget.readOnly ?? false,
@@ -66,7 +77,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
       controller: widget.controller,
       cursorColor: Colors.white,
       obscuringCharacter: '*',
-      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         errorText: widget.errorText,
         errorBorder: const OutlineInputBorder(
@@ -75,11 +85,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
         focusedErrorBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.red, width: 2.0),
         ),
-        enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: ColorsManager.primaryColor),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Theme.of(context).primaryColor),
         ),
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: ColorsManager.primaryColor),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Theme.of(context).primaryColor),
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         label: Text(

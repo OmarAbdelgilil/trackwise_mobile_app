@@ -26,11 +26,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
             currentPageNotifier.setPage(AppRoutes.steps);
             break;
           case 2:
-          //todo
+            //todo
             currentPageNotifier.setPage(AppRoutes.friends);
             break;
           case 3:
-          //todo
+            //todo
             currentPageNotifier.setPage(AppRoutes.profile);
             break;
           default:
@@ -44,34 +44,32 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-  type: BottomNavigationBarType.fixed,
-  backgroundColor: Colors.black,
-  currentIndex: _selectedIndex, 
-  onTap: _onItemTapped, 
-  selectedItemColor: ColorsManager.blue,
-  unselectedItemColor: Colors.grey, 
-  selectedFontSize: 12, 
-  unselectedFontSize: 10,
-  iconSize: 22,
-  items: [
-    BottomNavigationBarItem(
-      icon: Image.asset(ImagePathManager.heartBeat, scale: 1.7),
-      label: StringsManager.usage,
-    ),
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.directions_walk, size: 22), 
-      label: StringsManager.steps,
-    ),
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.people_alt_outlined, size: 22), 
-      label: StringsManager.friends,
-    ),
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.person_outline, size: 22), 
-      label: StringsManager.profile,
-    ),
-  ],
-);
-
+      type: BottomNavigationBarType.fixed,
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
+      selectedItemColor: ColorsManager.blue,
+      unselectedItemColor: Colors.grey,
+      selectedFontSize: 12,
+      unselectedFontSize: 10,
+      iconSize: 22,
+      items: [
+        BottomNavigationBarItem(
+          icon: Image.asset(ImagePathManager.heartBeat, scale: 1.7),
+          label: StringsManager.usage,
+        ),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.directions_walk, size: 22),
+          label: StringsManager.steps,
+        ),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.people_alt_outlined, size: 22),
+          label: StringsManager.friends,
+        ),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline, size: 22),
+          label: StringsManager.profile,
+        ),
+      ],
+    );
   }
 }

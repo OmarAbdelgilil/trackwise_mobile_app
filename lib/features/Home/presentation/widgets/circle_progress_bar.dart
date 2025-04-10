@@ -42,12 +42,11 @@ class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
                     children: [
                       const Text(
                         StringsManager.screenTime,
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(fontSize: 16),
                       ),
                       Text(
                         date,
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 13),
+                        style: const TextStyle(fontSize: 13),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -56,23 +55,20 @@ class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
                         children: [
                           Text(
                             totalUsageTime.inHours.toString(),
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 30),
+                            style: const TextStyle(fontSize: 30),
                           ),
                           const Text(
                             'hrs',
-                            style: TextStyle(color: Colors.white, fontSize: 12),
+                            style: TextStyle(fontSize: 12),
                           ),
                           if (totalUsageTime.inMinutes.remainder(60) > 20) ...[
                             Text(
                               totalUsageTime.inMinutes.remainder(60).toString(),
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 32),
+                              style: const TextStyle(fontSize: 32),
                             ),
                             const Text(
                               'mins',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 12),
+                              style: TextStyle(fontSize: 12),
                             ),
                           ]
                         ],
@@ -82,8 +78,7 @@ class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
                         child: Text(
                           prov.compareText,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 10),
+                          style: const TextStyle(fontSize: 10),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                         ),

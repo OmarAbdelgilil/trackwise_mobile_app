@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/features/Auth/presentation/login/login_screen.dart';
 import 'package:track_wise_mobile_app/features/Auth/presentation/register/register_viewmodel.dart';
 import 'package:track_wise_mobile_app/main.dart';
-import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/custom_text_field.dart';
 import 'package:track_wise_mobile_app/utils/extract_error.dart';
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
@@ -61,14 +60,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
     return Scaffold(
       appBar: AppBar(
-        foregroundColor: Colors.white,
         title: Text(
           StringsManager.signUpTitle,
-          style: TextStyle(fontSize: 24.sp, color: Colors.white),
+          style: TextStyle(fontSize: 24.sp),
         ),
-        backgroundColor: ColorsManager.backgroundColor,
       ),
-      backgroundColor: ColorsManager.backgroundColor,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -193,7 +189,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       height: 50.h,
                       child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorsManager.primaryColor,
+                              backgroundColor: Theme.of(context).primaryColor,
                               foregroundColor: Colors.white),
                           onPressed: () {
                             if (formKey.currentState!.validate()) {
@@ -217,7 +213,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 children: [
                   const Text(
                     StringsManager.alreadyHaveAcc,
-                    style: TextStyle(color: Colors.white),
                   ),
                   TextButton(
                     onPressed: () {
@@ -226,10 +221,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             builder: (context) => const LoginScreen()),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       StringsManager.signIn,
                       style: TextStyle(
-                          color: ColorsManager.primaryColor,
+                          color: Theme.of(context).primaryColor,
                           decoration: TextDecoration.underline),
                     ),
                   ),

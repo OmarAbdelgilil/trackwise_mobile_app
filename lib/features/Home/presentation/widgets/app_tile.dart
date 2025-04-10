@@ -19,14 +19,15 @@ class AppTile extends StatelessWidget {
             ),
       title: Text(
         appData.appName,
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        style: const TextStyle(fontSize: 14),
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           LinearProgressIndicator(
             //number of hours / max number of hours in this day
-            value: appData.usageTime.inMinutes / (maxUsage.inMinutes == 0? 1 : maxUsage.inMinutes),
+            value: appData.usageTime.inMinutes /
+                (maxUsage.inMinutes == 0 ? 1 : maxUsage.inMinutes),
             backgroundColor:
                 Colors.grey.shade800, //Color.fromARGB(0, 66, 66, 66),
             valueColor: const AlwaysStoppedAnimation<Color>(ColorsManager.blue),
@@ -37,7 +38,6 @@ class AppTile extends StatelessWidget {
               appData.usageTime.inHours != 0
                   ? '${appData.usageTime.inHours}hrs ${appData.usageTime.inMinutes.remainder(60)}mins'
                   : '${appData.usageTime.inMinutes}mins',
-              style: const TextStyle(color: Colors.white70),
             ),
           )
         ],

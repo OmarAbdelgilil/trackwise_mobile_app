@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:track_wise_mobile_app/core/themes/theme.dart';
 import 'package:track_wise_mobile_app/features/steps/presentation/steps_viewmodel.dart';
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
@@ -69,9 +70,7 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
                   getTooltipItem: (group, groupIndex, rod, rodIndex) =>
                       BarTooltipItem(
                           "${formater.format(rod.toY.toInt())} steps",
-                          const TextStyle(
-                              color: Color.fromARGB(212, 255, 255, 255),
-                              fontSize: 10)),
+                          const TextStyle(fontSize: 10)),
                 )),
             extraLinesData: ExtraLinesData(horizontalLines: [
               HorizontalLine(
@@ -103,8 +102,8 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
             gridData: const FlGridData(show: false),
             titlesData: FlTitlesData(
               bottomTitles: AxisTitles(
-                  sideTitles: _bottomTitles(
-                      prov.changeDateMode, dates, touchedBarGroupIndex)),
+                  sideTitles: _bottomTitles(prov.changeDateMode, dates, context,
+                      touchedBarGroupIndex)),
               leftTitles:
                   const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               topTitles:
@@ -139,7 +138,7 @@ List<BarChartGroupData> _chartGroups(
 }
 
 SideTitles _bottomTitles(ChangeDateMode changeDateMode, List<DateTime> dates,
-        int touchedBarGroupIndex) =>
+        BuildContext context, int touchedBarGroupIndex) =>
     SideTitles(
         showTitles: true,
         getTitlesWidget: (value, meta) {
@@ -155,7 +154,7 @@ SideTitles _bottomTitles(ChangeDateMode changeDateMode, List<DateTime> dates,
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
             decoration: isSelected
                 ? BoxDecoration(
-                    color: Colors.white,
+                    color: barChartLabelColor(context),
                     borderRadius: BorderRadius.circular(12),
                   )
                 : null,
@@ -164,7 +163,9 @@ SideTitles _bottomTitles(ChangeDateMode changeDateMode, List<DateTime> dates,
                   ? '$text-$endDateWeekly'
                   : text,
               style: TextStyle(
-                color: isSelected ? Colors.black : Colors.white,
+                color: isSelected
+                    ? Colors.black
+                    : Theme.of(context).textTheme.bodyLarge!.color,
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),

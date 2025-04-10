@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:track_wise_mobile_app/core/themes/theme.dart';
 import 'package:track_wise_mobile_app/features/steps/presentation/steps_viewmodel.dart';
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
@@ -20,7 +21,7 @@ class StepsDataContainer extends ConsumerWidget {
       padding: const EdgeInsets.all(16.0),
       margin: EdgeInsets.symmetric(horizontal: 18.0.w),
       decoration: BoxDecoration(
-        color: ColorsManager.containerColor,
+        color: containerColor(context),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -29,7 +30,6 @@ class StepsDataContainer extends ConsumerWidget {
           Text(
             "${formater.format(prov.pickedDateStepsData)} steps",
             style: const TextStyle(
-              color: Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
@@ -56,11 +56,9 @@ class StepsDataContainer extends ConsumerWidget {
             children: [
               const Text(
                 "0",
-                style: TextStyle(color: Colors.white),
               ),
               Text(
                 "Target: ${formater.format(prov.changeDateMode == ChangeDateMode.daily ? prov.dailyTarget : prov.changeDateMode == ChangeDateMode.weekly ? prov.dailyTarget * 7 : prov.dailyTarget * 30)}",
-                style: const TextStyle(color: Colors.white),
               ),
             ],
           ),
@@ -70,11 +68,11 @@ class StepsDataContainer extends ConsumerWidget {
             children: [
               Text(
                 "${distanceKm.toStringAsFixed(2)} km",
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                style: const TextStyle(fontSize: 16),
               ),
               Text(
                 "${(distanceKm * prov.weight * 0.57).round()} cal",
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                style: const TextStyle(fontSize: 16),
               ),
             ],
           ),

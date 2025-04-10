@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
 void showLogoutDialog(
     BuildContext context, Future<void> Function() logoutFunction) {
@@ -7,17 +6,17 @@ void showLogoutDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        backgroundColor: ColorsManager.backgroundColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: const Text(
           "Logout",
-          style: TextStyle(color: Colors.white),
         ),
-        content: const Text("Are you sure you want to log out?",
-            style: TextStyle(color: Colors.white)),
+        content: const Text(
+          "Are you sure you want to log out?",
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel", style: TextStyle(color: Colors.white)),
+            child: const Text("Cancel"),
           ),
           TextButton(
             onPressed: () async {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -19,9 +18,9 @@ class SectionHeader extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-              fontSize: 22.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.white),
+            fontSize: 22.sp,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const Spacer(),
         TextButton(
@@ -31,7 +30,7 @@ class SectionHeader extends StatelessWidget {
             style: TextStyle(
                 fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
-                color: ColorsManager.primaryColor),
+                color: Theme.of(context).primaryColor),
           ),
         ),
       ],

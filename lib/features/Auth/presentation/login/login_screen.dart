@@ -52,14 +52,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        foregroundColor: Colors.white,
         title: Text(
           StringsManager.loginTitle,
-          style: TextStyle(fontSize: 24.sp, color: Colors.white),
+          style: TextStyle(fontSize: 24.sp),
         ),
-        backgroundColor: ColorsManager.backgroundColor,
       ),
-      backgroundColor: ColorsManager.backgroundColor,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -106,10 +103,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {},
-                  child: const Text(
+                  child: Text(
                     StringsManager.forgetPassBtn,
                     style: TextStyle(
-                        color: ColorsManager.primaryColor,
+                        color: Theme.of(context).primaryColor,
                         decoration: TextDecoration.underline),
                   ),
                 ),
@@ -126,7 +123,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       height: 50.h,
                       child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorsManager.primaryColor,
+                              backgroundColor: Theme.of(context).primaryColor,
                               foregroundColor: Colors.white),
                           onPressed: () {
                             if (formKey.currentState!.validate()) {
@@ -146,7 +143,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 children: [
                   const Text(
                     StringsManager.dontHaveAcc,
-                    style: TextStyle(color: Colors.white),
                   ),
                   TextButton(
                     onPressed: () {
@@ -155,10 +151,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             builder: (context) => const RegisterScreen()),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       StringsManager.signUp,
                       style: TextStyle(
-                          color: ColorsManager.primaryColor,
+                          color: Theme.of(context).primaryColor,
                           decoration: TextDecoration.underline),
                     ),
                   ),

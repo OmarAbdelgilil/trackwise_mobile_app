@@ -9,7 +9,6 @@ import 'package:track_wise_mobile_app/features/Home/presentation/widgets/bottom_
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/home_toggle_button.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/widgets/scaffold_app_bar.dart';
 import 'package:track_wise_mobile_app/utils/change_date_mode.dart';
-import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -26,7 +25,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
         appBar: const ScaffoldAppBar(),
         bottomNavigationBar: const BottomNavBar(),
-        backgroundColor: ColorsManager.backgroundColor,
         body: ValueListenableBuilder<Map<String, dynamic>>(
             valueListenable: currentPageNotifier,
             builder: (context, value, child) {
@@ -93,8 +91,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     padding: EdgeInsets.only(left: 8.h),
                                     child: const Text(
                                       StringsManager.apps,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
+                                      style: TextStyle(fontSize: 20),
                                     )),
                                 const AppsListView()
                               ],

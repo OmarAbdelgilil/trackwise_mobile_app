@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:track_wise_mobile_app/features/steps/presentation/steps_viewmodel.dart';
-import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/custom_text_field.dart';
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
 
@@ -17,10 +16,9 @@ void showStepsDataDialogDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        backgroundColor: ColorsManager.backgroundColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: const Text(
           "Steps data",
-          style: TextStyle(color: Colors.white),
         ),
         content: Form(
           key: formKey,
@@ -82,7 +80,7 @@ void showStepsDataDialogDialog(
               FocusManager.instance.primaryFocus?.unfocus();
               Navigator.pop(context);
             },
-            child: const Text("Cancel", style: TextStyle(color: Colors.white)),
+            child: const Text("Cancel"),
           ),
           TextButton(
             onPressed: () {
@@ -95,7 +93,7 @@ void showStepsDataDialogDialog(
                     heightCm: double.parse(heightController.text));
               }
             },
-            child: const Text("Ok", style: TextStyle(color: Colors.white)),
+            child: const Text("Ok"),
           ),
         ],
       );

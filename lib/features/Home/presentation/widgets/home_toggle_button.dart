@@ -19,18 +19,14 @@ class HomeToggleButton extends StatelessWidget {
         prov.toggleDateMode(toggle);
       },
       style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(
-              Theme.of(context).colorScheme.primary.withValues(
-                    red: 0,
-                    green: 0,
-                    alpha: 0,
-                    blue: 0,
-                  )),
+          backgroundColor: WidgetStateColor.resolveWith(
+            (states) => Theme.of(context).scaffoldBackgroundColor,
+          ),
           shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
             side: BorderSide(
                 color: toggle == prov.changeDateMode
-                    ? ColorsManager.primaryColor
+                    ? Theme.of(context).primaryColor
                     : ColorsManager.lightgrey),
             borderRadius: const BorderRadius.all(Radius.zero),
           ))),
@@ -38,7 +34,7 @@ class HomeToggleButton extends StatelessWidget {
         text,
         style: TextStyle(
             color: toggle == prov.changeDateMode
-                ? ColorsManager.primaryColor
+                ? Theme.of(context).primaryColor
                 : ColorsManager.lightgrey),
       ),
     );

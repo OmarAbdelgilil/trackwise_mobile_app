@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
@@ -9,6 +8,8 @@ import 'package:track_wise_mobile_app/core/di/di.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/core/local/duration_adapter.dart';
 import 'package:track_wise_mobile_app/core/provider/permission_noti.dart';
+import 'package:track_wise_mobile_app/core/provider/theme_provider.dart';
+import 'package:track_wise_mobile_app/core/themes/theme.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/home_screen.dart';
 import 'package:track_wise_mobile_app/loading_screen.dart';
 import 'package:track_wise_mobile_app/permission_failed_screen.dart';
@@ -28,20 +29,21 @@ Future<void> main() async {
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
-class MyApp extends StatefulWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends ConsumerState<MyApp> {
   static const platform = MethodChannel('usage_stats');
   Future<bool> _checkPermission() async {
     final usage = await platform.invokeMethod('checkUsageAccess');
     final steps = await Permission.activityRecognition.request();
     return usage && steps.isGranted;
   }
+
   @override
   void initState() {
     super.initState();
@@ -54,6 +56,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = ref.watch(themeNotifierProvider);
     return ScreenUtilInit(
       designSize: const Size(411, 890),
       minTextAdapt: true,
@@ -61,11 +64,9 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         scaffoldMessengerKey: scaffoldMessengerKey,
         title: 'TrackWise',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-          fontFamily: GoogleFonts.roboto().fontFamily,
-        ),
+        theme: lightTheme,
+        darkTheme: darkTheme,
+        themeMode: themeMode,
         home: ValueListenableBuilder<bool?>(
             valueListenable: kPermission,
             builder: (context, value, child) {

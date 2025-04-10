@@ -20,14 +20,16 @@ class AnimatedBarCircleSwitchState extends State<AnimatedBarCircleSwitch> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: widget.prov.isBarChart ? 1 : 0);
-    
+    _pageController =
+        PageController(initialPage: widget.prov.isBarChart ? 1 : 0);
   }
+
   @override
   void dispose() {
     super.dispose();
     _pageController.dispose();
   }
+
   void _onPageChanged(int index) {
     widget.prov.toggleCharts();
   }
@@ -57,7 +59,7 @@ class AnimatedBarCircleSwitchState extends State<AnimatedBarCircleSwitch> {
         PageViewDotIndicator(
           currentItem: widget.prov.isBarChart ? 1 : 0,
           count: 2,
-          unselectedColor: Colors.white,
+          unselectedColor: Theme.of(context).textTheme.bodyLarge!.color!,
           selectedColor: Colors.blue,
         ),
       ],

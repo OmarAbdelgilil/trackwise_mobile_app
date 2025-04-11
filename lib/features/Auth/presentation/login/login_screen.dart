@@ -195,6 +195,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                 child: ElevatedButton(
                     onPressed: () {},
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

@@ -22,7 +22,10 @@ Future<void> main() async {
   Hive.init(appDocumentDirectory.path);
   Hive.registerAdapter(DurationAdapter());
   configureDependencies();
-
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -51,7 +54,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       setState(() {
         kPermission.value = isGranted;
       });
-    });
+    }).timeout(const Duration(seconds: 10),onTimeout: () {
+      kPermission.value = false;
+    },);
   }
 
   @override

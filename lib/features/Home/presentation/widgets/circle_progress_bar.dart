@@ -42,7 +42,7 @@ class _CircleProgressBarState extends ConsumerState<CircleProgressBar> {
                     children: [
                       const Text(
                         StringsManager.screenTime,
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 15),
                       ),
                       Text(
                         date,

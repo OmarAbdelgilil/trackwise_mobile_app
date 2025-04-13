@@ -6,4 +6,6 @@ class ApiConstants {
   static const String signupPath = '/signup';
   static const String addUsage = '/addUsage';
   static const String addSteps = '/addSteps';
+  static const String searchByEmail = '/findUserByEmail';
+  static const String scores = "/scores";
 }

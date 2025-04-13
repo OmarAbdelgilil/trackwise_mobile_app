@@ -20,28 +20,30 @@ class StepsNotifier extends StateNotifier<Map<DateTime, int>> {
     int steps = 0;
     String formattedDate = DateFormat('d-M-yyyy').format(startDate);
     try {
-      steps = (await platform.invokeMethod('getSteps', {"date": formattedDate})).toInt();
-        executeHive(
-          () async {
-            _hiveManager.addStepsDateToCache(startDate, steps);
-          },
-        );
+      steps = (await platform.invokeMethod('getSteps', {"date": formattedDate}))
+          .toInt();
+      executeHive(
+        () async {
+          _hiveManager.addStepsDateToCache(startDate, steps);
+        },
+      );
       state = {...state, startDate: steps};
     } on PlatformException catch (e) {
       print("Failed to get step count: '${e.message}'.");
     }
     return steps;
   }
+
   void resetStepsProvider(Map<DateTime, int> data) {
     final now = DateTime.now();
     final todayDate = DateTime(now.year, now.month, now.day);
     data.remove(todayDate);
-    if(state.containsKey(todayDate) && state[todayDate] != null)
-    {
+    if (state.containsKey(todayDate) && state[todayDate] != null) {
       data[todayDate] = state[todayDate]!;
     }
     state = data;
   }
+
   Future<void> addCachedDataToProvider() async {
     final result = await executeHive(
       () async {
@@ -52,8 +54,8 @@ class StepsNotifier extends StateNotifier<Map<DateTime, int>> {
       state = {...state, ...result.data!};
     }
   }
-  void clearProvider()
-  {
+
+  void clearProvider() {
     state = {};
   }
 }

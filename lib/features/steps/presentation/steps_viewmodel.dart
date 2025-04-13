@@ -31,12 +31,13 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     _loginSubscription = _authEventService.onLoginSuccess.listen((user) {
       resetStepsWhenLogin();
     });
-    _logoutSubscription = _authEventService.onLogoutSuccess.listen((event) {
-      state = InitialState();
-      _providerContainer.read(stepsProvider.notifier).clearProvider();
-      _initFunction();
-
-    },);
+    _logoutSubscription = _authEventService.onLogoutSuccess.listen(
+      (event) {
+        state = InitialState();
+        _providerContainer.read(stepsProvider.notifier).clearProvider();
+        _initFunction();
+      },
+    );
   }
   @override
   void dispose() {
@@ -44,8 +45,8 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     _logoutSubscription?.cancel();
     super.dispose();
   }
-  Future<void> _initFunction() async
-  {
+
+  Future<void> _initFunction() async {
     final prov = _providerContainer.read(stepsProvider.notifier);
     final now = DateTime.now();
     pickedDate = DateTime(now.year, now.month, now.day);
@@ -84,7 +85,7 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     state = DatePicked();
   }
 
-  void toggleBarTouch(DateTime date) async{
+  void toggleBarTouch(DateTime date) async {
     pickedDate = date;
     state = LoadingStepsData();
     pickedDateStepsData = await _getUsageInfo(pickedDate, changeDateMode);
@@ -94,14 +95,14 @@ class StepsViewmodel extends StateNotifier<StepsState> {
   void toggleDateMode(ChangeDateMode mode) async {
     if (changeDateMode != mode) {
       changeDateMode = mode;
-       state = LoadingStepsData();
+      state = LoadingStepsData();
       pickedDateStepsData = await _getUsageInfo(pickedDate, changeDateMode);
       await _updateBarData(pickedDate);
       state = DateModeChanged();
     }
   }
 
-  Future<void> _updateBarData(DateTime pickedDateEndBar) async{
+  Future<void> _updateBarData(DateTime pickedDateEndBar) async {
     Map<DateTime, int> result = {};
     int length = changeDateMode == ChangeDateMode.daily ? 7 : 4;
     for (int i = 1; i <= length; i++) {
@@ -138,15 +139,15 @@ class StepsViewmodel extends StateNotifier<StepsState> {
     state = StepsDataUpdated();
   }
 
-  void resetStepsWhenLogin() async
-  {
+  void resetStepsWhenLogin() async {
     final prov = _providerContainer.read(stepsProvider.notifier);
     pickedDateStepsData = await prov.getStepsUsageData(pickedDate);
     _updateBarData(pickedDate);
     state = StepsDataUpdated();
   }
+
   Future<int> _getUsageInfo(
-      DateTime startPickedDate, ChangeDateMode currentChangeDateMode) async{
+      DateTime startPickedDate, ChangeDateMode currentChangeDateMode) async {
     ////////******** don't update apps list or state here */
     int length = currentChangeDateMode == ChangeDateMode.daily
         ? 1

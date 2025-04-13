@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 
-
 @HiveType(typeId: 1) // Ensure typeId is unique
 class DurationAdapter extends TypeAdapter<Duration> {
   @override

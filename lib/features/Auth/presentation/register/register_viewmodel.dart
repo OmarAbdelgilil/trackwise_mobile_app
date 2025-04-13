@@ -8,9 +8,11 @@ import 'package:track_wise_mobile_app/features/Auth/domain/use_cases/register_us
 class RegisterViewmodel extends StateNotifier<RegisterState> {
   final RegisterUseCase _registerUseCase;
   RegisterViewmodel(this._registerUseCase) : super(RegInitialState());
-  void register(String email, String firstName, String lastName,String phoneNumber, String password, String confirmPassword) async {
+  void register(String email, String firstName, String lastName,
+      String phoneNumber, String password, String confirmPassword) async {
     state = RegLoadingState();
-    final result = await _registerUseCase.register(email, firstName, lastName, phoneNumber, password, confirmPassword);
+    final result = await _registerUseCase.register(
+        email, firstName, lastName, phoneNumber, password, confirmPassword);
     switch (result) {
       case Success<void>():
         state = RegSuccessState();
@@ -20,14 +22,15 @@ class RegisterViewmodel extends StateNotifier<RegisterState> {
         return;
     }
   }
-  void resetState()
-  {
+
+  void resetState() {
     state = RegInitialState();
   }
 }
 
-final registerProvider = StateNotifierProvider<RegisterViewmodel, RegisterState>(
-    (ref) => getIt<RegisterViewmodel>());
+final registerProvider =
+    StateNotifierProvider<RegisterViewmodel, RegisterState>(
+        (ref) => getIt<RegisterViewmodel>());
 
 sealed class RegisterState {}
 

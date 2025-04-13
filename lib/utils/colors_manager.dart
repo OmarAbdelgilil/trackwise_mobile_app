@@ -12,4 +12,5 @@ class ColorsManager {
   static const Color darkTr = Color(0xff227697);
   static const Color darkGrey = Color(0xff49454F);
   static const Color lightgrey = Color.fromARGB(255, 99, 94, 107);
+  static const Color lightGreen = Color(0xff6BD613);
 }

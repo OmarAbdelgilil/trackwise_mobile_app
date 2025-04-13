@@ -16,7 +16,8 @@ class StepsScreen extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     final stepsScreenState = ref.watch(stepsViewModelProvider);
     final prov = ref.read(stepsViewModelProvider.notifier);
-    if (stepsScreenState is InitialState || stepsScreenState is LoadingStepsData) {
+    if (stepsScreenState is InitialState ||
+        stepsScreenState is LoadingStepsData) {
       return const Center(child: CircularProgressIndicator());
     }
     return SingleChildScrollView(

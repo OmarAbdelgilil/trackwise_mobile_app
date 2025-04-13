@@ -28,23 +28,24 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthEventService _authEventService;
   final HiveManager _hiveManager;
   static const platform = MethodChannel('usage_stats');
-  AuthRepositoryImpl(
-      this._onlineDataSource, this._offlineDataSource, this._hiveManager, this._authEventService);
+  AuthRepositoryImpl(this._onlineDataSource, this._offlineDataSource,
+      this._hiveManager, this._authEventService);
 
   @override
   Future<Result<User>> login(String email, String password) async {
     final Result<LoginResponse> result =
         await _onlineDataSource.login(email, password);
 
-    if (result is Success<LoginResponse> && result.data != null && result.data!.token != null) {
+    if (result is Success<LoginResponse> &&
+        result.data != null &&
+        result.data!.token != null) {
       final token = result.data!.token!;
       final decodedToken = JwtDecoder.decode(token);
       final user = User.fromJson(decodedToken);
       _providerContainer.read(userProvider.notifier).setUser(user, token);
       await _offlineDataSource.saveToken(token);
       try {
-        if (
-            result.data!.usage == null ||
+        if (result.data!.usage == null ||
             (result.data!.usage as Map<String, dynamic>).isEmpty) {
           _onlineDataSource.setUsageHistory(
               _providerContainer.read(appUsageProvider), token);
@@ -52,19 +53,21 @@ class AuthRepositoryImpl implements AuthRepository {
           final data = await AppUsageData.fromRequest(result.data!.usage!);
           await _hiveManager.clearUsageCache();
           await _hiveManager.addAllUsageToCache(data);
-          _providerContainer.read(appUsageProvider.notifier).resetUsageProvider(data);
+          _providerContainer
+              .read(appUsageProvider.notifier)
+              .resetUsageProvider(data);
           _authEventService.emitLoginSuccess(user);
-
         }
       } catch (e) {
         print(e);
       }
       try {
-        if (
-            result.data!.steps == null ||
+        if (result.data!.steps == null ||
             (result.data!.steps as Map<String, dynamic>).isEmpty) {
-              final formattedData = _providerContainer.read(stepsProvider).map((key, value) => MapEntry(DateFormat('d-M-yyyy').format(key), value));
-              _onlineDataSource.setStepsHistory(formattedData, token);
+          final formattedData = _providerContainer.read(stepsProvider).map(
+              (key, value) =>
+                  MapEntry(DateFormat('d-M-yyyy').format(key), value));
+          _onlineDataSource.setStepsHistory(formattedData, token);
         } else {
           final resultMap = <DateTime, int>{};
           final data = result.data!.steps!;
@@ -74,14 +77,15 @@ class AuthRepositoryImpl implements AuthRepository {
           }
           await _hiveManager.clearStepsCache();
           await _hiveManager.addAllStepsToCache(resultMap);
-          _providerContainer.read(stepsProvider.notifier).resetStepsProvider(resultMap);
+          _providerContainer
+              .read(stepsProvider.notifier)
+              .resetStepsProvider(resultMap);
           _authEventService.emitLoginSuccess(user);
         }
       } catch (e) {
         print(e);
       }
-      if(await platform.invokeMethod('isBackgroundServiceRunning'))
-      {
+      if (await platform.invokeMethod('isBackgroundServiceRunning')) {
         await platform.invokeMethod('stopBackgroundService');
       }
       platform.invokeMethod('startBackgroundService', {'token': token});
@@ -109,10 +113,10 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       platform.invokeMethod('isBackgroundServiceRunning').then((value) {
         if (value == false) {
-          platform.invokeMethod('startBackgroundService', {'token': token?? ''});
+          platform
+              .invokeMethod('startBackgroundService', {'token': token ?? ''});
         }
       });
-      
     }
   }
 
@@ -123,12 +127,10 @@ class AuthRepositoryImpl implements AuthRepository {
     await _hiveManager.clearUsageCache();
     await _hiveManager.clearStepsCache();
     _authEventService.emitLogoutSuccess();
-    if(await platform.invokeMethod('isBackgroundServiceRunning'))
-    {
+    if (await platform.invokeMethod('isBackgroundServiceRunning')) {
       await platform.invokeMethod('stopBackgroundService');
     }
     await platform.invokeMethod('startBackgroundService', {'token': ''});
-    
   }
 }
 
@@ -137,18 +139,18 @@ class AuthRepositoryImpl implements AuthRepository {
 class AuthEventService {
   final _loginSuccessController = StreamController<User>.broadcast();
   final _logoutSuccessController = StreamController<void>.broadcast();
-  
+
   Stream<User> get onLoginSuccess => _loginSuccessController.stream;
   Stream<void> get onLogoutSuccess => _logoutSuccessController.stream;
-  
+
   void emitLoginSuccess(User user) {
     _loginSuccessController.add(user);
   }
-  
+
   void emitLogoutSuccess() {
     _logoutSuccessController.add(null);
   }
-  
+
   void dispose() {
     _loginSuccessController.close();
     _logoutSuccessController.close();

@@ -14,7 +14,8 @@ class AppUsageData {
       required this.packageName});
   static const _platform = MethodChannel('usage_stats');
   factory AppUsageData.fromJson(Map<dynamic, dynamic> json) {
-    if (json['usageMinutes'].runtimeType == double  || json['usageMinutes'].runtimeType == int) {
+    if (json['usageMinutes'].runtimeType == double ||
+        json['usageMinutes'].runtimeType == int) {
       json['usageMinutes'] =
           Duration(milliseconds: (json['usageMinutes'] * 60000).toInt());
     } else if (json['usageMinutes'].runtimeType != Duration) {
@@ -37,7 +38,8 @@ class AppUsageData {
 
   static Future<AppUsageData> _fromJsonResponse(
       Map<dynamic, dynamic> json) async {
-    if (json['usageMinutes'].runtimeType == double || json['usageMinutes'].runtimeType == int) {
+    if (json['usageMinutes'].runtimeType == double ||
+        json['usageMinutes'].runtimeType == int) {
       json['usageMinutes'] =
           Duration(milliseconds: (json['usageMinutes'] * 60000).toInt());
     } else if (json['usageMinutes'].runtimeType != Duration) {

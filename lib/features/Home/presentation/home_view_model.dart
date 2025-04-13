@@ -27,18 +27,20 @@ class HomeViewModel extends StateNotifier<HomeState> {
   final AuthEventService _authEventService;
   StreamSubscription? _loginSubscription;
   StreamSubscription? _logoutSubscription;
-  HomeViewModel(this._checkUserCacheUseCase, this._authEventService) : super(InitialState()) {
+  HomeViewModel(this._checkUserCacheUseCase, this._authEventService)
+      : super(InitialState()) {
     _providerContainer = providerContainer;
     _initFunction();
     _loginSubscription = _authEventService.onLoginSuccess.listen((user) {
       resetUsageWhenLogin();
     });
-    _logoutSubscription = _authEventService.onLogoutSuccess.listen((event) {
-      state = InitialState();
-      _providerContainer.read(appUsageProvider.notifier).clearProvider();
-      _initFunction();
-
-    },);
+    _logoutSubscription = _authEventService.onLogoutSuccess.listen(
+      (event) {
+        state = InitialState();
+        _providerContainer.read(appUsageProvider.notifier).clearProvider();
+        _initFunction();
+      },
+    );
   }
   @override
   void dispose() {
@@ -46,6 +48,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     _logoutSubscription?.cancel();
     super.dispose();
   }
+
   Future<void> openCalender(BuildContext context) async {
     final now = DateTime.now();
     DateTime? pickedDateTemp = await (changeDateMode != ChangeDateMode.monthly
@@ -198,11 +201,13 @@ class HomeViewModel extends StateNotifier<HomeState> {
       _getCompareText(pickedDate, changeDateMode);
     }
     _updateBarData(pickedDate);
-    await _providerContainer.read(stepsProvider.notifier).addCachedDataToProvider();
+    await _providerContainer
+        .read(stepsProvider.notifier)
+        .addCachedDataToProvider();
     state = UsageUpdated();
   }
-  void resetUsageWhenLogin()
-  {
+
+  void resetUsageWhenLogin() {
     final prov = _providerContainer.read(appUsageProvider.notifier);
     appsList = prov.getUsageState(pickedDate)!;
     appsList.sort((a, b) => b.usageTime.compareTo(a.usageTime));
@@ -212,6 +217,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     _updateBarData(pickedDate);
     state = UsageUpdated();
   }
+
   List<AppUsageData> _getUsageInfo(
       DateTime startPickedDate, ChangeDateMode currentChangeDateMode,
       {bool isCompare = false}) {

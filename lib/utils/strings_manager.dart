@@ -35,7 +35,8 @@ class StringsManager {
   static const String weekly = "Weekly";
   static const String monthly = "Monthly";
   static const String phoneNumberError = "wrong phone number format";
-  static const String minLengthPasswordError = "Your password must be at least 8 characters long";
+  static const String minLengthPasswordError =
+      "Your password must be at least 8 characters long";
   static const String dailyTargetLabel = "Daily Target";
   static const String dailyTargetHint = "6000 steps";
   static const String weightLabel = "Weight";
@@ -43,5 +44,4 @@ class StringsManager {
   static const String heightLabel = "Height";
   static const String heightHint = "Ex: 170 cm";
   static const String textFieldError = "enter a valid format";
-
 }

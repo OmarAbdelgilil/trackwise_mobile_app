@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:track_wise_mobile_app/core/api/api_constants.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/models/request/login_request.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/models/request/register_request.dart';
@@ -8,6 +9,8 @@ import 'package:track_wise_mobile_app/features/Auth/data/models/response/login_r
 // import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/models/response/register_response.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
+import 'package:track_wise_mobile_app/features/friends/data/models/response/scores_response/scores_response.dart';
+import 'package:track_wise_mobile_app/features/friends/data/models/response/search_email_response/search_email_response.dart';
 
 @singleton
 @injectable
@@ -19,13 +22,13 @@ class ApiManager {
     ));
     if (!kReleaseMode) {
       // its debug mode so print app logs
-      // _dio.interceptors.add(
-      //   PrettyDioLogger(
-      //     requestHeader: true,
-      //     requestBody: true,
-      //     responseHeader: true,
-      //   ),
-      // );
+      _dio.interceptors.add(
+        PrettyDioLogger(
+          requestHeader: true,
+          requestBody: true,
+          responseHeader: true,
+        ),
+      );
     }
   }
 
@@ -54,5 +57,17 @@ class ApiManager {
     await _dio.post(ApiConstants.addSteps,
         data: {"steps": data},
         options: Options(headers: {"Authorization": "Bearer $token"}));
+  }
+
+  Future<SearchEmailResponse> searchByEmail(String email) async {
+    final response =
+        await _dio.post(ApiConstants.searchByEmail, data: {"email": email});
+    return SearchEmailResponse.fromJson(response.data);
+  }
+
+  Future<ScoresResponse> getScores(String token) async {
+    final response = await _dio.get(ApiConstants.scores,
+        options: Options(headers: {"Authorization": "Bearer $token"}));
+    return ScoresResponse.fromJson(response.data);
   }
 }

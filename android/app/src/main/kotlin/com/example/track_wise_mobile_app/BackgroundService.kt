@@ -289,9 +289,21 @@ class BackgroundService : Service() {
             callback(null)
             return
         }
-        val tempListener = object : SensorEventListener {
+
+        var tempListener: SensorEventListener? = null
+
+        val timeoutHandler = Handler(Looper.getMainLooper())
+        val timeoutRunnable = Runnable {
+            tempListener?.let {
+                sensorManager.unregisterListener(it)
+                Log.d(TAG, "Sensor timeout: no new data.")
+                callback(null)
+            }
+        }
+        tempListener = object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent?) {
                 if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
+                    timeoutHandler.removeCallbacks(timeoutRunnable)
                     val steps = event.values[0]
                     //Log.d(TAG, "Steps since reboot: $steps")
                     ////////////////////////////////////////////////
@@ -332,6 +344,7 @@ class BackgroundService : Service() {
         }
 
         sensorManager.registerListener(tempListener, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        timeoutHandler.postDelayed(timeoutRunnable, 8000)
     }
 
     companion object {

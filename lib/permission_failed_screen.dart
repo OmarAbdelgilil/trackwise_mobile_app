@@ -21,6 +21,8 @@ class _PermissionFailedScreenState extends State<PermissionFailedScreen>
   static const platform = MethodChannel('usage_stats');
   _checkStepsPermission() async {
     stepsPermission = await Permission.activityRecognition.request();
+    setState(() {
+    });
     if (!stepsPermission!.isGranted) {
       openAppSettings();
     } else {
@@ -56,6 +58,8 @@ class _PermissionFailedScreenState extends State<PermissionFailedScreen>
     if (state == AppLifecycleState.resumed) {
       usagePermission = await platform.invokeMethod('checkUsageAccess');
       stepsPermission = await Permission.activityRecognition.status;
+      setState(() {
+      });
       kPermission.value = (usagePermission &&
           stepsPermission != null &&
           stepsPermission!.isGranted);
@@ -72,74 +76,75 @@ class _PermissionFailedScreenState extends State<PermissionFailedScreen>
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: Text("Grant Access",
-                        style: TextStyle(
-                            fontSize: 30.sp,
-                            color: ColorsManager.blue,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                  Text(
-                    'sorry you have to grant usage and steps access',
-                    style: TextStyle(
-                        fontSize: 15.sp,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: 30.h,
-                  ),
-                  Lottie.asset('assets/lotties/permissions_lottie.json'),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  if (!usagePermission) ...[
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20.0),
+                      child: Text("Grant Access",
+                          style: TextStyle(
+                              fontSize: 30.sp,
+                              color: ColorsManager.blue,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                    Text(
+                      'sorry you have to grant usage and steps access',
+                      style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold),
+                    ),
                     SizedBox(
                       height: 30.h,
                     ),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50.h,
-                      child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorsManager.blue,
-                              foregroundColor: Colors.white),
-                          onPressed: () async {
-                            await platform
-                                .invokeMethod('openUsageAccessSettings');
-                          },
-                          child: Text(
-                            'Grant access For Usage',
-                            style: TextStyle(
-                                fontSize: 20.sp, fontWeight: FontWeight.bold),
-                          )),
+                    Lottie.asset('assets/lotties/permissions_lottie.json'),
+                    const SizedBox(
+                      height: 20,
                     ),
+                    if (!usagePermission) ...[
+                      SizedBox(
+                        height: 30.h,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50.h,
+                        child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: ColorsManager.blue,
+                                foregroundColor: Colors.white),
+                            onPressed: () async {
+                              await platform
+                                  .invokeMethod('openUsageAccessSettings');
+                            },
+                            child: Text(
+                              'Grant access For Usage',
+                              style: TextStyle(
+                                  fontSize: 20.sp, fontWeight: FontWeight.bold),
+                            )),
+                      ),
+                    ],
+                    if (stepsPermission == null ||
+                        !stepsPermission!.isGranted) ...[
+                      SizedBox(
+                        height: 30.h,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50.h,
+                        child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: ColorsManager.blue,
+                                foregroundColor: Colors.white),
+                            onPressed: _checkStepsPermission,
+                            child: Text(
+                              'Grant access For Steps',
+                              style: TextStyle(
+                                  fontSize: 20.sp, fontWeight: FontWeight.bold),
+                            )),
+                      ),
+                    ]
                   ],
-                  if (stepsPermission == null ||
-                      !stepsPermission!.isGranted) ...[
-                    SizedBox(
-                      height: 30.h,
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50.h,
-                      child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorsManager.blue,
-                              foregroundColor: Colors.white),
-                          onPressed: _checkStepsPermission,
-                          child: Text(
-                            'Grant access For Steps',
-                            style: TextStyle(
-                                fontSize: 20.sp, fontWeight: FontWeight.bold),
-                          )),
-                    ),
-                  ]
-                ],
+                ),
               ),
       ),
     );

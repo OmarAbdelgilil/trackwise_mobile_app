@@ -32,7 +32,8 @@ class _StepsBarChartState extends ConsumerState<StepsBarChart> {
         touchedBarGroupIndex = dates.indexOf(prov.pickedDate);
       });
     }
-    final stepsTarget = prov.dailyTarget.toDouble();
+    
+    final stepsTarget = prov.changeDateMode == ChangeDateMode.daily ? prov.dailyTarget.toDouble() : prov.changeDateMode == ChangeDateMode.weekly ? (prov.dailyTarget * 7).toDouble() : (prov.dailyTarget * 30).toDouble();
     final maxBarValue = durations.isNotEmpty
         ? durations.reduce((a, b) => a > b ? a : b).toDouble()
         : 0;

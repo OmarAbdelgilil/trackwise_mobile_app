@@ -8,4 +8,8 @@ class ApiConstants {
   static const String addSteps = '/addSteps';
   static const String searchByEmail = '/findUserByEmail';
   static const String scores = "/scores";
+  static const String sendFriendRequest = '/sendRequest';
+  static const String getFriendRequests = "/getAllRequests";
+  static const String acceptFreindRequest = '/acceptRequest';
+  static const String rejectRequest = '/rejectRequest';
 }

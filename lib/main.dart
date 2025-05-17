@@ -54,9 +54,12 @@ class _MyAppState extends ConsumerState<MyApp> {
       setState(() {
         kPermission.value = isGranted;
       });
-    }).timeout(const Duration(seconds: 10),onTimeout: () {
-      kPermission.value = false;
-    },);
+    }).timeout(
+      const Duration(seconds: 10),
+      onTimeout: () {
+        kPermission.value = false;
+      },
+    );
   }
 
   @override

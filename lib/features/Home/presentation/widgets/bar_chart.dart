@@ -62,8 +62,7 @@ class _BarChartWidgetState extends ConsumerState<BarChartWidget> {
                   tooltipPadding: const EdgeInsets.all(0),
                   getTooltipColor: (group) => const Color.fromARGB(0, 0, 0, 0),
                   getTooltipItem: (group, groupIndex, rod, rodIndex) =>
-                      BarTooltipItem(
-                          "${rod.toY.toInt().toString()} hrs",
+                      BarTooltipItem("${rod.toY.toInt().toString()} hrs",
                           const TextStyle(fontSize: 10)),
                 )),
             extraLinesData: ExtraLinesData(horizontalLines: [

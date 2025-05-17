@@ -6,12 +6,12 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
   ThemeNotifier() : super(ThemeMode.system);
 
   void toggleTheme() {
-    if(state == ThemeMode.system)
-    {
-      var brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    if (state == ThemeMode.system) {
+      var brightness =
+          SchedulerBinding.instance.platformDispatcher.platformBrightness;
       bool isDarkMode = brightness == Brightness.dark;
       state = isDarkMode ? ThemeMode.light : ThemeMode.dark;
-      return ;
+      return;
     }
     state = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
   }

@@ -9,8 +9,10 @@ import 'package:track_wise_mobile_app/features/Auth/data/models/response/login_r
 // import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/models/response/register_response.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
+import 'package:track_wise_mobile_app/features/friends/data/models/response/friend_requests_response/friend_requests_response.dart';
 import 'package:track_wise_mobile_app/features/friends/data/models/response/scores_response/scores_response.dart';
 import 'package:track_wise_mobile_app/features/friends/data/models/response/search_email_response/search_email_response.dart';
+import 'package:track_wise_mobile_app/features/friends/data/models/response/send_friend_request_response.dart';
 
 @singleton
 @injectable
@@ -69,5 +71,38 @@ class ApiManager {
     final response = await _dio.get(ApiConstants.scores,
         options: Options(headers: {"Authorization": "Bearer $token"}));
     return ScoresResponse.fromJson(response.data);
+  }
+
+  Future<SendFriendRequestResponse> sendFriendRequest(
+      String email, String token) async {
+    final response = await _dio.post(ApiConstants.sendFriendRequest,
+        data: {"receiverEmail": email},
+        options: Options(headers: {"Authorization": "Bearer $token"}));
+
+    return SendFriendRequestResponse.fromJson(response.data);
+  }
+
+  Future<FriendRequestsResponse> getFriendRequests(String token) async {
+    final response = await _dio.get(ApiConstants.getFriendRequests,
+        options: Options(headers: {"Authorization": "Bearer $token"}));
+    return FriendRequestsResponse.fromJson(response.data);
+  }
+
+  Future<SendFriendRequestResponse> acceptFriendRequest(
+      String email, String token) async {
+    final response = await _dio.post(ApiConstants.acceptFreindRequest,
+        data: {"senderEmail": email},
+        options: Options(headers: {"Authorization": "Bearer $token"}));
+
+    return SendFriendRequestResponse.fromJson(response.data);
+  }
+
+  Future<SendFriendRequestResponse> rejectFriendRequest(
+      String email, String token) async {
+    final response = await _dio.post(ApiConstants.rejectRequest,
+        data: {"senderEmail": email},
+        options: Options(headers: {"Authorization": "Bearer $token"}));
+
+    return SendFriendRequestResponse.fromJson(response.data);
   }
 }

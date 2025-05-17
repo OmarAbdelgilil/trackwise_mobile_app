@@ -31,4 +31,45 @@ class OnlineDataSourcesImpl extends OnlineDataSource {
       return scores;
     });
   }
+
+  @override
+  Future<Result<String>> sendFriendRequest(String email, String token) {
+    return executeApi(() async {
+      final result = await _apiManager.sendFriendRequest(email, token);
+      final String message = result.message!;
+      return message;
+    });
+  }
+
+  @override
+  Future<Result<List<FriendUser>>> getFriendRequests(String token) {
+    return executeApi(() async {
+      final result = await _apiManager.getFriendRequests(token);
+      final resutList = result.requests!
+          .map(
+            (e) => FriendUser.fromJson(e.toJson()),
+          )
+          .toList();
+
+      return resutList;
+    });
+  }
+
+  @override
+  Future<Result<String>> acceptFriendRequest(String email, String token) {
+    return executeApi(() async {
+      final result = await _apiManager.acceptFriendRequest(email, token);
+      final String message = result.message!;
+      return message;
+    });
+  }
+
+  @override
+  Future<Result<String>> rejectFriendRequest(String email, String token) {
+    return executeApi(() async {
+      final result = await _apiManager.rejectFriendRequest(email, token);
+      final String message = result.message!;
+      return message;
+    });
+  }
 }

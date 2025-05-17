@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
 import 'package:track_wise_mobile_app/core/themes/theme.dart';
 import 'package:track_wise_mobile_app/features/friends/presentation/viewmodel/friends_screen_view_model.dart';
+import 'package:track_wise_mobile_app/features/friends/presentation/widgets/friend_requests_dialog.dart';
 import 'package:track_wise_mobile_app/features/friends/presentation/widgets/friends_search_dialog.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
@@ -70,6 +71,19 @@ class FriendsScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      IconButton(
+                          onPressed: () {
+                            viewModel.getScores();
+                          },
+                          icon: const Icon(Icons.refresh)),
+                      IconButton(
+                        onPressed: () {
+                          showFriendRequestsDialog(context);
+                        },
+                        icon: const Icon(
+                          Icons.people,
+                        ),
+                      ),
                       IconButton(
                         onPressed: () {
                           showFriendsSearchDialog(context);

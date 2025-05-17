@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:track_wise_mobile_app/core/api/api_error_handler.dart';
 import 'package:track_wise_mobile_app/core/di/di.dart';
+import 'package:track_wise_mobile_app/features/friends/domain/entities/friend_user.dart';
 import 'package:track_wise_mobile_app/features/friends/presentation/viewmodel/add_friends_screen_view_model.dart';
+import 'package:track_wise_mobile_app/main.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
 void showFriendsSearchDialog(BuildContext context) async {
@@ -27,70 +30,85 @@ void showFriendsSearchDialog(BuildContext context) async {
 
       return BlocProvider(
         create: (context) => viewmodel,
-        child: AlertDialog(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          content: SizedBox(
-            height: 200.h,
-            width: 300.w,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: controller,
-                  onChanged: onSearchChanged,
-                  decoration: InputDecoration(
-                    hintText: "Enter friends Email",
-                    prefixIcon: const Icon(
-                      Icons.search_sharp,
-                      color: Color.fromARGB(255, 50, 49, 52),
-                    ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    filled: true,
-                    fillColor: ColorsManager.darkGrey,
-                    border: OutlineInputBorder(
+        child: BlocListener<AddFriendsScreenViewModel, FriendsState>(
+          listener: (context, state) {
+            if (state is FriendRequesSuccess) {
+              scaffoldMessengerKey.currentState?.clearSnackBars();
+              scaffoldMessengerKey.currentState
+                  ?.showSnackBar(SnackBar(content: Text(state.message)));
+            }
+            if (state is FriendsRequesError) {
+              scaffoldMessengerKey.currentState?.clearSnackBars();
+              scaffoldMessengerKey.currentState?.showSnackBar(SnackBar(
+                  content: Text((state.message as DioHttpException)
+                      .exception!
+                      .response!
+                      .data["message"])));
+            }
+          },
+          child: AlertDialog(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            content: SizedBox(
+              height: 200.h,
+              width: 300.w,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: controller,
+                    onChanged: onSearchChanged,
+                    decoration: InputDecoration(
+                      hintText: "Enter friends Email",
+                      prefixIcon: const Icon(
+                        Icons.search_sharp,
+                        color: Color.fromARGB(255, 50, 49, 52),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 5),
+                      filled: true,
+                      fillColor: ColorsManager.darkGrey,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: const BorderSide(width: 0)),
+                      errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
-                        borderSide: const BorderSide(width: 0)),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(width: 0),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(width: 0),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(width: 0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(width: 0),
+                        borderSide: const BorderSide(width: 0),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: const BorderSide(width: 0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: const BorderSide(width: 0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: const BorderSide(width: 0),
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                  child: BlocBuilder<AddFriendsScreenViewModel, FriendsState>(
-                    builder: (context, state) {
-                      if (state is FriendsLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      if (state is FriendsLoaded) {
-                        return buildLeaderboardTile(
-                            1,
-                            "${state.user.firstName} ${state.user.lastName}",
-                            "add");
-                      }
-                      return const Text("Enter friend email");
-                    },
-                  ),
-                )
-              ],
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: BlocBuilder<AddFriendsScreenViewModel, FriendsState>(
+                      builder: (context, state) {
+                        if (state is FriendsLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        if (state is FriendsLoaded) {
+                          return buildLeaderboardTile(
+                              state.user, 1, viewmodel, "add");
+                        }
+                        return const Text("Enter friend email");
+                      },
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -100,8 +118,9 @@ void showFriendsSearchDialog(BuildContext context) async {
 }
 
 Widget buildLeaderboardTile(
+  FriendUser user,
   int rank,
-  String name,
+  AddFriendsScreenViewModel viewModel,
   String buttonText, {
   bool highlight = false,
 }) {
@@ -130,7 +149,7 @@ Widget buildLeaderboardTile(
           Expanded(
             flex: 3,
             child: Text(
-              name,
+              "${user.firstName} ${user.lastName}",
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: highlight ? Colors.blue : Colors.white,
@@ -139,15 +158,22 @@ Widget buildLeaderboardTile(
               ),
             ),
           ),
-          IconButton(
-            onPressed: () {
-              // Future: Add friend logic here
+          IconButton(onPressed: () {
+            print("preess");
+            viewModel.sendFriendRequest(user);
+          }, icon: BlocBuilder<AddFriendsScreenViewModel, FriendsState>(
+            builder: (context, state) {
+              if (state is FriendRequestLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return const Icon(
+                Icons.person_add_alt_1_outlined,
+                color: ColorsManager.lightGreen,
+              );
             },
-            icon: const Icon(
-              Icons.person_add_alt_1_outlined,
-              color: ColorsManager.lightGreen,
-            ),
-          ),
+          )),
         ],
       ),
     ),

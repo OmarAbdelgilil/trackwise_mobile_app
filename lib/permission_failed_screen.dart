@@ -21,8 +21,7 @@ class _PermissionFailedScreenState extends State<PermissionFailedScreen>
   static const platform = MethodChannel('usage_stats');
   _checkStepsPermission() async {
     stepsPermission = await Permission.activityRecognition.request();
-    setState(() {
-    });
+    setState(() {});
     if (!stepsPermission!.isGranted) {
       openAppSettings();
     } else {
@@ -58,8 +57,7 @@ class _PermissionFailedScreenState extends State<PermissionFailedScreen>
     if (state == AppLifecycleState.resumed) {
       usagePermission = await platform.invokeMethod('checkUsageAccess');
       stepsPermission = await Permission.activityRecognition.status;
-      setState(() {
-      });
+      setState(() {});
       kPermission.value = (usagePermission &&
           stepsPermission != null &&
           stepsPermission!.isGranted);
@@ -91,8 +89,7 @@ class _PermissionFailedScreenState extends State<PermissionFailedScreen>
                     Text(
                       'sorry you have to grant usage and steps access',
                       style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.bold),
+                          fontSize: 15.sp, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(
                       height: 30.h,

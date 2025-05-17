@@ -5,4 +5,8 @@ import 'package:track_wise_mobile_app/features/friends/domain/entities/scores.da
 abstract class FriendsRepo {
   Future<Result<FriendUser>> searchByEmail(String email);
   Future<Result<Scores>> getScores();
+  Future<Result<String>> sendFriendRequest(String email);
+  Future<Result<List<FriendUser>>> getFriendRequest();
+  Future<Result<String>> acceptFriendRequest(String email);
+  Future<Result<String>> rejectFriendRequest(String email);
 }

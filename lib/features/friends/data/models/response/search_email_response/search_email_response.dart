@@ -7,9 +7,9 @@ class SearchEmailResponse {
 
   factory SearchEmailResponse.fromJson(Map<String, dynamic> json) {
     return SearchEmailResponse(
-      user: json['user'] == null
+      user: json['user'] == null || (json['user'] as List<dynamic>).isEmpty
           ? null
-          : User.fromJson(json['user'] as Map<String, dynamic>),
+          : User.fromJson(json['user'][0] as Map<String, dynamic>),
     );
   }
 

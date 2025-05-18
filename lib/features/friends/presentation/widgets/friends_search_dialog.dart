@@ -101,7 +101,13 @@ void showFriendsSearchDialog(BuildContext context) async {
                         }
                         if (state is FriendsLoaded) {
                           return buildLeaderboardTile(
-                              state.user, 1, viewmodel, "add");
+                              state.user!, 1, viewmodel, "add");
+                        }
+                        if (state is FriendsError) {
+                          return Text((state.message as DioHttpException)
+                              .exception!
+                              .response!
+                              .data['message']);
                         }
                         return const Text("Enter friend email");
                       },

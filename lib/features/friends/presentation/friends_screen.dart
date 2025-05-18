@@ -27,37 +27,47 @@ class FriendsScreen extends StatelessWidget {
                 // **Top 3 Users Display**
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: containerColor(context),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          // **Second Place**
-                          buildProfile("assets/svgs/second.svg",
-                              viewModel.second, 80, 85),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: containerColor(context),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            // **Second Place**
+                            Flexible(
+                              child: buildProfile("assets/svgs/second.svg",
+                                  viewModel.second, 80, 85),
+                            ),
 
-                          const SizedBox(width: 20), // Space between images
+                            const SizedBox(width: 20),
 
-                          // **First Place (Biggest)**
-                          Column(
-                            children: [
-                              buildProfile("assets/svgs/first.svg",
-                                  viewModel.first, 145, 150),
-                            ],
-                          ),
+                            // **First Place**
+                            Flexible(
+                              flex: 2,
+                              child: Column(
+                                children: [
+                                  buildProfile("assets/svgs/first.svg",
+                                      viewModel.first, 145, 150),
+                                ],
+                              ),
+                            ),
 
-                          const SizedBox(width: 20), // Space between images
+                            const SizedBox(width: 20),
 
-                          // **Third Place**
-                          buildProfile(
-                              "assets/svgs/third.svg", viewModel.third, 80, 85),
-                        ],
+                            // **Third Place**
+                            Flexible(
+                              child: buildProfile("assets/svgs/third.svg",
+                                  viewModel.third, 80, 85),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -136,10 +146,15 @@ Widget buildProfile(
           ),
         ),
       ),
-      const SizedBox(height: 5), // Space between image and text
-      Text(
-        name,
-        style: const TextStyle(fontSize: 14),
+      const SizedBox(height: 5),
+      SizedBox(
+        width: width,
+        child: Text(
+          name,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 14),
+        ),
       ),
     ],
   );
@@ -166,17 +181,18 @@ Widget buildLeaderboardTile(int rank, String name, int steps, double hours,
           // Name
           Expanded(
             flex: 3,
-            child: Text(
-              name,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: highlight ? Colors.blue : Colors.white,
-                fontSize: 16,
-                fontWeight: highlight ? FontWeight.bold : FontWeight.normal,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Text(
+                name,
+                style: TextStyle(
+                  color: highlight ? Colors.blue : Colors.white,
+                  fontSize: 16,
+                  fontWeight: highlight ? FontWeight.bold : FontWeight.normal,
+                ),
               ),
             ),
           ),
-
           // Steps
           Expanded(
             flex: 2,

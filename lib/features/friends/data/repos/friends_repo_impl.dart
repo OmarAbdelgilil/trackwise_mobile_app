@@ -17,7 +17,8 @@ class FriendsRepoImpl implements FriendsRepo {
   FriendsRepoImpl(this._onlineDataSource, this._prefs);
   @override
   Future<Result<FriendUser>> searchByEmail(String email) async {
-    return await _onlineDataSource.searchByEmail(email);
+    return await _onlineDataSource.searchByEmail(
+        email, _prefs.getString("token")!);
   }
 
   @override

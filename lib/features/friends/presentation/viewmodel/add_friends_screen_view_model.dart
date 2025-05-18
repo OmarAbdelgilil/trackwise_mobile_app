@@ -18,7 +18,7 @@ class AddFriendsScreenViewModel extends Cubit<FriendsState> {
     final result = await _searchByEmailUseCase.searchByEmail(email);
     switch (result) {
       case Success<FriendUser>():
-        emit(FriendsLoaded(result.data!));
+        emit(FriendsLoaded(result.data));
       case Fail<FriendUser>():
         emit(FriendsError(result.exception!));
     }
@@ -57,7 +57,7 @@ class FriendsRequesError extends FriendsState {
 }
 
 class FriendsLoaded extends FriendsState {
-  final FriendUser user;
+  final FriendUser? user;
 
   FriendsLoaded(this.user);
 }

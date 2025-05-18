@@ -12,10 +12,11 @@ class OnlineDataSourcesImpl extends OnlineDataSource {
   ApiManager _apiManager;
   OnlineDataSourcesImpl(this._apiManager);
   @override
-  Future<Result<FriendUser>> searchByEmail(String email) {
+  Future<Result<FriendUser>> searchByEmail(String email, String token) {
     return executeApi(
       () async {
-        final result = await _apiManager.searchByEmail(email);
+        final result = await _apiManager.searchByEmail(email, token);
+
         return FriendUser.fromJson(result.user!.toJson());
       },
     );

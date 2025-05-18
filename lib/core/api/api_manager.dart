@@ -61,9 +61,10 @@ class ApiManager {
         options: Options(headers: {"Authorization": "Bearer $token"}));
   }
 
-  Future<SearchEmailResponse> searchByEmail(String email) async {
-    final response =
-        await _dio.post(ApiConstants.searchByEmail, data: {"email": email});
+  Future<SearchEmailResponse> searchByEmail(String email, String token) async {
+    final response = await _dio.post(ApiConstants.searchByEmail,
+        data: {"email": email},
+        options: Options(headers: {"Authorization": "Bearer $token"}));
     return SearchEmailResponse.fromJson(response.data);
   }
 

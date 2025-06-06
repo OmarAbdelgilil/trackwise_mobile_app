@@ -53,6 +53,12 @@ import '../../features/friends/presentation/viewmodel/friend_requests_view_model
 import '../../features/friends/presentation/viewmodel/friends_screen_view_model.dart'
     as _i1057;
 import '../../features/Home/presentation/home_view_model.dart' as _i286;
+import '../../features/Notifications/data/contracts/online_data_source.dart'
+    as _i125;
+import '../../features/Notifications/data/datasources/online_data_source_impl.dart'
+    as _i332;
+import '../../features/Notifications/presentation/notification_screen_view_model.dart'
+    as _i627;
 import '../../features/profile/presentation/view_models/profile_view_model.dart'
     as _i668;
 import '../../features/steps/presentation/steps_viewmodel.dart' as _i1071;
@@ -89,6 +95,12 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i1021.StepsNotifier(gh<_i587.HiveManager>()));
     gh.factory<_i229.AppUsageNotifier>(
         () => _i229.AppUsageNotifier(gh<_i587.HiveManager>()));
+    gh.factory<_i125.OnlineDataSource>(() => _i332.OnlineDataSourceImpl(
+          gh<_i460.SharedPreferences>(),
+          gh<_i1047.ApiManager>(),
+        ));
+    gh.factory<_i627.NotificationScreenViewModel>(
+        () => _i627.NotificationScreenViewModel(gh<_i125.OnlineDataSource>()));
     gh.factory<_i1071.StepsViewmodel>(() => _i1071.StepsViewmodel(
           gh<_i460.SharedPreferences>(),
           gh<_i481.AuthEventService>(),
@@ -101,18 +113,18 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i945.OnlineDataSource>(),
           gh<_i460.SharedPreferences>(),
         ));
-    gh.factory<_i1067.SearchByEmailUseCase>(
-        () => _i1067.SearchByEmailUseCase(gh<_i579.FriendsRepo>()));
-    gh.factory<_i94.GetScoresUseCase>(
-        () => _i94.GetScoresUseCase(gh<_i579.FriendsRepo>()));
-    gh.factory<_i143.SendFriendRequestUseCase>(
-        () => _i143.SendFriendRequestUseCase(gh<_i579.FriendsRepo>()));
-    gh.factory<_i635.GetFriendRequestsUseCase>(
-        () => _i635.GetFriendRequestsUseCase(gh<_i579.FriendsRepo>()));
     gh.factory<_i223.AcceptFriendRequestUseCase>(
         () => _i223.AcceptFriendRequestUseCase(gh<_i579.FriendsRepo>()));
+    gh.factory<_i635.GetFriendRequestsUseCase>(
+        () => _i635.GetFriendRequestsUseCase(gh<_i579.FriendsRepo>()));
+    gh.factory<_i94.GetScoresUseCase>(
+        () => _i94.GetScoresUseCase(gh<_i579.FriendsRepo>()));
     gh.factory<_i29.RejectFriendRequestUseCase>(
         () => _i29.RejectFriendRequestUseCase(gh<_i579.FriendsRepo>()));
+    gh.factory<_i1067.SearchByEmailUseCase>(
+        () => _i1067.SearchByEmailUseCase(gh<_i579.FriendsRepo>()));
+    gh.factory<_i143.SendFriendRequestUseCase>(
+        () => _i143.SendFriendRequestUseCase(gh<_i579.FriendsRepo>()));
     gh.factory<_i492.AuthRepository>(() => _i481.AuthRepositoryImpl(
           gh<_i597.OnlineDataSource>(),
           gh<_i537.OfflineDataSource>(),

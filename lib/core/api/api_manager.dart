@@ -9,6 +9,7 @@ import 'package:track_wise_mobile_app/features/Auth/data/models/response/login_r
 // import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:track_wise_mobile_app/features/Auth/data/models/response/register_response.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
+import 'package:track_wise_mobile_app/features/Notifications/data/response/recommendation_response/recommendation_response.dart';
 import 'package:track_wise_mobile_app/features/friends/data/models/response/friend_requests_response/friend_requests_response.dart';
 import 'package:track_wise_mobile_app/features/friends/data/models/response/scores_response/scores_response.dart';
 import 'package:track_wise_mobile_app/features/friends/data/models/response/search_email_response/search_email_response.dart';
@@ -105,5 +106,11 @@ class ApiManager {
         options: Options(headers: {"Authorization": "Bearer $token"}));
 
     return SendFriendRequestResponse.fromJson(response.data);
+  }
+
+  Future<RecommendationResponse> getRecommendation(String token) async {
+    final response = await _dio.get(ApiConstants.getRecommendation,
+        options: Options(headers: {"Authorization": "Bearer $token"}));
+    return RecommendationResponse.fromJson(response.data);
   }
 }

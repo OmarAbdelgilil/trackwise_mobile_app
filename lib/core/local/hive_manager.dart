@@ -136,4 +136,34 @@ class HiveManager {
     }
     await box.clear();
   }
+
+  Future<void> addRecommendation(Map<String, dynamic> data) async {
+    late Box box;
+    if (Hive.isBoxOpen(HiveConstants.recommendationsBox)) {
+      box = Hive.box(HiveConstants.recommendationsBox);
+    } else {
+      box = await Hive.openBox(HiveConstants.stepsBox);
+    }
+    await box.add(data);
+  }
+
+  Future<void> clearRecommendations(Map<String, dynamic> data) async {
+    late Box box;
+    if (Hive.isBoxOpen(HiveConstants.recommendationsBox)) {
+      box = Hive.box(HiveConstants.recommendationsBox);
+    } else {
+      box = await Hive.openBox(HiveConstants.stepsBox);
+    }
+    await box.clear();
+  }
+
+  Future<List<dynamic>> getRecommendations(Map<String, dynamic> data) async {
+    late Box box;
+    if (Hive.isBoxOpen(HiveConstants.recommendationsBox)) {
+      box = Hive.box(HiveConstants.recommendationsBox);
+    } else {
+      box = await Hive.openBox(HiveConstants.recommendationsBox);
+    }
+    return box.values.toList();
+  }
 }

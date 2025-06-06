@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/nav_bar_router/app_router.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/nav_bar_router/nav_bar_router.dart';
+import 'package:track_wise_mobile_app/features/Notifications/presentation/notifications_screen.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/image_path_manager.dart';
 
@@ -55,10 +56,24 @@ class ScaffoldAppBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.notifications_none),
-                onPressed: () {},
-              )
+              Stack(children: [
+                IconButton(
+                  icon: const Icon(Icons.notifications_none),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const NotificationsScreen(),
+                    ));
+                  },
+                ),
+                const Positioned(
+                    right: 14,
+                    top: 14,
+                    child: Icon(
+                      Icons.circle,
+                      color: Colors.red,
+                      size: 10,
+                    ))
+              ])
             ],
           );
         });

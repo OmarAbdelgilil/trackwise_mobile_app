@@ -31,8 +31,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
             break;
           case 3:
             //todo
-            currentPageNotifier.setPage(AppRoutes.profile);
+            currentPageNotifier.setPage(AppRoutes.chat);
             break;
+          case 4:
+            //todo
+            currentPageNotifier.setPage(AppRoutes.profile);
           default:
             currentPageNotifier.setPage(AppRoutes.homeScreen);
             break;
@@ -64,6 +67,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
         const BottomNavigationBarItem(
           icon: Icon(Icons.people_alt_outlined, size: 22),
           label: StringsManager.friends,
+        ),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.message_outlined, size: 22),
+          label: StringsManager.chat,
         ),
         const BottomNavigationBarItem(
           icon: Icon(Icons.person_outline, size: 22),

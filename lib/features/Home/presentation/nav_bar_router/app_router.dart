@@ -3,4 +3,5 @@ class AppRoutes {
   static const String steps = 'Steps Count';
   static const String friends = "Friends";
   static const String profile = 'Profile';
+  static const String chat = 'Chat';
 }

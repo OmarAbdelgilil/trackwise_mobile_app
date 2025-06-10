@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/home_screen.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/nav_bar_router/app_router.dart';
+import 'package:track_wise_mobile_app/features/chat/presentation/chat_screen.dart';
 import 'package:track_wise_mobile_app/features/friends/presentation/friends_screen.dart';
 import 'package:track_wise_mobile_app/features/profile/presentation/profile_screen.dart';
 import 'package:track_wise_mobile_app/features/steps/presentation/steps_screen.dart';
@@ -22,6 +23,9 @@ class CurrentPageNotifier extends ValueNotifier<Map<String, dynamic>> {
         break;
       case AppRoutes.profile:
         widget = const ProfileScreen();
+        break;
+      case AppRoutes.chat:
+        widget = const ChatScreen();
         break;
       default:
         widget = const HomeScreen();

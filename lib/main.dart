@@ -11,13 +11,18 @@ import 'package:track_wise_mobile_app/core/provider/permission_noti.dart';
 import 'package:track_wise_mobile_app/core/provider/theme_provider.dart';
 import 'package:track_wise_mobile_app/core/themes/theme.dart';
 import 'package:track_wise_mobile_app/features/Home/presentation/home_screen.dart';
+import 'package:track_wise_mobile_app/firebase_options.dart';
 import 'package:track_wise_mobile_app/loading_screen.dart';
 import 'package:track_wise_mobile_app/permission_failed_screen.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 final providerContainer = ProviderContainer();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   final appDocumentDirectory = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentDirectory.path);
   Hive.registerAdapter(DurationAdapter());

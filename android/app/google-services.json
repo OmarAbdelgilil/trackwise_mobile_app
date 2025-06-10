@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "246025531945",
+    "project_id": "trackwise-41b4d",
+    "storage_bucket": "trackwise-41b4d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246025531945:android:32f84d7c8851e8f0bbe238",
+        "android_client_info": {
+          "package_name": "com.example.track_wise_mobile_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBD4MiybFrVy5f7-ZH5HGMD-j1iYZ8w0Sc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -29,6 +29,9 @@ import '../../features/Auth/domain/use_cases/register_use_case.dart' as _i228;
 import '../../features/Auth/presentation/login/login_viewmodel.dart' as _i641;
 import '../../features/Auth/presentation/register/register_viewmodel.dart'
     as _i902;
+import '../../features/chat/chat_provider.dart' as _i616;
+import '../../features/chat/presentation/viewmodel/chat_viewmodel.dart'
+    as _i599;
 import '../../features/friends/data/contracts/online_data_source.dart' as _i945;
 import '../../features/friends/data/datasources/online_data_sources_impl.dart'
     as _i382;
@@ -86,6 +89,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => sharedPrefsModule.prefs,
       preResolve: true,
     );
+    gh.factory<_i616.ChatDetailsNotifier>(() => _i616.ChatDetailsNotifier());
     gh.singleton<_i1047.ApiManager>(() => _i1047.ApiManager());
     gh.singleton<_i481.AuthEventService>(() => _i481.AuthEventService());
     gh.lazySingleton<_i505.UserNotifier>(() => _i505.UserNotifier());
@@ -154,6 +158,8 @@ extension GetItInjectableX on _i174.GetIt {
               gh<_i1067.SearchByEmailUseCase>(),
               gh<_i143.SendFriendRequestUseCase>(),
             ));
+    gh.factory<_i599.ChatViewmodel>(
+        () => _i599.ChatViewmodel(gh<_i94.GetScoresUseCase>()));
     gh.factory<_i1057.FriendsScreenViewModel>(
         () => _i1057.FriendsScreenViewModel(gh<_i94.GetScoresUseCase>()));
     gh.factory<_i668.ProfileViewModel>(

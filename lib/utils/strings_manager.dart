@@ -29,6 +29,7 @@ class StringsManager {
   static const String usage = "Usage";
   static const String steps = "Steps";
   static const String friends = "Friends";
+  static const String chat = "Chat";
   static const String profile = "Profile";
   static const String noAppsFound = "No apps found in this date";
   static const String daily = "Daily";

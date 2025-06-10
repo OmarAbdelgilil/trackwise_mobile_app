@@ -29,6 +29,9 @@ import '../../features/Auth/domain/use_cases/register_use_case.dart' as _i228;
 import '../../features/Auth/presentation/login/login_viewmodel.dart' as _i641;
 import '../../features/Auth/presentation/register/register_viewmodel.dart'
     as _i902;
+import '../../features/chat/chat_provider.dart' as _i616;
+import '../../features/chat/presentation/viewmodel/chat_viewmodel.dart'
+    as _i599;
 import '../../features/forget_password/data/contracts/forget_password_online_datasource.dart'
     as _i274;
 import '../../features/forget_password/data/data_sources/forget_password_online_datasource_impl.dart'
@@ -99,6 +102,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => sharedPrefsModule.prefs,
       preResolve: true,
     );
+    gh.factory<_i616.ChatDetailsNotifier>(() => _i616.ChatDetailsNotifier());
     gh.factory<_i575.ForgetPasswordValidator>(
         () => _i575.ForgetPasswordValidator());
     gh.singleton<_i1047.ApiManager>(() => _i1047.ApiManager());
@@ -187,6 +191,8 @@ extension GetItInjectableX on _i174.GetIt {
               gh<_i94.GetScoresUseCase>(),
               gh<_i998.UnFriendUseCase>(),
             ));
+    gh.factory<_i599.ChatViewmodel>(
+        () => _i599.ChatViewmodel(gh<_i94.GetScoresUseCase>()));
     gh.factory<_i902.RegisterViewmodel>(
         () => _i902.RegisterViewmodel(gh<_i228.RegisterUseCase>()));
     gh.factory<_i641.LoginViewmodel>(

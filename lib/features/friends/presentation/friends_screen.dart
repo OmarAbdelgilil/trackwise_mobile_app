@@ -1,132 +1,196 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:track_wise_mobile_app/core/di/di.dart';
+import 'package:track_wise_mobile_app/core/provider/user_provider.dart';
 import 'package:track_wise_mobile_app/core/themes/theme.dart';
+import 'package:track_wise_mobile_app/features/friends/presentation/friends_login_screen.dart';
 import 'package:track_wise_mobile_app/features/friends/presentation/viewmodel/friends_screen_view_model.dart';
 import 'package:track_wise_mobile_app/features/friends/presentation/widgets/friend_requests_dialog.dart';
 import 'package:track_wise_mobile_app/features/friends/presentation/widgets/friends_search_dialog.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
-class FriendsScreen extends StatelessWidget {
+class FriendsScreen extends ConsumerWidget {
   const FriendsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final viewModel = getIt<FriendsScreenViewModel>();
-    return BlocProvider(
-      create: (context) => viewModel..getScores(),
-      child: BlocBuilder<FriendsScreenViewModel, FriendsStates>(
-        builder: (context, state) {
-          if (state is ScoresLoaded) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(height: 30), // Top padding
+  Widget build(BuildContext context, WidgetRef ref) {
+    final prov = ref.watch(userProvider);
+    final state = ref.watch(friendsViewModelProvider);
+    final viewModel = ref.read(friendsViewModelProvider.notifier);
+    if (prov == null) {
+      return const FriendsLoginScreen();
+    }
 
-                // **Top 3 Users Display**
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+    if (state is ScoresLoaded) {
+      return SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height: 30), // Top padding
+
+            // **Top 3 Users Display**
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: containerColor(context),
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: containerColor(context),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            // **Second Place**
-                            Flexible(
-                              child: buildProfile("assets/svgs/second.svg",
-                                  viewModel.second, 80, 85),
-                            ),
-
-                            const SizedBox(width: 20),
-
-                            // **First Place**
-                            Flexible(
-                              flex: 2,
-                              child: Column(
-                                children: [
-                                  buildProfile("assets/svgs/first.svg",
-                                      viewModel.first, 145, 150),
-                                ],
-                              ),
-                            ),
-
-                            const SizedBox(width: 20),
-
-                            // **Third Place**
-                            Flexible(
-                              child: buildProfile("assets/svgs/third.svg",
-                                  viewModel.third, 80, 85),
-                            ),
-                          ],
+                    padding: const EdgeInsets.all(20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        // **Second Place**
+                        Flexible(
+                          child: buildProfile("assets/svgs/second.svg",
+                              viewModel.second, 80, 85),
                         ),
-                      ),
+
+                        const SizedBox(width: 20),
+
+                        // **First Place**
+                        Flexible(
+                          flex: 2,
+                          child: Column(
+                            children: [
+                              buildProfile("assets/svgs/first.svg",
+                                  viewModel.first, 145, 150),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(width: 20),
+
+                        // **Third Place**
+                        Flexible(
+                          child: buildProfile(
+                              "assets/svgs/third.svg", viewModel.third, 80, 85),
+                        ),
+                      ],
                     ),
                   ),
                 ),
+              ),
+            ),
 
-                const SizedBox(height: 30), // Space below avatars
+            const SizedBox(height: 30), // Space below avatars
 
-                // **Search Button Aligned to Right**
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            viewModel.getScores();
-                          },
-                          icon: const Icon(Icons.refresh)),
-                      IconButton(
-                        onPressed: () {
-                          showFriendRequestsDialog(context);
-                        },
-                        icon: const Icon(
-                          Icons.people,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          showFriendsSearchDialog(context);
-                        },
-                        icon: const Icon(
-                          Icons.search_sharp,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: state.scores.scoresList.length,
-                    itemBuilder: (context, index) {
-                      final user = state.scores.scoresList[index];
-                      return buildLeaderboardTile(index + 1, user.name,
-                          user.steps, user.usage, user.score, user.me);
+            // **Search Button Aligned to Right**
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                      onPressed: () async {
+                        await viewModel.openCalender(context);
+                      },
+                      icon: const Icon(Icons.calendar_month)),
+                  IconButton(
+                      onPressed: () {
+                        viewModel.getScores(refresh: true);
+                      },
+                      icon: const Icon(Icons.refresh)),
+                  IconButton(
+                    onPressed: () {
+                      showFriendRequestsDialog(context);
                     },
+                    icon: const Icon(
+                      Icons.people,
+                    ),
                   ),
-                ),
-              ],
-            );
-          }
-          if (state is ScoresLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return Placeholder();
-        },
-      ),
+                  IconButton(
+                    onPressed: () {
+                      showFriendsSearchDialog(context);
+                    },
+                    icon: const Icon(
+                      Icons.search_sharp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(
+              height: 280,
+              child: ListView.builder(
+                itemCount: state.scores.scoresList.length,
+                itemBuilder: (context, index) {
+                  final user = state.scores.scoresList[index];
+                  return GestureDetector(
+                    onLongPressStart: (details) {
+                      if (user.me) {
+                        return;
+                      }
+                      final tapPosition = details.globalPosition;
+                      showMenu(
+                        context: context,
+                        position: RelativeRect.fromLTRB(
+                          tapPosition.dx,
+                          tapPosition.dy,
+                          tapPosition.dx,
+                          tapPosition.dy,
+                        ),
+                        items: [
+                          const PopupMenuItem(
+                            value: 'unfriend',
+                            child: Text('Unfriend'),
+                          ),
+                        ],
+                      ).then((value) {
+                        if (value == 'unfriend') {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text('Unfriend ${user.name}?'),
+                              content: Text(
+                                  'Are you sure you want to unfriend ${user.name}?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    viewModel.unFriend(user.email);
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Unfriend',
+                                      style: TextStyle(color: Colors.red)),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      });
+                    },
+                    child: buildLeaderboardTile(
+                      index + 1,
+                      user.name,
+                      user.steps,
+                      user.usage,
+                      user.score,
+                      user.me,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    if (state is ScoresLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return const SizedBox(
+      height: 0,
     );
   }
 }

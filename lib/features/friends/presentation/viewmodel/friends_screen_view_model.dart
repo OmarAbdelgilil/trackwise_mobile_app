@@ -1,20 +1,35 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
 import 'package:track_wise_mobile_app/core/common/result.dart';
+import 'package:track_wise_mobile_app/core/di/di.dart';
 import 'package:track_wise_mobile_app/features/friends/domain/entities/scores.dart';
 import 'package:track_wise_mobile_app/features/friends/domain/usecases/get_scores_use_case.dart';
+import 'package:track_wise_mobile_app/features/friends/domain/usecases/un_friend_use_case.dart';
 
 @injectable
-class FriendsScreenViewModel extends Cubit<FriendsStates> {
+class FriendsScreenViewModel extends StateNotifier<FriendsStates> {
   final GetScoresUseCase _getScoresUseCase;
+  final UnFriendUseCase _unFriendUseCase;
   String first = "NA";
   String second = "NA";
   String third = "NA";
-  FriendsScreenViewModel(this._getScoresUseCase) : super(FriendsInitial());
+  DateTime pickedDate = DateTime.now();
+  Map<String, Result<Scores>> prevResults = {};
+  FriendsScreenViewModel(this._getScoresUseCase, this._unFriendUseCase)
+      : super(FriendsInitial());
 
-  void getScores() async {
-    emit(ScoresLoading());
-    final result = await _getScoresUseCase.getScores();
+  void getScores({bool refresh = false}) async {
+    state = ScoresLoading();
+    Result<Scores> result;
+    final formDate = '${pickedDate.day}-${pickedDate.month}-${pickedDate.year}';
+    if (prevResults.containsKey(formDate) && !refresh) {
+      result = prevResults[formDate]!;
+    } else {
+      result = await _getScoresUseCase.getScores(
+          date: '${pickedDate.day}-${pickedDate.month}-${pickedDate.year}');
+    }
+
     switch (result) {
       case Success<Scores>():
         if (result.data!.scoresList.length >= 3) {
@@ -27,12 +42,49 @@ class FriendsScreenViewModel extends Cubit<FriendsStates> {
         } else if (result.data!.scoresList.length == 1) {
           first = result.data!.scoresList[0].name;
         }
-        emit(ScoresLoaded(result.data!));
+        prevResults[
+                '${pickedDate.day}-${pickedDate.month}-${pickedDate.year}'] =
+            result;
+
+        state = ScoresLoaded(result.data!);
       case Fail<Scores>():
-        emit(FriendsError(result.exception!));
+        state = FriendsError(result.exception!);
     }
   }
+
+  Future<void> unFriend(String email) async {
+    state = ScoresLoading();
+    final result = await _unFriendUseCase.unFriend(email);
+    switch (result) {
+      case Success<void>():
+        prevResults = {};
+        getScores();
+      case Fail<void>():
+        state = FriendsError(result.exception!);
+    }
+  }
+
+  Future<void> openCalender(BuildContext context) async {
+    final now = DateTime.now();
+    DateTime? pickedDateTemp = await showDatePicker(
+      context: context,
+      initialDate: pickedDate,
+      firstDate: now.subtract(const Duration(days: 365 * 3)),
+      lastDate: now,
+    );
+
+    if (pickedDateTemp == null) {
+      return;
+    }
+
+    pickedDate = pickedDateTemp;
+    getScores();
+  }
 }
+
+final friendsViewModelProvider =
+    StateNotifierProvider<FriendsScreenViewModel, FriendsStates>(
+        (ref) => getIt<FriendsScreenViewModel>()..getScores());
 
 abstract class FriendsStates {}
 

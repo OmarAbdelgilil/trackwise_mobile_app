@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/features/Auth/presentation/login/login_viewmodel.dart';
 import 'package:track_wise_mobile_app/features/Auth/presentation/register/register_screen.dart';
+import 'package:track_wise_mobile_app/features/forget_password/presentation/forget_password_screen.dart';
 import 'package:track_wise_mobile_app/main.dart';
-import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 import 'package:track_wise_mobile_app/utils/custom_text_field.dart';
 import 'package:track_wise_mobile_app/utils/extract_error.dart';
-import 'package:track_wise_mobile_app/utils/image_path_manager.dart';
+
 import 'package:track_wise_mobile_app/utils/strings_manager.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -102,7 +102,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ForgetPasswordScreen(),
+                    ));
+                  },
                   child: Text(
                     StringsManager.forgetPassBtn,
                     style: TextStyle(
@@ -160,60 +164,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ],
               ),
-              const Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        color: ColorsManager.darkGrey,
-                        thickness: 1,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text(
-                        StringsManager.or,
-                        style: TextStyle(
-                          color: ColorsManager
-                              .darkGrey, // Customize the text color
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(
-                        color: ColorsManager.darkGrey,
-                        thickness: 1,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                child: ElevatedButton(
-                    onPressed: () {},
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                            height: 30.h,
-                            width: 30.w,
-                            child: Image.asset(
-                              ImagePathManager.googleIcon,
-                              fit: BoxFit.cover,
-                            )),
-                        const Text(
-                          StringsManager.signWithGoogle,
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ],
-                    )),
-              )
             ],
           ),
         ),

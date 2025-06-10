@@ -7,7 +7,7 @@ import 'package:track_wise_mobile_app/features/friends/domain/repos/friends_repo
 class SearchByEmailUseCase {
   final FriendsRepo _friendsRepo;
   SearchByEmailUseCase(this._friendsRepo);
-  Future<Result<FriendUser>> searchByEmail(String email) {
+  Future<Result<List<FriendUser>>> searchByEmail(String email) {
     return _friendsRepo.searchByEmail(email);
   }
 }

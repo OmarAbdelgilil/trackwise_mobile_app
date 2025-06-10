@@ -9,23 +9,27 @@ import 'package:track_wise_mobile_app/features/friends/domain/entities/scores.da
 
 @Injectable(as: OnlineDataSource)
 class OnlineDataSourcesImpl extends OnlineDataSource {
-  ApiManager _apiManager;
+  final ApiManager _apiManager;
   OnlineDataSourcesImpl(this._apiManager);
   @override
-  Future<Result<FriendUser>> searchByEmail(String email, String token) {
+  Future<Result<List<FriendUser>>> searchByEmail(String email, String token) {
     return executeApi(
       () async {
         final result = await _apiManager.searchByEmail(email, token);
 
-        return FriendUser.fromJson(result.user!.toJson());
+        return result.users
+            .map(
+              (e) => FriendUser.fromJson(e!.toJson()),
+            )
+            .toList();
       },
     );
   }
 
   @override
-  Future<Result<Scores>> getScores(String token) {
+  Future<Result<Scores>> getScores(String token, {String? date}) {
     return executeApi(() async {
-      final result = await _apiManager.getScores(token);
+      final result = await _apiManager.getScores(token, date: date);
       final Scores scores =
           ScoresDto(friendsScores: result.friendsScores!, user: result.user!)
               .toScores();
@@ -71,6 +75,13 @@ class OnlineDataSourcesImpl extends OnlineDataSource {
       final result = await _apiManager.rejectFriendRequest(email, token);
       final String message = result.message!;
       return message;
+    });
+  }
+
+  @override
+  Future<Result<void>> unFriend(String email, String token) {
+    return executeApi(() async {
+      await _apiManager.unFriend(email, token);
     });
   }
 }

@@ -19,7 +19,6 @@ void showFriendsSearchDialog(BuildContext context) async {
       final TextEditingController controller = TextEditingController();
       Timer? debounce;
       void onSearchChanged(String query) {
-        print("object");
         if (debounce?.isActive ?? false) debounce!.cancel();
         debounce = Timer(const Duration(seconds: 1), () {
           if (query.isNotEmpty) {
@@ -49,7 +48,7 @@ void showFriendsSearchDialog(BuildContext context) async {
           child: AlertDialog(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             content: SizedBox(
-              height: 200.h,
+              height: 200,
               width: 300.w,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -100,8 +99,23 @@ void showFriendsSearchDialog(BuildContext context) async {
                           );
                         }
                         if (state is FriendsLoaded) {
-                          return buildLeaderboardTile(
-                              state.user!, 1, viewmodel, "add");
+                          return SizedBox(
+                            height: 126,
+                            child: ListView.builder(
+                              itemCount: state.users.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: buildLeaderboardTile(
+                                      state.users[index],
+                                      1,
+                                      viewmodel,
+                                      context,
+                                      "add"),
+                                );
+                              },
+                            ),
+                          );
                         }
                         if (state is FriendsError) {
                           return Text((state.message as DioHttpException)
@@ -127,6 +141,7 @@ Widget buildLeaderboardTile(
   FriendUser user,
   int rank,
   AddFriendsScreenViewModel viewModel,
+  BuildContext context,
   String buttonText, {
   bool highlight = false,
 }) {
@@ -165,8 +180,8 @@ Widget buildLeaderboardTile(
             ),
           ),
           IconButton(onPressed: () {
-            print("preess");
             viewModel.sendFriendRequest(user);
+            Navigator.of(context).pop();
           }, icon: BlocBuilder<AddFriendsScreenViewModel, FriendsState>(
             builder: (context, state) {
               if (state is FriendRequestLoading) {

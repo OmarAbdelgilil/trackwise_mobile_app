@@ -16,15 +16,15 @@ class FriendsRepoImpl implements FriendsRepo {
   final SharedPreferences _prefs;
   FriendsRepoImpl(this._onlineDataSource, this._prefs);
   @override
-  Future<Result<FriendUser>> searchByEmail(String email) async {
+  Future<Result<List<FriendUser>>> searchByEmail(String email) async {
     return await _onlineDataSource.searchByEmail(
         email, _prefs.getString("token")!);
   }
 
   @override
-  Future<Result<Scores>> getScores() {
+  Future<Result<Scores>> getScores({String? date}) {
     final token = _providerContainer.read(userProvider.notifier).token;
-    return _onlineDataSource.getScores(token!);
+    return _onlineDataSource.getScores(token!, date: date);
   }
 
   @override
@@ -49,5 +49,10 @@ class FriendsRepoImpl implements FriendsRepo {
   Future<Result<String>> rejectFriendRequest(String email) async {
     return await _onlineDataSource.rejectFriendRequest(
         email, _prefs.getString("token")!);
+  }
+
+  @override
+  Future<Result<void>> unFriend(String email) async {
+    return await _onlineDataSource.unFriend(email, _prefs.getString("token")!);
   }
 }

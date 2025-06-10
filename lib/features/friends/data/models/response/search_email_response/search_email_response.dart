@@ -1,19 +1,17 @@
 import 'user.dart';
 
 class SearchEmailResponse {
-  User? user;
+  List<User?> users;
 
-  SearchEmailResponse({this.user});
+  SearchEmailResponse({required this.users});
 
   factory SearchEmailResponse.fromJson(Map<String, dynamic> json) {
     return SearchEmailResponse(
-      user: json['user'] == null || (json['user'] as List<dynamic>).isEmpty
-          ? null
-          : User.fromJson(json['user'][0] as Map<String, dynamic>),
+      users: (json['user'] as List<dynamic>?)
+              ?.map((e) =>
+                  e == null ? null : User.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        'user': user?.toJson(),
-      };
 }

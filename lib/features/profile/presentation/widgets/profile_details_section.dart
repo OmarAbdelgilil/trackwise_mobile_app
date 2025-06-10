@@ -39,8 +39,7 @@ class ProfileDetailsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(
-            title: "Personal Info", buttonText: "Edit", onPressed: () {}),
+        SectionHeader(title: "Personal Info", buttonText: "", onPressed: () {}),
         detailItem("Email", email),
         detailItem("Phone", phone),
       ],

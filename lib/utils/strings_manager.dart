@@ -44,4 +44,33 @@ class StringsManager {
   static const String heightLabel = "Height";
   static const String heightHint = "Ex: 170 cm";
   static const String textFieldError = "enter a valid format";
+  static const issueValidEmail = "Please Enter Valid Email";
+  static const issueEmptyPassword = "Password Should Not Be Empty";
+  static const issueEmptyNewPassword = "New Password Should Not Be Empty";
+  static const issueEmptyPhone = "Phone Number Should Not Be Empty";
+  static const issueEmptyEamil = "Email Should Not Be Empty";
+  static const issuePasswordPattern =
+      "Password should have should have numbers & characters & special letters not less than 8 characters";
+  static const issuePasswordNotMatch = "Password not match";
+  static const verifyEmailScreenTitle = "Forget password";
+  static const verifyEmailScreenEmailGuide =
+      'Please enter your email associated to\nyour account';
+  static const emailFieldHint = 'Enter your email';
+  static const emailFieldLabel = 'Email';
+  static const emailFieldError = 'This Email is invalid ';
+  static const verifyOtpScreenTitle = 'Email verification';
+  static const verifyOtpScreenGuide =
+      'Please enter your code that send to your\nemail address';
+  static const invalidOtpError = 'Invalid code';
+  static const didntrecieveCode = "Didn't receive code?";
+  static const resendButtonText = 'Resend';
+  static const resetPassScreenTitle = 'Reset password';
+  static const resetPassScreenGuide =
+      'Password must not be empty and must contain\n6 characters with upper case letter and one\nnumber at least ';
+  static const newPasswordLabel = 'New password';
+  static const passwordFieldError = 'Password is invalid ';
+  static const confirmPasswordHint = 'Confirm password';
+  static const hintPassword = "Enter Your Password";
+  static const continueButtonText = "Continue";
+  static const passwordResetSuccess = "Password reset successfully!";
 }

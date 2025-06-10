@@ -67,7 +67,7 @@ ThemeData get darkTheme => ThemeData(
 Color containerColor(BuildContext context) {
   return Theme.of(context).brightness == Brightness.dark
       ? ColorsManager.darkContainer
-      : Colors.blueGrey[100]!;
+      : const Color.fromARGB(115, 207, 216, 220);
 }
 
 Color barChartLabelColor(BuildContext context) {

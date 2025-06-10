@@ -37,24 +37,24 @@ void showFriendRequestsDialog(BuildContext context) async {
                   content: SizedBox(
                     height: 200.h,
                     width: 300.w,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 0, vertical: 10),
-                          child: BlocBuilder<FriendRequestsViewModel,
-                              FriendsStates>(
-                            builder: (context, state) {
-                              if (state is ScoresLoading) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                              if (viewModel.requests.isNotEmpty) {
-                                return SizedBox(
-                                  height: 180,
+                    child: BlocBuilder<FriendRequestsViewModel, FriendsStates>(
+                        builder: (context, state) {
+                      if (state is ScoresLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      if (viewModel.requests.isNotEmpty) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 0, vertical: 10),
+                                child: SizedBox(
+                                  height: 150.h,
                                   child: ListView(
                                     children: [
                                       for (int i = 0;
@@ -66,19 +66,18 @@ void showFriendRequestsDialog(BuildContext context) async {
                                               i + 1,
                                               viewModel.requests[i],
                                               viewModel,
+                                              context,
                                               ""),
                                         ),
                                     ],
                                   ),
-                                );
-                              }
-
-                              return const Text("No friends requests for now");
-                            },
-                          ),
-                        )
-                      ],
-                    ),
+                                ))
+                          ],
+                        );
+                      }
+                      return const Center(
+                          child: Text("No friends requests for now"));
+                    }),
                   )),
             ));
       });
@@ -88,6 +87,7 @@ Widget buildLeaderboardTile(
   int rank,
   FriendUser user,
   FriendRequestsViewModel viewModel,
+  BuildContext context,
   String buttonText, {
   bool highlight = false,
 }) {
@@ -128,6 +128,7 @@ Widget buildLeaderboardTile(
           IconButton(
             onPressed: () {
               viewModel.acceptFriendRequest(user);
+              Navigator.of(context).pop();
             },
             icon: const Icon(
               Icons.check,
@@ -137,6 +138,7 @@ Widget buildLeaderboardTile(
           IconButton(
             onPressed: () {
               viewModel.rejectFriendRequest(user);
+              Navigator.of(context).pop();
             },
             icon: const Icon(
               Icons.close,

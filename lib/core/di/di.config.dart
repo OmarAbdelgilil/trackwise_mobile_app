@@ -29,6 +29,14 @@ import '../../features/Auth/domain/use_cases/register_use_case.dart' as _i228;
 import '../../features/Auth/presentation/login/login_viewmodel.dart' as _i641;
 import '../../features/Auth/presentation/register/register_viewmodel.dart'
     as _i902;
+import '../../features/forget_password/data/contracts/forget_password_online_datasource.dart'
+    as _i274;
+import '../../features/forget_password/data/data_sources/forget_password_online_datasource_impl.dart'
+    as _i505;
+import '../../features/forget_password/presentation/foreget_password_viewmodel.dart'
+    as _i170;
+import '../../features/forget_password/presentation/forget_password_validator/forget_password_validator.dart'
+    as _i575;
 import '../../features/friends/data/contracts/online_data_source.dart' as _i945;
 import '../../features/friends/data/datasources/online_data_sources_impl.dart'
     as _i382;
@@ -46,6 +54,8 @@ import '../../features/friends/domain/usecases/search_by_email_use_case.dart'
     as _i1067;
 import '../../features/friends/domain/usecases/send_friend_request_use_case.dart'
     as _i143;
+import '../../features/friends/domain/usecases/un_friend_use_case.dart'
+    as _i998;
 import '../../features/friends/presentation/viewmodel/add_friends_screen_view_model.dart'
     as _i1;
 import '../../features/friends/presentation/viewmodel/friend_requests_view_model.dart'
@@ -59,6 +69,9 @@ import '../../features/Notifications/data/datasources/online_data_source_impl.da
     as _i332;
 import '../../features/Notifications/presentation/notification_screen_view_model.dart'
     as _i627;
+import '../../features/profile/data/contracts/online_data_source.dart' as _i883;
+import '../../features/profile/data/data_sources/online_data_source_impl.dart'
+    as _i356;
 import '../../features/profile/presentation/view_models/profile_view_model.dart'
     as _i668;
 import '../../features/steps/presentation/steps_viewmodel.dart' as _i1071;
@@ -86,6 +99,8 @@ extension GetItInjectableX on _i174.GetIt {
       () => sharedPrefsModule.prefs,
       preResolve: true,
     );
+    gh.factory<_i575.ForgetPasswordValidator>(
+        () => _i575.ForgetPasswordValidator());
     gh.singleton<_i1047.ApiManager>(() => _i1047.ApiManager());
     gh.singleton<_i481.AuthEventService>(() => _i481.AuthEventService());
     gh.lazySingleton<_i505.UserNotifier>(() => _i505.UserNotifier());
@@ -101,14 +116,25 @@ extension GetItInjectableX on _i174.GetIt {
         ));
     gh.factory<_i627.NotificationScreenViewModel>(
         () => _i627.NotificationScreenViewModel(gh<_i125.OnlineDataSource>()));
+    gh.factory<_i274.ForgetPasswordOnlineDatasource>(() =>
+        _i505.ForgetPasswordOnlineDatasourceImpl(gh<_i1047.ApiManager>()));
     gh.factory<_i1071.StepsViewmodel>(() => _i1071.StepsViewmodel(
           gh<_i460.SharedPreferences>(),
           gh<_i481.AuthEventService>(),
         ));
     gh.factory<_i945.OnlineDataSource>(
         () => _i382.OnlineDataSourcesImpl(gh<_i1047.ApiManager>()));
+    gh.factory<_i883.OnlineDataSource>(() => _i356.OnlineDataSourcesImpl(
+          gh<_i1047.ApiManager>(),
+          gh<_i460.SharedPreferences>(),
+        ));
     gh.factory<_i597.OnlineDataSource>(
         () => _i163.OnlineDataSourceImpl(gh<_i1047.ApiManager>()));
+    gh.factory<_i170.ForegetPasswordViewmodel>(
+        () => _i170.ForegetPasswordViewmodel(
+              gh<_i575.ForgetPasswordValidator>(),
+              gh<_i274.ForgetPasswordOnlineDatasource>(),
+            ));
     gh.factory<_i579.FriendsRepo>(() => _i620.FriendsRepoImpl(
           gh<_i945.OnlineDataSource>(),
           gh<_i460.SharedPreferences>(),
@@ -125,6 +151,8 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i1067.SearchByEmailUseCase(gh<_i579.FriendsRepo>()));
     gh.factory<_i143.SendFriendRequestUseCase>(
         () => _i143.SendFriendRequestUseCase(gh<_i579.FriendsRepo>()));
+    gh.factory<_i998.UnFriendUseCase>(
+        () => _i998.UnFriendUseCase(gh<_i579.FriendsRepo>()));
     gh.factory<_i492.AuthRepository>(() => _i481.AuthRepositoryImpl(
           gh<_i597.OnlineDataSource>(),
           gh<_i537.OfflineDataSource>(),
@@ -155,13 +183,18 @@ extension GetItInjectableX on _i174.GetIt {
               gh<_i143.SendFriendRequestUseCase>(),
             ));
     gh.factory<_i1057.FriendsScreenViewModel>(
-        () => _i1057.FriendsScreenViewModel(gh<_i94.GetScoresUseCase>()));
-    gh.factory<_i668.ProfileViewModel>(
-        () => _i668.ProfileViewModel(gh<_i1054.LogoutUseCase>()));
+        () => _i1057.FriendsScreenViewModel(
+              gh<_i94.GetScoresUseCase>(),
+              gh<_i998.UnFriendUseCase>(),
+            ));
     gh.factory<_i902.RegisterViewmodel>(
         () => _i902.RegisterViewmodel(gh<_i228.RegisterUseCase>()));
     gh.factory<_i641.LoginViewmodel>(
         () => _i641.LoginViewmodel(gh<_i694.LoginUseCase>()));
+    gh.factory<_i668.ProfileViewModel>(() => _i668.ProfileViewModel(
+          gh<_i1054.LogoutUseCase>(),
+          gh<_i883.OnlineDataSource>(),
+        ));
     return this;
   }
 }

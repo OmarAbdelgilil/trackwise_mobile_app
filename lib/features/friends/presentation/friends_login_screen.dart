@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:track_wise_mobile_app/features/Auth/presentation/login/login_screen.dart';
 import 'package:track_wise_mobile_app/utils/colors_manager.dart';
 
-class ProfileLoginScreen extends StatelessWidget {
-  const ProfileLoginScreen({super.key});
+class FriendsLoginScreen extends StatelessWidget {
+  const FriendsLoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class ProfileLoginScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
-              Icons.person_outlined,
+              Icons.people_alt_outlined,
               size: 250.sp,
               color: const Color.fromARGB(143, 73, 69, 79),
             ),
@@ -30,7 +30,7 @@ class ProfileLoginScreen extends StatelessWidget {
             Transform.translate(
               offset: Offset(0, -35.h),
               child: Text(
-                'Login to show your profile',
+                'Login to show your friends',
                 style:
                     TextStyle(fontSize: 20.sp, color: ColorsManager.darkGrey),
               ),

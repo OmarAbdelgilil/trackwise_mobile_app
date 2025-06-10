@@ -10,10 +10,14 @@ import 'package:track_wise_mobile_app/features/Auth/data/models/response/login_r
 import 'package:track_wise_mobile_app/features/Auth/data/models/response/register_response.dart';
 import 'package:track_wise_mobile_app/features/Home/data/models/app_usage_data.dart';
 import 'package:track_wise_mobile_app/features/Notifications/data/response/recommendation_response/recommendation_response.dart';
+import 'package:track_wise_mobile_app/features/forget_password/data/models/responses/password_reset_response.dart';
+import 'package:track_wise_mobile_app/features/forget_password/data/models/responses/verify_email_response.dart';
+import 'package:track_wise_mobile_app/features/forget_password/data/models/responses/verify_otp_response.dart';
 import 'package:track_wise_mobile_app/features/friends/data/models/response/friend_requests_response/friend_requests_response.dart';
 import 'package:track_wise_mobile_app/features/friends/data/models/response/scores_response/scores_response.dart';
 import 'package:track_wise_mobile_app/features/friends/data/models/response/search_email_response/search_email_response.dart';
 import 'package:track_wise_mobile_app/features/friends/data/models/response/send_friend_request_response.dart';
+import 'package:track_wise_mobile_app/features/profile/data/models/response/user_tags/user_tags.dart';
 
 @singleton
 @injectable
@@ -69,9 +73,12 @@ class ApiManager {
     return SearchEmailResponse.fromJson(response.data);
   }
 
-  Future<ScoresResponse> getScores(String token) async {
-    final response = await _dio.get(ApiConstants.scores,
-        options: Options(headers: {"Authorization": "Bearer $token"}));
+  Future<ScoresResponse> getScores(String token, {String? date}) async {
+    final response = await _dio.post(ApiConstants.scores,
+        data: {"date": date},
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }));
     return ScoresResponse.fromJson(response.data);
   }
 
@@ -112,5 +119,40 @@ class ApiManager {
     final response = await _dio.get(ApiConstants.getRecommendation,
         options: Options(headers: {"Authorization": "Bearer $token"}));
     return RecommendationResponse.fromJson(response.data);
+  }
+
+  Future<void> unFriend(String email, String token) async {
+    await _dio.post(ApiConstants.unFriend,
+        data: {"friendEmail": email},
+        options: Options(headers: {"Authorization": "Bearer $token"}));
+  }
+
+  Future<UserTags> getUserTags(String token) async {
+    final response = await _dio.get(ApiConstants.userTags,
+        options: Options(headers: {"Authorization": "Bearer $token"}));
+    return UserTags.fromJson(response.data);
+  }
+
+  Future<VerifyEmailResponse> verifyEmail(String email) async {
+    final response = await _dio.post(
+      ApiConstants.verifyEmail,
+      data: {"email": email},
+    );
+    return VerifyEmailResponse.fromJson(response.data);
+  }
+
+  Future<VerifyOtpResponse> verifyOtp(String otp, String token) async {
+    final response = await _dio.post(ApiConstants.verifyOtp,
+        data: {"otp": otp},
+        options: Options(headers: {"Authorization": "Bearer $token"}));
+    return VerifyOtpResponse.fromJson(response.data);
+  }
+
+  Future<PasswordResetResponse> resetPass(
+      String password, String confirmPassword, String token) async {
+    final response = await _dio.post(ApiConstants.resetPass,
+        data: {"password": password, "confirmPassword": confirmPassword},
+        options: Options(headers: {"Authorization": "Bearer $token"}));
+    return PasswordResetResponse.fromJson(response.data);
   }
 }

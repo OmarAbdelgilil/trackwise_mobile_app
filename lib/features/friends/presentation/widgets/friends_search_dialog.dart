@@ -118,6 +118,13 @@ void showFriendsSearchDialog(BuildContext context) async {
                           );
                         }
                         if (state is FriendsError) {
+                          if((state.message as DioHttpException).exception!.response == null)
+                          {
+                            return const Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: Text('Somthing went wrong please try again'),
+                            );
+                          }
                           return Text((state.message as DioHttpException)
                               .exception!
                               .response!

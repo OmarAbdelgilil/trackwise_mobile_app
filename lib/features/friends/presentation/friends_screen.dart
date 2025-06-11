@@ -20,7 +20,26 @@ class FriendsScreen extends ConsumerWidget {
     if (prov == null) {
       return const FriendsLoginScreen();
     }
-
+    if (state is FriendsError) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Something went wrong.',
+              style: TextStyle(color: Colors.red, fontSize: 16),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                viewModel.getScores();
+              },
+              child: const Text('Try Again'),
+            ),
+          ],
+        ),
+      );
+    }
     if (state is ScoresLoaded) {
       return SingleChildScrollView(
         child: Column(

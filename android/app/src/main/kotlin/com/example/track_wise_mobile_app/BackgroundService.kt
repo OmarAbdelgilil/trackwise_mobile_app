@@ -120,7 +120,7 @@ class BackgroundService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Keep on the hard work")
             .setContentText("Steps today: 0\nUsage time: 0 mins")
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification)
             .setStyle(NotificationCompat.BigTextStyle().bigText("Steps today: 0\nUsage time: 0 mins"))
             .setContentIntent(createPendingIntent())
             .build()
@@ -132,7 +132,7 @@ class BackgroundService : Service() {
         val updatedNotification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Keep on the hard work")
             .setContentText(steps)  // Dynamic message with step count
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification)
             .setStyle(NotificationCompat.BigTextStyle().bigText(steps))
             .setContentIntent(createPendingIntent())
             .build()
